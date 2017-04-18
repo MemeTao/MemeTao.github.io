@@ -1,0 +1,198 @@
+<p>2-2</p>
+
+<p>(a) 计算 1 + 2 * 4</p>
+
+<p>(b) 无输出</p>
+
+<p>(c) 一样。无输出语句。</p>
+
+<p>(d) 单独执行无输出，在交互解释器里执行输出结果。</p>
+
+<p>(e)print 1 + 2 * 4</p>
+
+<p>2-4</p>
+
+<p>(a)</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="nb">str</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">'input a str:'</span><span class="p">)</span>
+<span class="k">print</span> <span class="nb">str</span>
+</code></pre>
+</div>
+
+<p>(b)</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="nb">str</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">'input a int:'</span><span class="p">)</span>
+<span class="k">print</span> <span class="nb">int</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>2-5</p>
+
+<p>(a)</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">while</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="mi">10</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">i</span><span class="p">,</span>
+    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+</code></pre>
+</div>
+
+<p>(b)</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="k">for</span> <span class="n">eachNum</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">11</span><span class="p">):</span>
+    <span class="k">print</span> <span class="n">eachNum</span><span class="p">,</span>
+</code></pre>
+</div>
+
+<p>2-6</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">num</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">'input a num: '</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">num</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">'正数'</span><span class="p">,</span>
+<span class="k">elif</span> <span class="n">num</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">'负数'</span><span class="p">,</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">'0'</span><span class="p">,</span>
+</code></pre>
+</div>
+
+<p>2-7</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">myStr</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">'input a str: '</span><span class="p">)</span>
+<span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">myStr</span><span class="p">):</span>
+    <span class="k">print</span> <span class="n">myStr</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="n">myStr</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">'input a str: '</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">myStr</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">c</span><span class="p">,</span>
+</code></pre>
+</div>
+
+<p>2-8</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">aList</span> <span class="o">=</span> <span class="nb">list</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">):</span>
+    <span class="n">num</span> <span class="o">=</span> <span class="nb">raw_input</span><span class="p">(</span><span class="s">'input a num : '</span><span class="p">)</span>
+    <span class="n">aList</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">num</span><span class="p">))</span>
+
+<span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="n">myNum</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">aList</span><span class="p">):</span>
+    <span class="n">myNum</span> <span class="o">+=</span> <span class="n">aList</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+<span class="k">print</span> <span class="s">'myNum is : </span><span class="si">%</span><span class="s">d'</span> <span class="o">%</span> <span class="p">(</span><span class="n">myNum</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>2-9</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">aTuple</span> <span class="o">=</span> <span class="p">[</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span>
+<span class="n">myNum</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">aTuple</span><span class="p">:</span>
+    <span class="n">myNum</span> <span class="o">+=</span> <span class="n">i</span>
+
+<span class="k">print</span> <span class="s">'average value is : </span><span class="si">%</span><span class="s">f '</span> <span class="o">%</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">myNum</span><span class="p">)</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">aTuple</span><span class="p">))</span>
+</code></pre>
+</div>
+
+<p>2-10</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">b</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+<span class="k">while</span> <span class="n">b</span> <span class="ow">is</span> <span class="bp">False</span><span class="p">:</span>
+    <span class="n">num</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">raw_input</span><span class="p">(</span><span class="s">'input a num among 1 to 100 : '</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">num</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">num</span> <span class="o">&lt;=</span> <span class="mi">100</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">'succeed!'</span>
+        <span class="k">break</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">'input error!'</span>
+</code></pre>
+</div>
+
+<p>2-11</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="k">def</span> <span class="nf">display_menu</span><span class="p">():</span>
+    <span class="s">"""展示菜单"""</span>
+    <span class="k">print</span> <span class="s">'1. 取五个数的和'</span>
+    <span class="k">print</span> <span class="s">'2. 取五个数的平均值'</span>
+    <span class="k">print</span> <span class="s">'x. 退出'</span>
+    <span class="n">sel</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">raw_input</span><span class="p">(</span><span class="s">'输入您的选项：'</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">sel</span>
+
+<span class="k">def</span> <span class="nf">tuple_sum</span><span class="p">(</span><span class="n">aTuple</span><span class="p">):</span>
+    <span class="s">"""求和"""</span>
+    <span class="n">num</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">aTuple</span><span class="p">:</span>
+        <span class="n">num</span> <span class="o">+=</span> <span class="n">i</span>
+    <span class="k">return</span> <span class="n">num</span>
+
+<span class="n">aTuple</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="k">while</span> <span class="bp">True</span> <span class="p">:</span>
+    <span class="n">sel</span> <span class="o">=</span> <span class="n">display_menu</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">sel</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="s">'1'</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">'num is : </span><span class="si">%</span><span class="s">d '</span> <span class="o">%</span> <span class="n">tuple_sum</span><span class="p">(</span><span class="n">aTuple</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">sel</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="s">'2'</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s">'average is : </span><span class="si">%</span><span class="s">f '</span> <span class="o">%</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">tuple_sum</span><span class="p">(</span><span class="n">aTuple</span><span class="p">))</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="n">aTuple</span><span class="p">))</span>
+    <span class="k">elif</span> <span class="n">sel</span> <span class="o">==</span> <span class="nb">str</span><span class="p">(</span><span class="s">'x'</span><span class="p">):</span>
+        <span class="k">break</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">continue</span>
+</code></pre>
+</div>
+
+<p>2-15</p>
+
+<p>(a)</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">num1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">raw_input</span><span class="p">(</span><span class="s">'input num1:'</span><span class="p">))</span>
+<span class="n">num2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">raw_input</span><span class="p">(</span><span class="s">'input num2:'</span><span class="p">))</span>
+<span class="n">num3</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">raw_input</span><span class="p">(</span><span class="s">'input num3:'</span><span class="p">))</span>
+<span class="k">if</span> <span class="n">num1</span> <span class="o">&gt;</span> <span class="n">num2</span><span class="p">:</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">num2</span>
+    <span class="n">num2</span> <span class="o">=</span> <span class="n">num1</span>
+    <span class="n">num1</span> <span class="o">=</span> <span class="n">tmp</span>
+<span class="k">if</span> <span class="n">num2</span> <span class="o">&gt;</span> <span class="n">num3</span><span class="p">:</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">num3</span>
+    <span class="n">num3</span> <span class="o">=</span> <span class="n">num2</span>
+    <span class="n">num2</span> <span class="o">=</span> <span class="n">tmp</span>
+<span class="k">if</span> <span class="n">num1</span> <span class="o">&gt;</span> <span class="n">num2</span><span class="p">:</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">num2</span>
+    <span class="n">num2</span> <span class="o">=</span> <span class="n">num1</span>
+    <span class="n">num1</span> <span class="o">=</span> <span class="n">tmp</span>
+
+<span class="k">print</span> <span class="s">'min to max is </span><span class="si">%</span><span class="s">d, </span><span class="si">%</span><span class="s">d, </span><span class="si">%</span><span class="s">d'</span> <span class="o">%</span> <span class="p">(</span><span class="n">num1</span><span class="p">,</span> <span class="n">num2</span><span class="p">,</span> <span class="n">num3</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>(b)</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">num1</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">raw_input</span><span class="p">(</span><span class="s">'input num1:'</span><span class="p">))</span>
+<span class="n">num2</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">raw_input</span><span class="p">(</span><span class="s">'input num2:'</span><span class="p">))</span>
+<span class="n">num3</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">raw_input</span><span class="p">(</span><span class="s">'input num3:'</span><span class="p">))</span>
+<span class="k">if</span> <span class="n">num1</span> <span class="o">&lt;</span> <span class="n">num2</span><span class="p">:</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">num2</span>
+    <span class="n">num2</span> <span class="o">=</span> <span class="n">num1</span>
+    <span class="n">num1</span> <span class="o">=</span> <span class="n">tmp</span>
+<span class="k">if</span> <span class="n">num2</span> <span class="o">&lt;</span> <span class="n">num3</span><span class="p">:</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">num3</span>
+    <span class="n">num3</span> <span class="o">=</span> <span class="n">num2</span>
+    <span class="n">num2</span> <span class="o">=</span> <span class="n">tmp</span>
+<span class="k">if</span> <span class="n">num1</span> <span class="o">&lt;</span> <span class="n">num2</span><span class="p">:</span>
+    <span class="n">tmp</span> <span class="o">=</span> <span class="n">num2</span>
+    <span class="n">num2</span> <span class="o">=</span> <span class="n">num1</span>
+    <span class="n">num1</span> <span class="o">=</span> <span class="n">tmp</span>
+
+<span class="k">print</span> <span class="s">'min to max is </span><span class="si">%</span><span class="s">d, </span><span class="si">%</span><span class="s">d, </span><span class="si">%</span><span class="s">d'</span> <span class="o">%</span> <span class="p">(</span><span class="n">num1</span><span class="p">,</span> <span class="n">num2</span><span class="p">,</span> <span class="n">num3</span><span class="p">)</span>
+</code></pre>
+</div>
+
+<p>2-16</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="n">fobj</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">'hello.txt'</span><span class="p">,</span> <span class="s">'r'</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">eachLine</span> <span class="ow">in</span> <span class="n">fobj</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">eachLine</span><span class="p">,</span>
+<span class="n">fobj</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+</code></pre>
+</div>

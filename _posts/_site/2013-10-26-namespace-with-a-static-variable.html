@@ -1,0 +1,63 @@
+<p><strong>有如下三个文件</strong>
+<em>header.h</em></p>
+
+<div class="language-cpp highlighter-rouge"><pre class="highlight"><code><span class="cp">#pragma once
+</span><span class="k">namespace</span> <span class="n">NS1</span>
+<span class="p">{</span>
+	<span class="k">static</span> <span class="kt">int</span> <span class="n">var</span> <span class="o">=</span> <span class="mi">10</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="kt">void</span> <span class="n">print_var</span><span class="p">();</span>
+</code></pre>
+</div>
+
+<p><em>src.cpp</em></p>
+
+<div class="language-cpp highlighter-rouge"><pre class="highlight"><code><span class="cp">#include &lt;stdio.h&gt;
+#include "header.h"
+</span>
+<span class="kt">void</span> <span class="nf">print_var</span><span class="p">()</span>
+<span class="p">{</span>
+	<span class="n">printf</span><span class="p">(</span><span class="s">"%d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">NS1</span><span class="o">::</span><span class="n">var</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p><em>main.cpp</em></p>
+
+<div class="language-cpp highlighter-rouge"><pre class="highlight"><code><span class="cp">#include &lt;stdio.h&gt;
+#include "header.h"
+</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+	<span class="n">printf</span><span class="p">(</span><span class="s">"%d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">NS1</span><span class="o">::</span><span class="n">var</span><span class="p">);</span>
+	<span class="n">NS1</span><span class="o">::</span><span class="n">var</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+	<span class="n">print_var</span><span class="p">();</span>
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+
+<p>这三个文件是尝试的基础。</p>
+
+<p><strong>Situation A:</strong>
+将 header.h 里的 var 的 static 去掉，发现编译通过，但是链接时提示：
+<code class="highlighter-rouge">main.obj : error LNK2005: "int NS1::var" (?var@NS1@@3HA) 已经在 src.obj 中定义，fatal error LNK1169: 找到一个或多个多重定义的符号。</code></p>
+
+<p><strong>Situation B:</strong>
+还原 static，编译通过，运行生成的 EXE，输出：<code class="highlighter-rouge">10 10</code> 与预期的<code class="highlighter-rouge">10 0</code>不符。</p>
+
+<p>根据 static 对变量的作用域的影响，推断应该是预编译过程中 NS1::var 分别被引入了 src.cpp 和 main.cpp，而在两个源文件中的 NS1::var 非同一个变量，而且其作用域分别为各自所在的 cpp 文件。</p>
+
+<p><strong>求证：</strong>
+将两个 cpp 文件中的 printf 语句都改为</p>
+
+<div class="language-cpp highlighter-rouge"><pre class="highlight"><code><span class="n">printf</span><span class="p">(</span><span class="s">"%d address is : 0x%X</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">NS1</span><span class="o">::</span><span class="n">var</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">NS1</span><span class="o">::</span><span class="n">var</span><span class="p">);</span>
+</code></pre>
+</div>
+<p>输出为：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>10 address is : 0x3C8004
+10 address is : 0x3C8000
+</code></pre>
+</div>
+<p>可见两个源文件中的 var 非同一个。</p>

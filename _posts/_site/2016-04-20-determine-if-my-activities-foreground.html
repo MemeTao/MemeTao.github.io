@@ -1,0 +1,108 @@
+<p>本文记录的是一种判断当前激活的 Activity 是否属于本进程的方法。</p>
+
+<p><strong>约定：文中表述说一个 Activity 处于激活状态是指它是屏幕上当前展示的 Activity，且没有被 Dialog 覆盖。</strong></p>
+
+<h2 id="原理">原理</h2>
+
+<p>Activity 的生命周期由 Android 系统维护，所以使用一个 Activity 的生命周期方法 <code class="highlighter-rouge">onResume</code> 与 <code class="highlighter-rouge">onPause</code> 来记录它的激活状态是可靠的。</p>
+
+<p>同理，因为前台 Activity 只有一个，所以判断前台 Activity 是否属于本进程只需要判断本进程是否有 Activity 处于激活状态即可。</p>
+
+<h2 id="实现">实现</h2>
+
+<p>顺着这个思路，直接想到的方案就是去给代码里所有的 Activity 实现一个共同基类，然后在基类里的 <code class="highlighter-rouge">onResume</code> 和 <code class="highlighter-rouge">onPause</code> 方法去更新一个全局计数器了。</p>
+
+<p>这固然可行，但遇到有些不能继承共同基类的情况，比如继承自 ListActivity 和 ExpandableListActivity 等 Activity 的子类的，就得重复去在具体 Activity 里的对应方法里添加代码了，一旦有一个 Activity 忘了添加，这个机制就失效了，所以并不优雅。</p>
+
+<p>幸好 Android 在 API Level 14 的时候新加入了 <code class="highlighter-rouge">android.app.Application.ActivityLifecycleCallbacks</code> 接口，它会在 Activity 生命周期事件发生时产生回调：</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">interface</span> <span class="nc">ActivityLifecycleCallbacks</span> <span class="o">{</span>
+    <span class="kt">void</span> <span class="nf">onActivityCreated</span><span class="o">(</span><span class="n">Activity</span> <span class="n">activity</span><span class="o">,</span> <span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="o">);</span>
+    <span class="kt">void</span> <span class="nf">onActivityStarted</span><span class="o">(</span><span class="n">Activity</span> <span class="n">activity</span><span class="o">);</span>
+    <span class="kt">void</span> <span class="nf">onActivityResumed</span><span class="o">(</span><span class="n">Activity</span> <span class="n">activity</span><span class="o">);</span>
+    <span class="kt">void</span> <span class="nf">onActivityPaused</span><span class="o">(</span><span class="n">Activity</span> <span class="n">activity</span><span class="o">);</span>
+    <span class="kt">void</span> <span class="nf">onActivityStopped</span><span class="o">(</span><span class="n">Activity</span> <span class="n">activity</span><span class="o">);</span>
+    <span class="kt">void</span> <span class="nf">onActivitySaveInstanceState</span><span class="o">(</span><span class="n">Activity</span> <span class="n">activity</span><span class="o">,</span> <span class="n">Bundle</span> <span class="n">outState</span><span class="o">);</span>
+    <span class="kt">void</span> <span class="nf">onActivityDestroyed</span><span class="o">(</span><span class="n">Activity</span> <span class="n">activity</span><span class="o">);</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>这真是救星。</p>
+
+<p>那么优雅的实现方案：</p>
+
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="nc">MyApplication</span> <span class="kd">extends</span> <span class="n">Application</span> <span class="o">{</span>
+    <span class="kd">private</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="n">hasActivityActivate</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+
+    <span class="nd">@Override</span>
+    <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onCreate</span><span class="o">()</span> <span class="o">{</span>
+        <span class="kd">super</span><span class="o">.</span><span class="na">onCreate</span><span class="o">();</span>
+        <span class="n">registerActivityLifecycleCallbacks</span><span class="o">(</span><span class="k">new</span> <span class="n">ActivityLifecycleCallbacks</span><span class="o">()</span> <span class="o">{</span>
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onActivityCreated</span><span class="o">(</span><span class="n">Activity</span> <span class="n">activity</span><span class="o">,</span> <span class="n">Bundle</span> <span class="n">savedInstanceState</span><span class="o">)</span> <span class="o">{</span>
+
+            <span class="o">}</span>
+
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onActivityStarted</span><span class="o">(</span><span class="n">Activity</span> <span class="n">activity</span><span class="o">)</span> <span class="o">{</span>
+
+            <span class="o">}</span>
+
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onActivityResumed</span><span class="o">(</span><span class="n">Activity</span> <span class="n">activity</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">hasActivityActivate</span> <span class="o">=</span> <span class="kc">true</span><span class="o">;</span>
+            <span class="o">}</span>
+
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onActivityPaused</span><span class="o">(</span><span class="n">Activity</span> <span class="n">activity</span><span class="o">)</span> <span class="o">{</span>
+                <span class="n">hasActivityActivate</span> <span class="o">=</span> <span class="kc">false</span><span class="o">;</span>
+            <span class="o">}</span>
+
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onActivityStopped</span><span class="o">(</span><span class="n">Activity</span> <span class="n">activity</span><span class="o">)</span> <span class="o">{</span>
+
+            <span class="o">}</span>
+
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onActivitySaveInstanceState</span><span class="o">(</span><span class="n">Activity</span> <span class="n">activity</span><span class="o">,</span> <span class="n">Bundle</span> <span class="n">outState</span><span class="o">)</span> <span class="o">{</span>
+
+            <span class="o">}</span>
+
+            <span class="nd">@Override</span>
+            <span class="kd">public</span> <span class="kt">void</span> <span class="nf">onActivityDestroyed</span><span class="o">(</span><span class="n">Activity</span> <span class="n">activity</span><span class="o">)</span> <span class="o">{</span>
+
+            <span class="o">}</span>
+        <span class="o">});</span>
+    <span class="o">}</span>
+
+    <span class="kd">public</span> <span class="kd">static</span> <span class="kt">boolean</span> <span class="nf">hasActivityActivate</span><span class="o">()</span> <span class="o">{</span>
+        <span class="k">return</span> <span class="n">hasActivityActivate</span><span class="o">;</span>
+    <span class="o">}</span>
+<span class="o">}</span>
+</code></pre>
+</div>
+
+<p>然后在需要的时候调用 <code class="highlighter-rouge">MyApplication.hasActivityActivate()</code> 就行了。</p>
+
+<p>当然别忘了在 AndroidManifest.xml 里声明指定你的 Application 类名：</p>
+
+<div class="language-xml highlighter-rouge"><pre class="highlight"><code>...
+<span class="nt">&lt;application</span>
+    <span class="na">android:name=</span><span class="s">".MyApplication"</span>
+    <span class="err">....</span>
+</code></pre>
+</div>
+
+<h2 id="后话">后话</h2>
+
+<p>本文记录的只是判断当前进程是否有 Activity 处于激活状态的方法，判断当前应用、其它应用的前后台情况有多种方法，它们的优缺点、适用场景在以下 GitHub 仓库有详细列举，有需求的同学可以参考：</p>
+
+<p><a href="https://github.com/wenmingvs/AndroidProcess">https://github.com/wenmingvs/AndroidProcess</a></p>
+
+<h2 id="参考">参考</h2>
+
+<ul>
+  <li><a href="https://github.com/wenmingvs/AndroidProcess">wenmingvs/AndroidProcess</a></li>
+  <li><a href="http://stackoverflow.com/questions/3667022/checking-if-an-android-application-is-running-in-the-background/5862048#5862048">Checking if an Android application is running in the background</a></li>
+</ul>

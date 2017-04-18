@@ -1,0 +1,93 @@
+<p>这几天正在复习算法，今天在看一篇文章时偶然看到这个题目，想了一下居然没什么思路……（抱歉，实在太菜。)，文章中提示了一个关键词：Fibonacci 数列。然后我又小百度了一下，找了一个具体分析实例，结合两处，这才理清了思路。（汗啊……基础全忘光了，这以后咋办啊……深感担忧……)</p>
+
+<h3 id="问题描述">问题描述</h3>
+
+<p>一只青蛙一次可以跳上 1 级台阶，也可以跳上 2 级台阶，请问这只青蛙跳上 n 级的台阶总共有多少种跳法？</p>
+
+<h3 id="问题分析">问题分析</h3>
+
+<p>设青蛙跳上 n 级台阶的跳法为 f(n) 种。</p>
+
+<p>设 Fibonacci 数列的第 x 项值为 fibo(x)。</p>
+
+<ol>
+  <li>当 n=1 时，f(n)=1=fibo(2)</li>
+  <li>当 n=2 时，f(n)=2=fibo(3)</li>
+  <li>当 n&gt;2 时，分析可知，在跳上第 n 级台阶前一步，必然是在第 (n-1) 或 (n-2) 级台阶，故有 f(n) = f(n-1) + f(n-2); 依此类推……</li>
+</ol>
+
+<p>则有：</p>
+
+<p><del>f(n)</del><br />
+<del>= f(n-1) + f(n-2)</del><br />
+<del>= 2f(n-2) + f(n-3)</del><br />
+<del>= 3f(n-3) + 2f(n-4)</del><br />
+<del>= 5 f(n-4) + 3f(n-5)</del><br />
+<del>= 8f(n-5) + 5f(n-6)</del><br />
+<del>= …</del><br />
+<del>= fibo(x+1)f(n-x)+fibo(x)f(n-(x+1))</del><br />
+<del>=…</del><br />
+<del>= fibo(n-1)f(n-(n-2)) + fibo(n-2)f(n-(n-1))</del><br />
+<del>= fibo(n-1)f(2) + fibo(n-2)f(1)</del></p>
+
+<p>f(n) 的规律符合 Fibonacci 数列的规律，它与 Fibonacci 的区别是 Fibonacci 的前两个元素是 1，1，而 f(n) 的规律是 1，2，即可知有 <code class="highlighter-rouge">f(n)=fibo(n+1)</code>。</p>
+
+<h3 id="简单的-c-实现">简单的 C++ 实现</h3>
+
+<div class="language-cpp highlighter-rouge"><pre class="highlight"><code><span class="cp">#include &lt;iostream&gt;
+</span><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="c1">// 非递归写法
+</span><span class="kt">int</span> <span class="nf">fibo</span><span class="p">(</span><span class="kt">int</span> <span class="n">n</span><span class="p">)</span>  <span class="c1">// 获取 Fibonacci 数列的第 N 项值
+</span><span class="p">{</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">1</span> <span class="o">||</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="k">else</span>
+    <span class="p">{</span>
+        <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">tmp</span><span class="p">;</span>
+        <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">3</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;=</span> <span class="n">n</span><span class="p">;</span> <span class="o">++</span> <span class="n">i</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">a</span><span class="p">;</span>
+            <span class="n">a</span> <span class="o">=</span> <span class="n">b</span><span class="p">;</span>
+            <span class="n">b</span> <span class="o">+=</span> <span class="n">tmp</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">b</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="c1">//// 递归写法
+//int fibo(int n)
+//{
+//    if(n == 1 || n == 2)
+//        return 1;
+//    else
+//        return fibo(n-1) + fibo(n-2);
+//}
+</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"请输入楼梯的级数："</span><span class="p">;</span>
+
+    <span class="kt">int</span> <span class="n">n</span><span class="p">;</span>
+    <span class="n">cin</span> <span class="o">&gt;&gt;</span> <span class="n">n</span><span class="p">;</span>
+
+    <span class="kt">int</span> <span class="n">sum</span><span class="p">;</span>
+
+    <span class="c1">//if(1==n)
+</span>    <span class="c1">//    sum = 1;
+</span>    <span class="c1">//else if (2==n)
+</span>    <span class="c1">//    sum = 2;
+</span>    <span class="c1">//else
+</span>    <span class="c1">//{
+</span>    <span class="c1">//    sum = 2 * fibo(n-1) + fibo(n-2);
+</span>    <span class="c1">//}
+</span>    <span class="n">sum</span> <span class="o">=</span> <span class="n">fibo</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
+
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"共有 "</span> <span class="o">&lt;&lt;</span> <span class="n">sum</span> <span class="o">&lt;&lt;</span> <span class="s">" 种跳法。"</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
+</div>
