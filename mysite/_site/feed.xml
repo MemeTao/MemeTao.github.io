@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>songroger</title>
+    <description>Hi there, My name is Luozhan.Song, usually I use &quot;songroger&quot; as my ID everywhere. I was born and raised in Hunan China.  I'm really fond of beautiful design, drawing etc.
+</description>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Tue, 18 Apr 2017 16:25:00 +0800</pubDate>
+    <lastBuildDate>Tue, 18 Apr 2017 16:25:00 +0800</lastBuildDate>
+    <generator>Jekyll v3.4.3</generator>
+    
+      <item>
+        <title>Markdown</title>
+        <description>&lt;hr /&gt;
+&lt;p&gt;Markdown manual&lt;/p&gt;
+
+&lt;h3 id=&quot;1-斜体和粗体&quot;&gt;1. 斜体和粗体&lt;/h3&gt;
+
+&lt;p&gt;使用 * 和 ** 表示斜体和粗体。&lt;/p&gt;
+
+&lt;p&gt;示例：&lt;/p&gt;
+
+&lt;p&gt;这是 &lt;em&gt;斜体&lt;/em&gt;，这是 &lt;strong&gt;粗体&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;h3 id=&quot;2-分级标题&quot;&gt;2. 分级标题&lt;/h3&gt;
+
+&lt;p&gt;使用 === 表示一级标题，使用 — 表示二级标题。&lt;/p&gt;
+
+&lt;p&gt;示例：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;这是一个一级标题
+============================
+
+这是一个二级标题
+--------------------------------------------------
+
+### 这是一个三级标题
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;你也可以选择在行首加井号表示不同级别的标题 (H1-H6)，例如：# H1, ## H2, ### H3，#### H4。&lt;/p&gt;
+
+&lt;h3 id=&quot;3-外链接&quot;&gt;3. 外链接&lt;/h3&gt;
+
+&lt;p&gt;使用 [描述](链接地址) 为文字增加外链接。&lt;/p&gt;
+
+&lt;p&gt;示例：&lt;/p&gt;
+
+&lt;p&gt;这是去往 &lt;a href=&quot;http://github.com&quot;&gt;本人博客&lt;/a&gt; 的链接。&lt;/p&gt;
+
+&lt;h3 id=&quot;4-无序列表&quot;&gt;4. 无序列表&lt;/h3&gt;
+
+&lt;p&gt;使用 *，+，- 表示无序列表。&lt;/p&gt;
+
+&lt;p&gt;示例：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;无序列表项 一&lt;/li&gt;
+  &lt;li&gt;无序列表项 二&lt;/li&gt;
+  &lt;li&gt;无序列表项 三&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;5-有序列表&quot;&gt;5. 有序列表&lt;/h3&gt;
+
+&lt;p&gt;使用数字和点表示有序列表。&lt;/p&gt;
+
+&lt;p&gt;示例：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;有序列表项 一&lt;/li&gt;
+  &lt;li&gt;有序列表项 二&lt;/li&gt;
+  &lt;li&gt;有序列表项 三&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;6-文字引用&quot;&gt;6. 文字引用&lt;/h3&gt;
+
+&lt;p&gt;使用 &amp;gt; 表示文字引用。&lt;/p&gt;
+
+&lt;p&gt;示例：&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;野火烧不尽，春风吹又生。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h3 id=&quot;7-行内代码块&quot;&gt;7. 行内代码块&lt;/h3&gt;
+
+&lt;p&gt;使用 `代码` 表示行内代码块。&lt;/p&gt;
+
+&lt;p&gt;示例：&lt;/p&gt;
+
+&lt;p&gt;让我们聊聊 &lt;code class=&quot;highlighter-rouge&quot;&gt;html&lt;/code&gt;。&lt;/p&gt;
+
+&lt;h3 id=&quot;8--代码块&quot;&gt;8.  代码块&lt;/h3&gt;
+
+&lt;p&gt;使用 四个缩进空格 表示代码块。&lt;/p&gt;
+
+&lt;p&gt;示例：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;这是一个代码块，此行左侧有四个不可见的空格。
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;9--插入图像&quot;&gt;9.  插入图像&lt;/h3&gt;
+
+&lt;p&gt;使用 ![描述](图片链接地址) 插入图像。&lt;/p&gt;
+
+&lt;p&gt;示例：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;https://en.wikipedia.org/static/images/project-logos/enwiki-2x.png&quot; alt=&quot;我的头像&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;markdown-高阶语法手册&quot;&gt;Markdown 高阶语法手册&lt;/h2&gt;
+
+&lt;h3 id=&quot;1-标签分类&quot;&gt;1. 标签分类&lt;/h3&gt;
+
+&lt;p&gt;在编辑区任意行的列首位置输入以下代码给文稿标签：&lt;/p&gt;
+
+&lt;p&gt;标签： 数学 英语 Markdown&lt;/p&gt;
+
+&lt;p&gt;或者&lt;/p&gt;
+
+&lt;p&gt;Tags： 数学 英语 Markdown&lt;/p&gt;
+
+&lt;h3 id=&quot;2-删除线&quot;&gt;2. 删除线&lt;/h3&gt;
+
+&lt;p&gt;使用 ~~ 表示删除线。&lt;/p&gt;
+
+&lt;p&gt;&lt;del&gt;这是一段错误的文本。&lt;/del&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;3-注脚&quot;&gt;3. 注脚&lt;/h3&gt;
+
+&lt;p&gt;使用 [^keyword] 表示注脚。&lt;/p&gt;
+
+&lt;p&gt;这是一个注脚&lt;sup id=&quot;fnref:footnote&quot;&gt;&lt;a href=&quot;#fn:footnote&quot; class=&quot;footnote&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;的样例。&lt;/p&gt;
+
+&lt;p&gt;这是第二个注脚&lt;sup id=&quot;fnref:footnote2&quot;&gt;&lt;a href=&quot;#fn:footnote2&quot; class=&quot;footnote&quot;&gt;2&lt;/a&gt;&lt;/sup&gt;的样例。&lt;/p&gt;
+
+&lt;h3 id=&quot;4-加强的代码块&quot;&gt;4. 加强的代码块&lt;/h3&gt;
+
+&lt;p&gt;支持四十一种编程语言的语法高亮的显示，行号显示。&lt;/p&gt;
+
+&lt;p&gt;非代码示例：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ sudo apt-get install vim-gnome
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Python 示例：&lt;/p&gt;
+
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nd&quot;&gt;@requires_authorization&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;somefunc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;param2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;'''A docstring'''&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;param1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;param2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# interesting&lt;/span&gt;
+        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'Greater'&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;param1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;or&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;None&lt;/span&gt;
+
+&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;SomeClass&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;pass&lt;/span&gt;
+
+&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;message&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'''interpreter
+... prompt'''&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;JavaScript 示例：&lt;/p&gt;
+
+&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cm&quot;&gt;/**
+* nth element in the fibonacci series.
+* @param n &amp;gt;= 0
+* @return the nth element, &amp;gt;= 0.
+*/&lt;/span&gt;
+&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;fib&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;tmp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;--&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;tmp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;nx&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;tmp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;fib&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;5-定义型列表&quot;&gt;5. 定义型列表&lt;/h3&gt;
+
+&lt;dl&gt;
+  &lt;dt&gt;名词 1&lt;/dt&gt;
+  &lt;dd&gt;定义 1（左侧有一个可见的冒号和四个不可见的空格）&lt;/dd&gt;
+  &lt;dt&gt;代码块 2&lt;/dt&gt;
+  &lt;dd&gt;这是代码块的定义（左侧有一个可见的冒号和四个不可见的空格）
+
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;代码块（左侧有八个不可见的空格）
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+  &lt;/dd&gt;
+&lt;/dl&gt;
+
+&lt;h3 id=&quot;6-html-标签&quot;&gt;6. Html 标签&lt;/h3&gt;
+
+&lt;p&gt;本站支持在 Markdown 语法中嵌套 Html 标签，譬如，你可以用 Html 写一个纵跨两行的表格：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;table&amp;gt;
+    &amp;lt;tr&amp;gt;
+        &amp;lt;th rowspan=&quot;2&quot;&amp;gt;值班人员&amp;lt;/th&amp;gt;
+        &amp;lt;th&amp;gt;星期一&amp;lt;/th&amp;gt;
+        &amp;lt;th&amp;gt;星期二&amp;lt;/th&amp;gt;
+        &amp;lt;th&amp;gt;星期三&amp;lt;/th&amp;gt;
+    &amp;lt;/tr&amp;gt;
+    &amp;lt;tr&amp;gt;
+        &amp;lt;td&amp;gt;李强&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;张明&amp;lt;/td&amp;gt;
+        &amp;lt;td&amp;gt;王平&amp;lt;/td&amp;gt;
+    &amp;lt;/tr&amp;gt;
+&amp;lt;/table&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;table&gt;
+    &lt;tr&gt;
+        &lt;th rowspan=&quot;2&quot;&gt;值班人员&lt;/th&gt;
+        &lt;th&gt;星期一&lt;/th&gt;
+        &lt;th&gt;星期二&lt;/th&gt;
+        &lt;th&gt;星期三&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;李强&lt;/td&gt;
+        &lt;td&gt;张明&lt;/td&gt;
+        &lt;td&gt;王平&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/table&gt;
+
+&lt;h3 id=&quot;7-待办事宜-todo-列表&quot;&gt;7. 待办事宜 Todo 列表&lt;/h3&gt;
+
+&lt;p&gt;使用带有 [ ] 或 [x] （未完成或已完成）项的列表语法撰写一个待办事宜列表，并且支持子列表嵌套以及混用Markdown语法，例如：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;- [ ] **Cmd Markdown 开发**
+    - [ ] 改进 Cmd 渲染算法，使用局部渲染技术提高渲染效率
+    - [ ] 支持以 PDF 格式导出文稿
+    - [x] 新增Todo列表功能 [语法参考](https://github.com/)
+    - [x] 改进 LaTex 功能
+        - [x] 修复 LaTex 公式渲染问题
+        - [x] 新增 LaTex 公式编号功能 [语法参考](http://docs.mathjax.org)
+- [ ] **七月旅行准备**
+    - [ ] 准备邮轮上需要携带的物品
+    - [ ] 浏览日本免税店的物品
+    - [x] 购买蓝宝石公主号七月一日的船票
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;对应显示如下待办事宜 Todo 列表：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;[ ] &lt;strong&gt;Cmd Markdown 开发&lt;/strong&gt;
+    &lt;ul&gt;
+      &lt;li&gt;[ ] 改进 Cmd 渲染算法，使用局部渲染技术提高渲染效率&lt;/li&gt;
+      &lt;li&gt;[ ] 支持以 PDF 格式导出文稿&lt;/li&gt;
+      &lt;li&gt;[x] 新增Todo列表功能 &lt;a href=&quot;https://github.com/blog/1375-task-lists-in-gfm-issues-pulls-comments&quot;&gt;语法参考&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;[x] 改进 LaTex 功能
+        &lt;ul&gt;
+          &lt;li&gt;[x] 修复 LaTex 公式渲染问题&lt;/li&gt;
+          &lt;li&gt;[x] 新增 LaTex 公式编号功能 &lt;a href=&quot;http://docs.mathjax.org/en/latest/tex.html#tex-eq-numbers&quot;&gt;语法参考&lt;/a&gt;&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;[ ] &lt;strong&gt;七月旅行准备&lt;/strong&gt;
+    &lt;ul&gt;
+      &lt;li&gt;[ ] 准备邮轮上需要携带的物品&lt;/li&gt;
+      &lt;li&gt;[ ] 浏览日本免税店的物品&lt;/li&gt;
+      &lt;li&gt;[x] 购买蓝宝石公主号七月一日的船票&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;footnotes&quot;&gt;
+  &lt;ol&gt;
+    &lt;li id=&quot;fn:footnote&quot;&gt;
+      &lt;p&gt;这是一个 &lt;em&gt;注脚&lt;/em&gt; 的 &lt;strong&gt;文本&lt;/strong&gt;。&amp;nbsp;&lt;a href=&quot;#fnref:footnote&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+    &lt;li id=&quot;fn:footnote2&quot;&gt;
+      &lt;p&gt;这是另一个 &lt;em&gt;注脚&lt;/em&gt; 的 &lt;strong&gt;文本&lt;/strong&gt;。&amp;nbsp;&lt;a href=&quot;#fnref:footnote2&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
+    &lt;/li&gt;
+  &lt;/ol&gt;
+&lt;/div&gt;
+</description>
+        <pubDate>Wed, 12 Oct 2016 17:13:17 +0800</pubDate>
+        <link>http://localhost:4000/markdown-manual/</link>
+        <guid isPermaLink="true">http://localhost:4000/markdown-manual/</guid>
+        
+        
+        <category>diary</category>
+        
+      </item>
+    
+      <item>
+        <title>The Murmur Theme</title>
+        <description>&lt;hr /&gt;
+&lt;p&gt;Landing somewhere between a scholarly publication and an adventurers notebook, the Murmur theme presents your words &amp;amp; photographs in a handsome, agreeable manner. It is well behaved on both mobile &amp;amp; desktop and radically minimal in its footprint. Charged and ready for deployment to Github Pages.&lt;/p&gt;
+
+&lt;p&gt;Suitable for shortform, longform, and probably even waveform. It is purpose-built to accomodate photographic content wonderfully and lends itself well to journaling your sojourn.&lt;/p&gt;
+
+</description>
+        <pubDate>Sun, 15 Nov 2015 20:05:14 +0800</pubDate>
+        <link>http://localhost:4000/the-murmur-theme/</link>
+        <guid isPermaLink="true">http://localhost:4000/the-murmur-theme/</guid>
+        
+        
+        <category>jekyll</category>
+        
+        <category>theme</category>
+        
+      </item>
+    
+  </channel>
+</rss>

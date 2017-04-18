@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="songroger">
+
+  <title>Markdown</title>
+
+  <meta name="description" content="&lt;hr /&gt;&lt;p&gt;Markdown manual&lt;/p&gt;">
+
+  <!-- Open graph data -->
+  <meta property="og:site_name" content="songroger">
+  <meta property="og:title" content="Markdown">
+  <meta property="og:url" content="http://localhost:4000/markdown-manual/">
+  <meta property="og:type" content="article">
+  <meta property="og:description" content="&lt;hr /&gt;&lt;p&gt;Markdown manual&lt;/p&gt;">
+
+  <!-- Standard Stuff -->
+  <link rel="canonical" href="http://localhost:4000/markdown-manual/"/>
+  <link rel="alternate" type="application/rss+xml" title="songroger" href="http://localhost:4000/feed.xml"/>
+
+  <!-- Favicons -->
+  <link rel="shortcut icon" href="http://7xof48.com1.z0.glb.clouddn.com/favicon.png">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-config" content="/assets/browserconfig.xml">
+  <meta name="theme-color" content="#ffffff">
+
+  <!-- Styles -->
+  
+    <style type="text/css">
+      ::selection{background:#1565c0;color:#fff;text-shadow:none}html{font-size:109.375%;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;font-smoothing:antialiased;text-size-adjust:100%;box-sizing:border-box}@media screen and (min-width:700px){html{font-size:125%}}@media screen and (min-width:1440px){html{font-size:140.625%}}*,:after,:before{margin:0;padding:0;box-sizing:inherit}body{color:#444;font-family:Georgia,Source Sans Pro,sans-serif;font-size:.9rem;line-height:1.6rem}img{display:block;max-width:100%;height:auto;border:0}a:active,a:hover,a:visited{color:#444;text-decoration:none}strong{font-weight:700}em{font-style:italic}a{background:transparent;color:#1565c0;text-decoration:none;cursor:pointer;word-wrap:break-word}a:active,a:focus,a:hover{outline:0;text-decoration:none}h1,h2,h3,h4,h5,h6,p{margin-bottom:.2rem}h1,h2,h3,h4,h5,h6{color:#000;font-weight:700;vertical-align:middle}h1:not(:first-child),h2:not(:first-child),h3:not(:first-child),h4:not(:first-child),h5:not(:first-child),h6:not(:first-child){margin-top:2.4rem}h1{font-size:2rem;line-height:3.2rem}h2{font-size:1.5rem;line-height:2.4rem}h3{font-size:1.17rem}h4{font-size:1rem}h5{font-size:.707rem}h6{font-size:.5rem}ol,ul{margin:0 0 1.6rem 1.6rem}ol ol,ol ul,ul ol,ul ul{margin:0 1.6rem}hr{display:block;height:1.6rem;border:0;box-shadow:inset 0 1px 0 #eee}blockquote{margin-bottom:1.6rem;padding:1.6rem;border-left:4px solid #e6e6e6;background:#f7f7f7}blockquote p{margin:0}.col{max-width:calc(700px + 1.6rem);margin:0 auto;padding:0 .8rem}@media screen and (min-width:1440px){.col{max-width:calc(800px + 1.6rem)}}.header{display:flex;flex-wrap:wrap;justify-content:space-around;margin-bottom:2rem;box-shadow:0 1px 0 0 #eee}@media screen and (min-width:734px){.header{font-size:.75rem}}.header__logo{margin-bottom:0;font-size:1rem;font-weight:400;line-height:1.6rem}.header__logo img{display:initial;width:30px;height:30px;vertical-align:middle;border-radius:15px;opacity:1}.header__logo img:hover{opacity:.5;transition:all .5s ease-in}.header__logo a{color:#999;text-transform:uppercase}@media screen and (min-width:734px){.header__logo{font-size:.75rem}}.header__nav{display:flex;flex-wrap:wrap}.header__nav a{color:#444}.header__nav a:hover{color:#999;transition:all .5s ease-in}.header__link{padding:.8rem;color:#444;text-decoration:none;border-bottom:2px solid transparent;padding-bottom:1px}.header__link:hover{transition:all .5s ease-in;border-color:hsla(34,5%,70%,.7)}.header__link--logo{padding:.8rem;display:block}.header__link--logo:focus,.header__link--logo:hover{color:#444;transition:all .5s ease-in}.footer{margin-top:.5rem;padding:1.6rem 0;box-shadow:inset 0 1px 0 #eee}.footer .col{font-size:13px;text-align:center}.subscribe{color:#999;transition:all .25s ease-in}.subscribe:hover{color:#444;text-decoration:none}.blocks{display:flex;align-items:center;margin-bottom:.1rem}.blocks--space{justify-content:space-between}.block__item--mr{margin-right:.8rem}.blocks__item a{text-decoration:none;color:#999;border:3px solid rgba(0,0,0,.1);border-radius:20px;padding:1px 15px;font-family:Georgia,Microsoft YaHei,sans-serif}.blocks__item a:hover{color:#444;border-color:#999;transition:all .5s ease-in}.blocks__item .btn{box-shadow:inset 0 0 0 0 #1565c0}.article{margin-bottom:3rem;animation:itemshow .9s linear}.article__title{margin-bottom:.8rem}.article__title--single,.article__title a{font-family:Georgia,Microsoft YaHei,sans-serif}.article__title a{color:#444;transition:all .25s ease-in}.article__title a:hover{color:#999;text-decoration:none}.article__date{display:block;margin-bottom:.8rem;font-size:.7501rem}.cover{margin-bottom:.5rem}.cover img{width:100%}.article__more{color:#999;text-decoration:none}.article__more:hover{transition:all .5s ease-in;color:#444;text-decoration:none}.post-tags{text-align:right;text-decoration:none;font:italic 700 12px/30px Georgia,serif}.post-tags a{color:#999}.post-tags a:hover{color:#444;text-decoration:none}@-webkit-keyframes 'itemshow'{0%{top:-60px;opacity:0}33%{top:-40px;opacity:.2}66%{top:-20px;opacity:.6}to{top:0;opacity:1}}@keyframes 'itemshow'{0%{top:-60px;opacity:0}33%{top:-40px;opacity:.2}66%{top:-20px;opacity:.6}to{top:0;opacity:1}}.arch-item{margin-bottom:10px;animation:itemshow .9s linear}.arch-title{color:#444;font-size:20px;font-family:Georgia,Hiragino Sans GB,Microsoft YaHei,sans-serif;font-weight:700;padding-right:10px}.arch-title:hover{color:#999;transition:all .25s ease-in}time{font-size:15px;font-family:Optima,Helvetica Neue,sans-serif}.arch-desc,time{color:#999}code,pre{background:#f7f7f7;font-family:Source Code Pro,monospace;font-size:.847rem;overflow-x:auto;vertical-align:top}.highlight{margin-bottom:1.6rem;padding:.8rem;background:#f7f7f7;box-shadow:inset 0 0 0 1px #eee}.highlight .c{color:#998}.highlight .err{background-color:#e3d2d2;color:#a61717}.highlight .k,.highlight .o{font-weight:400}.highlight .cm{color:#998}.highlight .cp{color:#999;font-weight:400}.highlight .c1{color:#998}.highlight .cs{color:#999;font-weight:400}.highlight .gd{background-color:#fdd;color:#000}.highlight .gd .x{background-color:#faa;color:#000}.highlight .gr{color:#a00}.highlight .gh{color:#999}.highlight .gi{background-color:#dfd;color:#000}.highlight .gi .x{background-color:#afa;color:#000}.highlight .go{color:#888}.highlight .gp{color:#555}.highlight .gs{font-weight:400}.highlight .gu{color:#aaa}.highlight .gt{color:#a00}.highlight .kc,.highlight .kd,.highlight .kp,.highlight .kr,.highlight .kt{font-weight:400}.highlight .kt{color:#458}.highlight .m{color:#099}.highlight .s{color:#d14}.highlight .na{color:teal}.highlight .nb{color:#0086b3}.highlight .nc{color:#458;font-weight:400}.highlight .no{color:teal}.highlight .ni{color:purple}.highlight .ne,.highlight .nf{color:#900;font-weight:400}.highlight .nn{color:#555}.highlight .nt{color:navy}.highlight .nv{color:teal}.highlight .ow{font-weight:400}.highlight .w{color:#bbb}.highlight .mf,.highlight .mh,.highlight .mi,.highlight .mo{color:#099}.highlight .s2,.highlight .sb,.highlight .sc,.highlight .sd,.highlight .se,.highlight .sh,.highlight .si,.highlight .sx{color:#d14}.highlight .sr{color:#009926}.highlight .s1{color:#d14}.highlight .ss{color:#990073}.highlight .bp{color:#999}.highlight .vc,.highlight .vg,.highlight .vi{color:teal}.highlight .il{color:#099}
+    </style>
+  
+
+
+</head>
+
+<body>
+
+  <header class="header">
+
+    
+      <div class="header__logo">
+        <a href="/" class="header__link--logo">
+        <!-- <div class="spinner"></div> -->
+        <img src="http://7xof48.com1.z0.glb.clouddn.com/avatar.jpg"></a>
+      </div>
+    
+
+    <nav class="header__nav" role="navigation">      
+      <a href="/archive/" class="header__link">Archive</a>
+      <a href="http://twitter.com/songrogero" class="header__link" target="_blank">Twitter</a>
+      <!-- <a href="http://github.com/songroger" class="header__link" target="_blank">Github</a> -->
+      <a href="http://facebook.com/song.roger.1" class="header__link" target="_blank">Facebook</a>
+      <a href="/about/" class="header__link">About</a>
+    </nav>
+  </header>
+
+  <main class="col">
+
+
+<article class="article">
+  <h2 class="article__title article__title--single">Markdown</h2>
+  <time class="article__date" datetime="2016-10-12"> 17:13 Oct.12-2016</time>
+  
+  <hr />
+<p>Markdown manual</p>
+
+<h3 id="1-斜体和粗体">1. 斜体和粗体</h3>
+
+<p>使用 * 和 ** 表示斜体和粗体。</p>
+
+<p>示例：</p>
+
+<p>这是 <em>斜体</em>，这是 <strong>粗体</strong>。</p>
+
+<h3 id="2-分级标题">2. 分级标题</h3>
+
+<p>使用 === 表示一级标题，使用 — 表示二级标题。</p>
+
+<p>示例：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>这是一个一级标题
+============================
+
+这是一个二级标题
+--------------------------------------------------
+
+### 这是一个三级标题
+</code></pre>
+</div>
+
+<p>你也可以选择在行首加井号表示不同级别的标题 (H1-H6)，例如：# H1, ## H2, ### H3，#### H4。</p>
+
+<h3 id="3-外链接">3. 外链接</h3>
+
+<p>使用 [描述](链接地址) 为文字增加外链接。</p>
+
+<p>示例：</p>
+
+<p>这是去往 <a href="http://github.com">本人博客</a> 的链接。</p>
+
+<h3 id="4-无序列表">4. 无序列表</h3>
+
+<p>使用 *，+，- 表示无序列表。</p>
+
+<p>示例：</p>
+
+<ul>
+  <li>无序列表项 一</li>
+  <li>无序列表项 二</li>
+  <li>无序列表项 三</li>
+</ul>
+
+<h3 id="5-有序列表">5. 有序列表</h3>
+
+<p>使用数字和点表示有序列表。</p>
+
+<p>示例：</p>
+
+<ol>
+  <li>有序列表项 一</li>
+  <li>有序列表项 二</li>
+  <li>有序列表项 三</li>
+</ol>
+
+<h3 id="6-文字引用">6. 文字引用</h3>
+
+<p>使用 &gt; 表示文字引用。</p>
+
+<p>示例：</p>
+
+<blockquote>
+  <p>野火烧不尽，春风吹又生。</p>
+</blockquote>
+
+<h3 id="7-行内代码块">7. 行内代码块</h3>
+
+<p>使用 `代码` 表示行内代码块。</p>
+
+<p>示例：</p>
+
+<p>让我们聊聊 <code class="highlighter-rouge">html</code>。</p>
+
+<h3 id="8--代码块">8.  代码块</h3>
+
+<p>使用 四个缩进空格 表示代码块。</p>
+
+<p>示例：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>这是一个代码块，此行左侧有四个不可见的空格。
+</code></pre>
+</div>
+
+<h3 id="9--插入图像">9.  插入图像</h3>
+
+<p>使用 ![描述](图片链接地址) 插入图像。</p>
+
+<p>示例：</p>
+
+<p><img src="https://en.wikipedia.org/static/images/project-logos/enwiki-2x.png" alt="我的头像" /></p>
+
+<h2 id="markdown-高阶语法手册">Markdown 高阶语法手册</h2>
+
+<h3 id="1-标签分类">1. 标签分类</h3>
+
+<p>在编辑区任意行的列首位置输入以下代码给文稿标签：</p>
+
+<p>标签： 数学 英语 Markdown</p>
+
+<p>或者</p>
+
+<p>Tags： 数学 英语 Markdown</p>
+
+<h3 id="2-删除线">2. 删除线</h3>
+
+<p>使用 ~~ 表示删除线。</p>
+
+<p><del>这是一段错误的文本。</del></p>
+
+<h3 id="3-注脚">3. 注脚</h3>
+
+<p>使用 [^keyword] 表示注脚。</p>
+
+<p>这是一个注脚<sup id="fnref:footnote"><a href="#fn:footnote" class="footnote">1</a></sup>的样例。</p>
+
+<p>这是第二个注脚<sup id="fnref:footnote2"><a href="#fn:footnote2" class="footnote">2</a></sup>的样例。</p>
+
+<h3 id="4-加强的代码块">4. 加强的代码块</h3>
+
+<p>支持四十一种编程语言的语法高亮的显示，行号显示。</p>
+
+<p>非代码示例：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ sudo apt-get install vim-gnome
+</code></pre>
+</div>
+
+<p>Python 示例：</p>
+
+<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="nd">@requires_authorization</span>
+<span class="k">def</span> <span class="nf">somefunc</span><span class="p">(</span><span class="n">param1</span><span class="o">=</span><span class="s">''</span><span class="p">,</span> <span class="n">param2</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
+    <span class="s">'''A docstring'''</span>
+    <span class="k">if</span> <span class="n">param1</span> <span class="o">&gt;</span> <span class="n">param2</span><span class="p">:</span> <span class="c"># interesting</span>
+        <span class="k">print</span> <span class="s">'Greater'</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">param2</span> <span class="o">-</span> <span class="n">param1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="bp">None</span>
+
+<span class="k">class</span> <span class="nc">SomeClass</span><span class="p">:</span>
+    <span class="k">pass</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">message</span> <span class="o">=</span> <span class="s">'''interpreter
+... prompt'''</span>
+</code></pre>
+</div>
+
+<p>JavaScript 示例：</p>
+
+<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="cm">/**
+* nth element in the fibonacci series.
+* @param n &gt;= 0
+* @return the nth element, &gt;= 0.
+*/</span>
+<span class="kd">function</span> <span class="nx">fib</span><span class="p">(</span><span class="nx">n</span><span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> <span class="nx">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">b</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">tmp</span><span class="p">;</span>
+  <span class="k">while</span> <span class="p">(</span><span class="o">--</span><span class="nx">n</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">tmp</span> <span class="o">=</span> <span class="nx">a</span><span class="p">;</span>
+    <span class="nx">a</span> <span class="o">+=</span> <span class="nx">b</span><span class="p">;</span>
+    <span class="nx">b</span> <span class="o">=</span> <span class="nx">tmp</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nx">a</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="nb">document</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="nx">fib</span><span class="p">(</span><span class="mi">10</span><span class="p">));</span>
+</code></pre>
+</div>
+
+<h3 id="5-定义型列表">5. 定义型列表</h3>
+
+<dl>
+  <dt>名词 1</dt>
+  <dd>定义 1（左侧有一个可见的冒号和四个不可见的空格）</dd>
+  <dt>代码块 2</dt>
+  <dd>这是代码块的定义（左侧有一个可见的冒号和四个不可见的空格）
+
+    <div class="highlighter-rouge"><pre class="highlight"><code>代码块（左侧有八个不可见的空格）
+</code></pre>
+    </div>
+  </dd>
+</dl>
+
+<h3 id="6-html-标签">6. Html 标签</h3>
+
+<p>本站支持在 Markdown 语法中嵌套 Html 标签，譬如，你可以用 Html 写一个纵跨两行的表格：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;table&gt;
+    &lt;tr&gt;
+        &lt;th rowspan="2"&gt;值班人员&lt;/th&gt;
+        &lt;th&gt;星期一&lt;/th&gt;
+        &lt;th&gt;星期二&lt;/th&gt;
+        &lt;th&gt;星期三&lt;/th&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+        &lt;td&gt;李强&lt;/td&gt;
+        &lt;td&gt;张明&lt;/td&gt;
+        &lt;td&gt;王平&lt;/td&gt;
+    &lt;/tr&gt;
+&lt;/table&gt;
+</code></pre>
+</div>
+
+<table>
+    <tr>
+        <th rowspan="2">值班人员</th>
+        <th>星期一</th>
+        <th>星期二</th>
+        <th>星期三</th>
+    </tr>
+    <tr>
+        <td>李强</td>
+        <td>张明</td>
+        <td>王平</td>
+    </tr>
+</table>
+
+<h3 id="7-待办事宜-todo-列表">7. 待办事宜 Todo 列表</h3>
+
+<p>使用带有 [ ] 或 [x] （未完成或已完成）项的列表语法撰写一个待办事宜列表，并且支持子列表嵌套以及混用Markdown语法，例如：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>- [ ] **Cmd Markdown 开发**
+    - [ ] 改进 Cmd 渲染算法，使用局部渲染技术提高渲染效率
+    - [ ] 支持以 PDF 格式导出文稿
+    - [x] 新增Todo列表功能 [语法参考](https://github.com/)
+    - [x] 改进 LaTex 功能
+        - [x] 修复 LaTex 公式渲染问题
+        - [x] 新增 LaTex 公式编号功能 [语法参考](http://docs.mathjax.org)
+- [ ] **七月旅行准备**
+    - [ ] 准备邮轮上需要携带的物品
+    - [ ] 浏览日本免税店的物品
+    - [x] 购买蓝宝石公主号七月一日的船票
+</code></pre>
+</div>
+
+<p>对应显示如下待办事宜 Todo 列表：</p>
+
+<ul>
+  <li>[ ] <strong>Cmd Markdown 开发</strong>
+    <ul>
+      <li>[ ] 改进 Cmd 渲染算法，使用局部渲染技术提高渲染效率</li>
+      <li>[ ] 支持以 PDF 格式导出文稿</li>
+      <li>[x] 新增Todo列表功能 <a href="https://github.com/blog/1375-task-lists-in-gfm-issues-pulls-comments">语法参考</a></li>
+      <li>[x] 改进 LaTex 功能
+        <ul>
+          <li>[x] 修复 LaTex 公式渲染问题</li>
+          <li>[x] 新增 LaTex 公式编号功能 <a href="http://docs.mathjax.org/en/latest/tex.html#tex-eq-numbers">语法参考</a></li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+  <li>[ ] <strong>七月旅行准备</strong>
+    <ul>
+      <li>[ ] 准备邮轮上需要携带的物品</li>
+      <li>[ ] 浏览日本免税店的物品</li>
+      <li>[x] 购买蓝宝石公主号七月一日的船票</li>
+    </ul>
+  </li>
+</ul>
+
+<div class="footnotes">
+  <ol>
+    <li id="fn:footnote">
+      <p>这是一个 <em>注脚</em> 的 <strong>文本</strong>。&nbsp;<a href="#fnref:footnote" class="reversefootnote">&#8617;</a></p>
+    </li>
+    <li id="fn:footnote2">
+      <p>这是另一个 <em>注脚</em> 的 <strong>文本</strong>。&nbsp;<a href="#fnref:footnote2" class="reversefootnote">&#8617;</a></p>
+    </li>
+  </ol>
+</div>
+
+  
+</article>
+
+<div class="blocks">
+  <div class="block__item block__item--mr">
+    <a href="https://twitter.com/intent/tweet?text=Markdown&amp;url=http://localhost:4000/markdown-manual/&amp;via=songrogero">
+      <svg class="btn__icon" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <title>Twitter Icon</title>
+        <path d="M14.4 4.2C14.4 4.4 14.4 4.5 14.4 4.7 14.4 9 11.1 14 5 14 3.2 14 1.5 13.5 0 12.5 0.3 12.6 0.5 12.6 0.8 12.6 2.3 12.6 3.7 12 4.9 11.2 3.4 11.1 2.2 10.2 1.8 8.9 2 8.9 2.2 8.9 2.4 8.9 2.7 8.9 3 8.9 3.3 8.8 1.8 8.5 0.6 7.2 0.6 5.6L0.6 5.6C1.1 5.8 1.6 6 2.1 6 1.2 5.4 0.7 4.4 0.7 3.2 0.7 2.6 0.8 2.1 1.1 1.6 2.7 3.6 5.2 4.9 7.9 5 7.8 4.8 7.8 4.5 7.8 4.3 7.8 2.5 9.3 1 11.1 1 12 1 12.9 1.4 13.5 2 14.2 1.9 14.9 1.6 15.6 1.2 15.3 2 14.8 2.6 14.1 3.1 14.8 3 15.4 2.8 16 2.5 15.6 3.2 15 3.8 14.4 4.2L14.4 4.2Z"/>
+      </svg>
+    </a>
+  </div>
+  <div class="block__item">
+    <a href="https://www.facebook.com/sharer/sharer.php?u=http://localhost:4000/markdown-manual/">
+      <svg class="btn__icon" viewBox="0 0 16 16" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <title>Facebook Icon</title>
+        <path d="M9.5 3L12 3 12 0 9.5 0C7.6 0 6 1.6 6 3.5L6 5 4 5 4 8 6 8 6 16 9 16 9 8 11.5 8 12 5 9 5 9 3.5C9 3.2 9.2 3 9.5 3L9.5 3Z"/>
+      </svg>
+    </a>
+  </div>
+</div>
+
+
+
+<footer class="footer">
+	<div class="col">
+		© 2014-2016 songroger | <a href="/feed.xml" class="subscribe">RSS</a>
+	</div>
+</footer>
+<script type="text/javascript">
+  //友盟统计
+  var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+  document.write(unescape("%3Cspan style='display:none;' id='cnzz_stat_icon_1260641879'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s95.cnzz.com/z_stat.php%3Fid%3D1260641879' type='text/javascript'%3E%3C/script%3E"));
+</script>
+</body>
+</html>
