@@ -1,23 +1,20 @@
 # Site configuration
 domain: "http://songroger.win"
 baseurl: "" # the subpath of your site, e.g. /blog/
-url: "http://songroger.github.io/" # the base hostname & protocol for your site
-permalink: /:title/
-avatar: http://7xof48.com1.z0.glb.clouddn.com/avatar.jpg
+url: "http://MemeTao.github.io/" # the base hostname & protocol for your site
+permalink: /:title/   #永久链接
+avatar: #http://7xof48.com1.z0.glb.clouddn.com/avatar.jpg
 about: http://7xof48.com1.z0.glb.clouddn.com/about.jpg
 favicon: http://7xof48.com1.z0.glb.clouddn.com/favicon.png
 basecss: 
 # Theme specific configuration
-title: songroger
+title: Welcome my site 
 description: >
-  Hi there, My name is Luozhan.Song, usually I use "songroger" as my ID everywhere.
-  I was born and raised in Hunan China. 
-  I'm really fond of beautiful design, drawing etc.
-
+    嘿嘿,我还不知道这里该写什么,MARK:_config.yml line:13
+    修改测试
 # Contact and social media links
-twitter_username: songrogero
-github_username: songroger
-facebook_username: song.roger.1
+#twitter_username: songrogero
+github_username: MemeTao 
 instagram_username: songroger198
 linkedin_username: songroger
 

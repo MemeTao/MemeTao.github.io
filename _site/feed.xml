@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>songroger</title>
-    <description>Hi there, My name is Luozhan.Song, usually I use &quot;songroger&quot; as my ID everywhere. I was born and raised in Hunan China.  I'm really fond of beautiful design, drawing etc.
+    <title>Welcome my site</title>
+    <description>嘿嘿,我还不知道这里该写什么,MARK:_config.yml line:13 修改测试
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 18 Apr 2017 16:25:00 +0800</pubDate>
-    <lastBuildDate>Tue, 18 Apr 2017 16:25:00 +0800</lastBuildDate>
+    <pubDate>Thu, 20 Apr 2017 20:51:20 +0800</pubDate>
+    <lastBuildDate>Thu, 20 Apr 2017 20:51:20 +0800</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
     
       <item>
@@ -292,25 +292,6 @@
         
         
         <category>diary</category>
-        
-      </item>
-    
-      <item>
-        <title>The Murmur Theme</title>
-        <description>&lt;hr /&gt;
-&lt;p&gt;Landing somewhere between a scholarly publication and an adventurers notebook, the Murmur theme presents your words &amp;amp; photographs in a handsome, agreeable manner. It is well behaved on both mobile &amp;amp; desktop and radically minimal in its footprint. Charged and ready for deployment to Github Pages.&lt;/p&gt;
-
-&lt;p&gt;Suitable for shortform, longform, and probably even waveform. It is purpose-built to accomodate photographic content wonderfully and lends itself well to journaling your sojourn.&lt;/p&gt;
-
-</description>
-        <pubDate>Sun, 15 Nov 2015 20:05:14 +0800</pubDate>
-        <link>http://localhost:4000/the-murmur-theme/</link>
-        <guid isPermaLink="true">http://localhost:4000/the-murmur-theme/</guid>
-        
-        
-        <category>jekyll</category>
-        
-        <category>theme</category>
         
       </item>
     
