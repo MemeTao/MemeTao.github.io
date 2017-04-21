@@ -6,9 +6,23 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 20 Apr 2017 20:51:20 +0800</pubDate>
-    <lastBuildDate>Thu, 20 Apr 2017 20:51:20 +0800</lastBuildDate>
+    <pubDate>Thu, 20 Apr 2017 22:28:08 +0800</pubDate>
+    <lastBuildDate>Thu, 20 Apr 2017 22:28:08 +0800</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
+    
+      <item>
+        <title>Test</title>
+        <description>&lt;hr /&gt;
+&lt;p&gt;Markdown manual&lt;/p&gt;
+</description>
+        <pubDate>Sun, 12 Feb 2017 17:13:17 +0800</pubDate>
+        <link>http://localhost:4000/VBIT/</link>
+        <guid isPermaLink="true">http://localhost:4000/VBIT/</guid>
+        
+        
+        <category>diary</category>
+        
+      </item>
     
       <item>
         <title>Markdown</title>
