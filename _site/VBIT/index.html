@@ -7,16 +7,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="author" content="songroger">
 
-  <title>Test</title>
+  <title>维特比算法的实现</title>
 
-  <meta name="description" content="&lt;hr /&gt;&lt;p&gt;Markdown manual&lt;/p&gt;">
+  <meta name="description" content="&lt;hr /&gt;&lt;p&gt;前几天做通信原理的实验，发现网上关于维特比算法的解释太理论化，我结合代码通俗话的解释一下。如果看了以下代码您还是不能理解维特比纠错算法的真实目的，算我输!&lt;/p&gt;&lt;p&gt;首先，我问大家一个问题，如下：&lt;img src=&quot;../mate...">
 
   <!-- Open graph data -->
   <meta property="og:site_name" content="Welcome my site">
-  <meta property="og:title" content="Test">
+  <meta property="og:title" content="维特比算法的实现">
   <meta property="og:url" content="http://localhost:4000/VBIT/">
   <meta property="og:type" content="article">
-  <meta property="og:description" content="&lt;hr /&gt;&lt;p&gt;Markdown manual&lt;/p&gt;">
+  <meta property="og:description" content="&lt;hr /&gt;&lt;p&gt;前几天做通信原理的实验，发现网上关于维特比算法的解释太理论化，我结合代码通俗话的解释一下。如果看了以下代码您还是不能理解维特比纠错算法的真实目的，算我输!&lt;/p&gt;&lt;p&gt;首先，我问大家一个问题，如下：&lt;img src=&quot;../mate...">
 
   <!-- Standard Stuff -->
   <link rel="canonical" href="http://localhost:4000/VBIT/"/>
@@ -61,11 +61,23 @@
 
 
 <article class="article">
-  <h2 class="article__title article__title--single">Test</h2>
+  <h2 class="article__title article__title--single">维特比算法的实现</h2>
   <time class="article__date" datetime="2017-02-12"> 17:13 Feb.12-2017</time>
   
   <hr />
-<p>Markdown manual</p>
+<p>前几天做通信原理的实验，发现网上关于维特比算法的解释太理论化，我结合代码通俗话的解释一下。如果看了以下代码您还是不能理解维特比纠错算法的真实目的，算我输!</p>
+
+<p>首先，我问大家一个问题，如下：
+<img src="../material/route_guess.png" alt="路径猜测" />
+  A，B，C代表三个地点，三条实线代表路径。假设张三现在要去A、B、C的其中一个地方，由于淘宝上买了一个劣质的指南针，方向出了偏差，虚线是他走过的路，我们不知道到底偏了多少。我们以上帝视觉<strong>猜测</strong>张三的目的，显然：<strong>看上去张三的目的地好像是B</strong>。如果我们信赖这个指南针(偏的并不离谱),那么我们的结论也许就是对的。</p>
+
+<p><strong>注意哦</strong>,我们的结论是根据最近的地点距离猜得，并不是非常准确，也就是说张三的目的地是A也是有可能的，即:<strong>指南针偏的的太多了</strong></p>
+
+<p>这里的”偏的太多了”，在通信上可以认为信息在传输过程受到了非常大的干扰，导致接收到的信息已经面目全非，想要恢复原有信息的话已经不太可能。</p>
+
+<p>这就是维特比算法的一部分,<strong>根据汉明距离来选择最有可能通往下一个节点的路径</strong>。所以说，如果信息位错的太离谱了，它就不可靠了，这个太离谱是有一个<strong>度</strong>的，具体是多少，您可以参考下面的代码做个实验。</p>
+
+<p>对了！如果您不知道什么是<strong>汉明距离</strong>，那么您可以直接关掉这个页面了。</p>
 
   
 </article>

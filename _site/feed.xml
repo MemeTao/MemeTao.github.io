@@ -6,14 +6,26 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 20 Apr 2017 22:28:08 +0800</pubDate>
-    <lastBuildDate>Thu, 20 Apr 2017 22:28:08 +0800</lastBuildDate>
+    <pubDate>Fri, 21 Apr 2017 22:05:15 +0800</pubDate>
+    <lastBuildDate>Fri, 21 Apr 2017 22:05:15 +0800</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
     
       <item>
-        <title>Test</title>
+        <title>维特比算法的实现</title>
         <description>&lt;hr /&gt;
-&lt;p&gt;Markdown manual&lt;/p&gt;
+&lt;p&gt;前几天做通信原理的实验，发现网上关于维特比算法的解释太理论化，我结合代码通俗话的解释一下。如果看了以下代码您还是不能理解维特比纠错算法的真实目的，算我输!&lt;/p&gt;
+
+&lt;p&gt;首先，我问大家一个问题，如下：
+&lt;img src=&quot;../material/route_guess.png&quot; alt=&quot;路径猜测&quot; /&gt;
+  A，B，C代表三个地点，三条实线代表路径。假设张三现在要去A、B、C的其中一个地方，由于淘宝上买了一个劣质的指南针，方向出了偏差，虚线是他走过的路，我们不知道到底偏了多少。我们以上帝视觉&lt;strong&gt;猜测&lt;/strong&gt;张三的目的，显然：&lt;strong&gt;看上去张三的目的地好像是B&lt;/strong&gt;。如果我们信赖这个指南针(偏的并不离谱),那么我们的结论也许就是对的。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;注意哦&lt;/strong&gt;,我们的结论是根据最近的地点距离猜得，并不是非常准确，也就是说张三的目的地是A也是有可能的，即:&lt;strong&gt;指南针偏的的太多了&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;这里的”偏的太多了”，在通信上可以认为信息在传输过程受到了非常大的干扰，导致接收到的信息已经面目全非，想要恢复原有信息的话已经不太可能。&lt;/p&gt;
+
+&lt;p&gt;这就是维特比算法的一部分,&lt;strong&gt;根据汉明距离来选择最有可能通往下一个节点的路径&lt;/strong&gt;。所以说，如果信息位错的太离谱了，它就不可靠了，这个太离谱是有一个&lt;strong&gt;度&lt;/strong&gt;的，具体是多少，您可以参考下面的代码做个实验。&lt;/p&gt;
+
+&lt;p&gt;对了！如果您不知道什么是&lt;strong&gt;汉明距离&lt;/strong&gt;，那么您可以直接关掉这个页面了。&lt;/p&gt;
 </description>
         <pubDate>Sun, 12 Feb 2017 17:13:17 +0800</pubDate>
         <link>http://localhost:4000/VBIT/</link>
