@@ -7,8 +7,8 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 22 Apr 2017 22:13:39 +0800</pubDate>
-    <lastBuildDate>Sat, 22 Apr 2017 22:13:39 +0800</lastBuildDate>
+    <pubDate>Sat, 22 Apr 2017 22:29:32 +0800</pubDate>
+    <lastBuildDate>Sat, 22 Apr 2017 22:29:32 +0800</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
     
       <item>
@@ -113,8 +113,8 @@
 
 &lt;p&gt;假设信号序列在传输过程中出错了，导致了某些位由原来的1-&amp;gt;0,0-&amp;gt;1，我们就令第3、4位吧。&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;convolution(3) = 1;
-convolution(4) = 0;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;convolution(3) = ~convolution(3);
+convolution(4) = ~convolution(4);
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
