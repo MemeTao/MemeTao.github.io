@@ -4,18 +4,18 @@ baseurl: "" # the subpath of your site, e.g. /blog/
 url: "http://MemeTao.github.io/" # the base hostname & protocol for your site
 permalink: /:title/   #永久链接
 avatar: #http://7xof48.com1.z0.glb.clouddn.com/avatar.jpg
-about: http://7xof48.com1.z0.glb.clouddn.com/about.jpg
+#about 界面的图片链接
+about:  http://b378.photo.store.qq.com/psb?/V1311dRQ1yWisx/kv5WfHv3.AQQMXsqf4MggaUjVPgsSWf.UKJlwgb3yX8!/b/dHoBAAAAAAAA&bo=0ALMA9ACzAMFCSo!&rf=viewer_4
 favicon: http://7xof48.com1.z0.glb.clouddn.com/favicon.png
 basecss: 
 # Theme specific configuration
 title: Welcome my site 
 description: >
-    QQ:964664728
+    中国计量大学本科 通信工程 在读(2017)
+     
 # Contact and social media links
 #twitter_username: songrogero
 github_username: MemeTao 
-instagram_username: songroger198
-linkedin_username: songroger
 
 exclude: ['node_modules', 'gulpfile.js', 'package.json']
 

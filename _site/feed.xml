@@ -2,12 +2,13 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Welcome my site</title>
-    <description>QQ:964664728
+    <description>中国计量大学本科 通信工程 在读(2017)
+ 
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 22 Apr 2017 22:02:54 +0800</pubDate>
-    <lastBuildDate>Sat, 22 Apr 2017 22:02:54 +0800</lastBuildDate>
+    <pubDate>Sat, 22 Apr 2017 22:13:39 +0800</pubDate>
+    <lastBuildDate>Sat, 22 Apr 2017 22:13:39 +0800</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
     
       <item>
@@ -277,7 +278,7 @@ end
 
 &lt;p&gt;PS:如果您需要整份代码，可以在以下地址获取&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;&lt;a href=&quot;http://github.com/MemeTao/MemeTao.github.io/material/VTB/code/&quot;&gt;代码&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://github.com/MemeTao/MemeTao.github.io/tree/master/material/VTB/code&quot;&gt;代码&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
 
 </description>
         <pubDate>Sun, 12 Feb 2017 17:13:17 +0800</pubDate>
