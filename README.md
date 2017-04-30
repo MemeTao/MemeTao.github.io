@@ -1,2 +1,2 @@
-**template from  [murmur](http://songroger.github.io/murmur)**
+**refer to  [murmur](http://songroger.github.io/murmur)**
 
