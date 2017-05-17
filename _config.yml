@@ -30,3 +30,4 @@ gems: ['jekyll-paginate']
 # Pagination
 paginate: 5
 paginate_path: /archive/page:num
+
