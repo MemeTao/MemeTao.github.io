@@ -7,9 +7,49 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 07 May 2017 15:55:34 +0800</pubDate>
-    <lastBuildDate>Sun, 07 May 2017 15:55:34 +0800</lastBuildDate>
+    <pubDate>Sat, 20 May 2017 22:10:05 +0800</pubDate>
+    <lastBuildDate>Sat, 20 May 2017 22:10:05 +0800</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
+    
+      <item>
+        <title>C++回调函数引发的思考</title>
+        <description>&lt;hr /&gt;
+&lt;p&gt;今天在公司实习，领导为了让我熟悉公司底层服务端架构，让我花两天时间写一个基于当前平台多线程收发消息的Demo。我参考项目中的旧代码编写这个Demo，平台上有个接口是注册回调函数的，我参照接口函数参数类型一一编写，最后碰到一个编译错误，百思不得其解，后来是同事提醒这里需要加个static关键字，他说C++回调函数必须是static，我一脸茫然。他让我去看static关键的作用，我说我都知道呀，static嘛，balabala…..。他说对啊，所以这里要加static。我还是一脸茫然，为了不暴露我&lt;strong&gt;菜&lt;/strong&gt;的事实，只好点头说是。下班后深究之下，终于发现了问题根源。同事说的也有失偏颇。&lt;/p&gt;
+
+&lt;p&gt;先看下面的例子:&lt;/p&gt;
+&lt;h3 id=&quot;普通的回调&quot;&gt;普通的回调:&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&quot;../material/CALLBACK/normal_callback.png&quot; alt=&quot;普通回调函数&quot; /&gt;
+很正常，函数正常运行。&lt;/p&gt;
+&lt;h3 id=&quot;c成员函数作为回调函数&quot;&gt;C++成员函数作为回调函数&lt;/h3&gt;
+
+&lt;p&gt;现在我们来看，&lt;strong&gt;当回调的函数是某个对象的成员函数的时候&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../material/CALLBACK/class_memberfunction.png&quot; alt=&quot;C++回调&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;我们编写类成员函数类型，和接口要求的回调函数参数类型&lt;strong&gt;“完全一样”&lt;/strong&gt;,好，我们编译一下：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../material/CALLBACK/compile_error.png&quot; alt=&quot;C++回调编译结果&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;为什么会这样？函数指针不都只这么用的么，而且怎么还和static搭上了关系？根据编译器的提示，我上网找资料，终于发现了症结所在，算是今天最大的收获了！&lt;/p&gt;
+
+&lt;h3 id=&quot;找原因&quot;&gt;找原因&lt;/h3&gt;
+&lt;p&gt;要从C++对象模型说起，&lt;strong&gt;this指针&lt;/strong&gt;。&lt;/p&gt;
+
+&lt;p&gt;1.我们知道C++的类成员函数中,默认都隐含了一个this指针,标识调用该成员函数的对象&lt;/p&gt;
+
+&lt;p&gt;2.为什么需要有一个this指针呢?C++设计这个机制的初衷是什么呢?&lt;/p&gt;
+
+&lt;p&gt;我们知道,普通的C++类,其成员函数是类的所有对象共享的,而数据时每个对象所独有的.即:&lt;strong&gt;数据独有,方法共享&lt;/strong&gt;。因此在调用类的某个成员方法(非静态方法)时,我怎么知道是哪个对象调用的呢?此时就是通过this指针来区分的，通过this指针我可以区分是该类的哪个对象正在调用该成员方法。&lt;/p&gt;
+
+</description>
+        <pubDate>Sat, 20 May 2017 21:09:12 +0800</pubDate>
+        <link>http://localhost:4000/callback/</link>
+        <guid isPermaLink="true">http://localhost:4000/callback/</guid>
+        
+        
+        <category>C++</category>
+        
+      </item>
     
       <item>
         <title>我的这一次选择</title>

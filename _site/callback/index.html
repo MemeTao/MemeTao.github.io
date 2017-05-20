@@ -7,19 +7,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="author" content="songroger">
 
-  <title>Archive</title>
+  <title>C++回调函数引发的思考</title>
 
-  <meta name="description" content="中国计量大学本科 通信工程 在读(2017) ">
+  <meta name="description" content="&lt;hr /&gt;&lt;p&gt;今天在公司实习，领导为了让我熟悉公司底层服务端架构，让我花两天时间写一个基于当前平台多线程收发消息的Demo。我参考项目中的旧代码编写这个Demo，平台上有个接口是注册回调函数的，我参照接口函数参数类型一一编写，最后碰到一个编译错误，百思不得其解，后来是同事提醒这里需要加...">
 
   <!-- Open graph data -->
   <meta property="og:site_name" content="Welcome my site">
-  <meta property="og:title" content="Archive">
-  <meta property="og:url" content="http://localhost:4000/archive/">
+  <meta property="og:title" content="C++回调函数引发的思考">
+  <meta property="og:url" content="http://localhost:4000/callback/">
   <meta property="og:type" content="article">
-  <meta property="og:description" content="中国计量大学本科 通信工程 在读(2017) ">
+  <meta property="og:description" content="&lt;hr /&gt;&lt;p&gt;今天在公司实习，领导为了让我熟悉公司底层服务端架构，让我花两天时间写一个基于当前平台多线程收发消息的Demo。我参考项目中的旧代码编写这个Demo，平台上有个接口是注册回调函数的，我参照接口函数参数类型一一编写，最后碰到一个编译错误，百思不得其解，后来是同事提醒这里需要加...">
 
   <!-- Standard Stuff -->
-  <link rel="canonical" href="http://localhost:4000/archive/"/>
+  <link rel="canonical" href="http://localhost:4000/callback/"/>
   <link rel="alternate" type="application/rss+xml" title="Welcome my site" href="http://localhost:4000/feed.xml"/>
 
   <!-- Favicons -->
@@ -60,54 +60,42 @@
   <main class="col">
 
 
-<h2 class="article__title article__title--single">Archive</h2>
-<ul>
+<article class="article">
+  <h2 class="article__title article__title--single">C++回调函数引发的思考</h2>
+  <time class="article__date" datetime="2017-05-20"> 21:09 May.20-2017</time>
   
-    <div class="arch-item">
-      <li>
-        <a href="/callback/" class="arch-title">C++回调函数引发的思考</a>
-        <time>May.20, 2017</time>
-      </li>
-      
-    </div>
-  
-    <div class="arch-item">
-      <li>
-        <a href="/mytracks/" class="arch-title">我的这一次选择</a>
-        <time>May.07, 2017</time>
-      </li>
-      
-    </div>
-  
-    <div class="arch-item">
-      <li>
-        <a href="/VBIT/" class="arch-title">维特比算法的实现</a>
-        <time>Apr.12, 2017</time>
-      </li>
-      
-    </div>
-  
-    <div class="arch-item">
-      <li>
-        <a href="/markdown-manual/" class="arch-title">Markdown</a>
-        <time>Oct.12, 2016</time>
-      </li>
-      <div class="arch-desc">love markdown, love plain texts. Enjoy its manual</div>
-    </div>
-  
-</ul>
+  <hr />
+<p>今天在公司实习，领导为了让我熟悉公司底层服务端架构，让我花两天时间写一个基于当前平台多线程收发消息的Demo。我参考项目中的旧代码编写这个Demo，平台上有个接口是注册回调函数的，我参照接口函数参数类型一一编写，最后碰到一个编译错误，百思不得其解，后来是同事提醒这里需要加个static关键字，他说C++回调函数必须是static，我一脸茫然。他让我去看static关键的作用，我说我都知道呀，static嘛，balabala…..。他说对啊，所以这里要加static。我还是一脸茫然，为了不暴露我<strong>菜</strong>的事实，只好点头说是。下班后深究之下，终于发现了问题根源。同事说的也有失偏颇。</p>
 
-    <nav class="blocks blocks--space">
-      <div class="blocks__item">
-        
-      </div>
-      <div class="blocks__item">
-        Page: 1 of 1
-      </div>
-      <div class="blocks__item">
-        
-      </div>
-    </nav>
+<p>先看下面的例子:</p>
+<h3 id="普通的回调">普通的回调:</h3>
+<p><img src="../material/CALLBACK/normal_callback.png" alt="普通回调函数" />
+很正常，函数正常运行。</p>
+<h3 id="c成员函数作为回调函数">C++成员函数作为回调函数</h3>
+
+<p>现在我们来看，<strong>当回调的函数是某个对象的成员函数的时候</strong></p>
+
+<p><img src="../material/CALLBACK/class_memberfunction.png" alt="C++回调" /></p>
+
+<p>我们编写类成员函数类型，和接口要求的回调函数参数类型<strong>“完全一样”</strong>,好，我们编译一下：</p>
+
+<p><img src="../material/CALLBACK/compile_error.png" alt="C++回调编译结果" /></p>
+
+<p>为什么会这样？函数指针不都只这么用的么，而且怎么还和static搭上了关系？根据编译器的提示，我上网找资料，终于发现了症结所在，算是今天最大的收获了！</p>
+
+<h3 id="找原因">找原因</h3>
+<p>要从C++对象模型说起，<strong>this指针</strong>。</p>
+
+<p>1.我们知道C++的类成员函数中,默认都隐含了一个this指针,标识调用该成员函数的对象</p>
+
+<p>2.为什么需要有一个this指针呢?C++设计这个机制的初衷是什么呢?</p>
+
+<p>我们知道,普通的C++类,其成员函数是类的所有对象共享的,而数据时每个对象所独有的.即:<strong>数据独有,方法共享</strong>。因此在调用类的某个成员方法(非静态方法)时,我怎么知道是哪个对象调用的呢?此时就是通过this指针来区分的，通过this指针我可以区分是该类的哪个对象正在调用该成员方法。</p>
+
+
+  
+</article>
+
 
 
 
