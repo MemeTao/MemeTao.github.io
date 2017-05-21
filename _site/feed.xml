@@ -7,16 +7,18 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 21 May 2017 20:09:11 +0800</pubDate>
-    <lastBuildDate>Sun, 21 May 2017 20:09:11 +0800</lastBuildDate>
+    <pubDate>Sun, 21 May 2017 20:21:06 +0800</pubDate>
+    <lastBuildDate>Sun, 21 May 2017 20:21:06 +0800</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
     
       <item>
-        <title>C++回调函数引发的思考</title>
+        <title>当回调函数是C++类成员函数</title>
         <description>&lt;hr /&gt;
 &lt;p&gt;今天在公司实习，领导为了让我熟悉公司底层服务端架构，给我两天时间写一个基于当前平台的多线程收发消息的Demo。我参考项目中的旧代码编写这个Demo，平台上有个接口是注册回调函数的，我参照接口函数参数类型一一编写，最后碰到一个编译错误，百思不得其解，后来是同事提醒这里需要加个static关键字，他说C++回调函数必须是static，我一脸茫然。他让我去看static关键的作用，我说我都知道呀，static嘛，balabala…..。他说对啊，所以这里要加static。我还是一脸茫然，为了不暴露我&lt;strong&gt;菜&lt;/strong&gt;的事实，只好点头说是。下班后深究之下，终于发现了问题根源,同事说的并不是全对。&lt;/p&gt;
 
-&lt;p&gt;先看下面的例子:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;本次发现的问题: C++类成员函数不遵守默认函数调用约定(__cdecl),因为要传递this指针&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;看下面的例子:&lt;/p&gt;
 &lt;h3 id=&quot;普通的回调&quot;&gt;普通的回调:&lt;/h3&gt;
 &lt;p&gt;&lt;img src=&quot;../material/CALLBACK/normal_callback.png&quot; alt=&quot;普通回调函数&quot; /&gt;
 很正常，函数正常运行。&lt;/p&gt;

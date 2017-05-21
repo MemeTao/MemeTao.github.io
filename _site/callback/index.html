@@ -7,13 +7,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="author" content="songroger">
 
-  <title>C++回调函数引发的思考</title>
+  <title>当回调函数是C++类成员函数</title>
 
   <meta name="description" content="&lt;hr /&gt;&lt;p&gt;今天在公司实习，领导为了让我熟悉公司底层服务端架构，给我两天时间写一个基于当前平台的多线程收发消息的Demo。我参考项目中的旧代码编写这个Demo，平台上有个接口是注册回调函数的，我参照接口函数参数类型一一编写，最后碰到一个编译错误，百思不得其解，后来是同事提醒这里需要加...">
 
   <!-- Open graph data -->
   <meta property="og:site_name" content="Welcome my site">
-  <meta property="og:title" content="C++回调函数引发的思考">
+  <meta property="og:title" content="当回调函数是C++类成员函数">
   <meta property="og:url" content="http://localhost:4000/callback/">
   <meta property="og:type" content="article">
   <meta property="og:description" content="&lt;hr /&gt;&lt;p&gt;今天在公司实习，领导为了让我熟悉公司底层服务端架构，给我两天时间写一个基于当前平台的多线程收发消息的Demo。我参考项目中的旧代码编写这个Demo，平台上有个接口是注册回调函数的，我参照接口函数参数类型一一编写，最后碰到一个编译错误，百思不得其解，后来是同事提醒这里需要加...">
@@ -61,13 +61,15 @@
 
 
 <article class="article">
-  <h2 class="article__title article__title--single">C++回调函数引发的思考</h2>
+  <h2 class="article__title article__title--single">当回调函数是C++类成员函数</h2>
   <time class="article__date" datetime="2017-05-20"> 21:09 May.20-2017</time>
   
   <hr />
 <p>今天在公司实习，领导为了让我熟悉公司底层服务端架构，给我两天时间写一个基于当前平台的多线程收发消息的Demo。我参考项目中的旧代码编写这个Demo，平台上有个接口是注册回调函数的，我参照接口函数参数类型一一编写，最后碰到一个编译错误，百思不得其解，后来是同事提醒这里需要加个static关键字，他说C++回调函数必须是static，我一脸茫然。他让我去看static关键的作用，我说我都知道呀，static嘛，balabala…..。他说对啊，所以这里要加static。我还是一脸茫然，为了不暴露我<strong>菜</strong>的事实，只好点头说是。下班后深究之下，终于发现了问题根源,同事说的并不是全对。</p>
 
-<p>先看下面的例子:</p>
+<p><strong>本次发现的问题: C++类成员函数不遵守默认函数调用约定(__cdecl),因为要传递this指针</strong></p>
+
+<p>看下面的例子:</p>
 <h3 id="普通的回调">普通的回调:</h3>
 <p><img src="../material/CALLBACK/normal_callback.png" alt="普通回调函数" />
 很正常，函数正常运行。</p>
