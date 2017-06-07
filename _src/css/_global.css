@@ -48,13 +48,13 @@ html {
 
 @media screen and (min-width: 700px) {
   html {
-    font-size: 125%;
+    font-size: 100%;
   }
 }
 
 @media screen and (min-width: 1440px) {
   html {
-    font-size: 140.625%;
+    font-size: 100%;
   }
 }
 
