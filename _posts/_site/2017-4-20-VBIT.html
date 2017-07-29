@@ -103,7 +103,7 @@ convolution(4) = ~convolution(4);
 </code></pre>
 </div>
 
-<p><img src="../material/VTB/chaneltransform.png" alt="信道传输" /></p>
+<p><img src="../material/VTB/channeltransform.png" alt="信道传输" /></p>
 
 <h3 id="第四步接收差错纠正">第四步：接收、差错纠正</h3>
 
@@ -234,24 +234,27 @@ end
 
 <h4 id="关于汉明距离的计算">关于汉明距离的计算</h4>
 
-<p>我认为这个您是可以自己接触的，出于人道主义：
-    function hanmingDis = input(src,cur)
-    len_src = length(src);
-    len_cur = length(cur);
-    if(len_src ~= len_cur)
-        disp(‘error input: len_cur not equal len_src’);
+<p>我认为这个您是可以自己接触的，出于人道主义：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>function hanmingDis = input(src,cur)
+len_src = length(src);
+len_cur = length(cur);
+if(len_src ~= len_cur)
+    disp('error input: len_cur not equal len_src');
+end
+dis = 0;
+for i = 1 : len_cur
+    if(cur(i) ~= src(i))
+        dis = dis + 1;
     end
-    dis = 0;
-    for i = 1 : len_cur
-        if(cur(i) ~= src(i))
-            dis = dis + 1;
-        end
-    end
-    hanmingDis = dis;</p>
+end
+hanmingDis = dis;
+</code></pre>
+</div>
 
 <p>好，我们来测试一下在出现差错的情况下，它是否还能还原信息序列：</p>
 
-<p><img src="../material/VTB/afterdecode.png" alt="纠错" /></p>
+<p><img src="../material/VTB/decode.png" alt="纠错" /></p>
 
 <h3 id="总结与测试">总结与测试</h3>
 
