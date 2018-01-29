@@ -7,19 +7,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="author" content="songroger">
 
-  <title>考研-从头到尾</title>
+  <title>TCP缓冲区与write系统调用</title>
 
-  <meta name="description" content="&lt;hr /&gt;&lt;p&gt;因为种种原因，从宇视辞职后，仿惶无依一个月，开始计划考研。&lt;/p&gt;">
+  <meta name="description" content="&lt;hr /&gt;">
 
   <!-- Open graph data -->
   <meta property="og:site_name" content="Welcome my site">
-  <meta property="og:title" content="考研-从头到尾">
-  <meta property="og:url" content="http://localhost:4000/masterPlan/">
+  <meta property="og:title" content="TCP缓冲区与write系统调用">
+  <meta property="og:url" content="http://localhost:4000/TcpBuffer/">
   <meta property="og:type" content="article">
-  <meta property="og:description" content="&lt;hr /&gt;&lt;p&gt;因为种种原因，从宇视辞职后，仿惶无依一个月，开始计划考研。&lt;/p&gt;">
+  <meta property="og:description" content="&lt;hr /&gt;">
 
   <!-- Standard Stuff -->
-  <link rel="canonical" href="http://localhost:4000/masterPlan/"/>
+  <link rel="canonical" href="http://localhost:4000/TcpBuffer/"/>
   <link rel="alternate" type="application/rss+xml" title="Welcome my site" href="http://localhost:4000/feed.xml"/>
 
   <!-- Favicons -->
@@ -62,80 +62,72 @@
 
 
 <article class="article">
-  <h2 class="article__title article__title--single">考研-从头到尾</h2>
-  <time class="article__date" datetime="2017-07-29"> 14:13 Jul.29-2017</time>
+  <h2 class="article__title article__title--single">TCP缓冲区与write系统调用</h2>
+  <time class="article__date" datetime="2018-01-29"> 15:13 Jan.29-2018</time>
   
   <hr />
-<p>因为种种原因，从宇视辞职后，仿惶无依一个月，开始计划考研。</p>
 
-<p>既然要考研了，当然要选择自己最感兴趣的专业，毫无疑问，我打算往计算机方向发展。</p>
-
-<p>之前也了解过，计算机考研有四门专业课，分别是数据结构、计算机组成原理、操作系统原理、计算机网络。即使我之前看过数据结构(并基本实现过所有代码，自认为学的还可以)和TCP/IP卷一，可是随着复习进度的推进，我发现老本很快就被我吃完了，导致有点拖进度。</p>
-
-<h3 id="今天是2017-7-29">今天是2017-7-29</h3>
+<h3 id="背景">背景：</h3>
+<p>在非阻塞多线程TCP网络编程中，设想一个场景:</p>
 
 <blockquote>
-  <p>自从我着手复习已经有一个月整。距离考研还有4个月20天，除去生产实习的15天，我大概还剩下4个月时间，感到了时间的紧迫。按照计划，这个月结束我应该要把高等数学二本教材、数据结构、计算机组成原理过一遍的，现在的情况是高等数学还有一章，数据结构还有小半本书，计算机组成原理还有两章。</p>
+  <p>程序A想通过TCP连接发送100KB的数据,我们通过系统调用write()来写入数据。因为我不希望程序长时间阻塞在write()，我希望操作系统迅速将我的100KB数据放入TCP缓冲区，然后write()系统调用返回，内核自动将我们的100KB数据通过TCP发送出去。这里不经有个疑问:TCP缓冲区可以放下我的100KB数据么？</p>
 </blockquote>
 
-<p>造成这个结果的原因其实很简单:</p>
+<p>以上的<em>TCP缓冲区</em>我故意描述的比较有歧义，实际上有两层意思。我随即google，最后发现我的操作系统的默认缓冲区大小是:</p>
 
-<p>1、看书不够快</p>
+<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="err">运行结果：</span>
+<span class="err">$</span> <span class="n">cat</span> <span class="o">/</span><span class="n">proc</span><span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">net</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">wmem_default</span> <span class="o">(</span><span class="err">套接字缓冲区大小</span><span class="o">-</span><span class="err">写</span><span class="o">)</span>
+<span class="mi">212992</span> 
+<span class="err">$</span> <span class="n">cat</span> <span class="o">/</span><span class="n">proc</span><span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">net</span><span class="o">/</span><span class="n">ipv4</span><span class="o">/</span><span class="n">tcp_wmem</span>     <span class="o">(</span><span class="n">tcp</span><span class="err">缓冲区大小</span><span class="o">-</span><span class="err">写</span><span class="o">)</span>
+<span class="mi">4096</span>	<span class="mi">16384</span>	<span class="mi">4194304</span>               <span class="err">最小值、默认值、最大值</span>
 
-<p>2、不够努力。除去晚上2个小时的看考研英语视频，我每天花在学习上面的时间只有5个小时,
-况且我还给自己每周分配了两天假期。</p>
+</code></pre>
+</div>
 
-<p>理一下下个月的计划：</p>
+<p>对于socket缓冲区大小，Linux手册还说,<em>The Linux kernel doubles this value (to allow space for bookkeeping overhead)</em>,可见，为了所谓的Overheard,内核付出的代价是成倍的。</p>
 
-<p>1、每天做两个小时高等数学习题。</p>
+<p>看到这里，有人会有疑问，也是我在网上搜索资料时遇到的最多的误解:滑动窗口最大才2^16 = 65536 = 64KB，你这208KB怎么还比64KB大了？这里要区分一下内核套接字缓冲区大小() 与 TCP缓冲区大小之间的关系。</p>
 
-<p>2、过一遍线性代数和概率论。</p>
+<p>举个小例子：</p>
+<blockquote>
+  <p>假设程序有100KB数据，我们调用write(fd,data)将数据写入的是套接字缓冲区，由于100 &lt; 208 故，操作系统将数据从用户态拷内内存后，write系统调用就返回了，然后TCP从该缓冲区中取数据,由于16KB(默认值) &lt; 100KB,故TCP得搬运好多次，但是这都是内核的事情，我们管不着。如果数据是209KB，很显然，write()调用势必要阻塞了，阻塞到什么时候?我的理解是,阻塞到TCP将多余的1KB发送出去，并收到回复。(例子可能不是很恰当,如果有不明确的自己google吧)</p>
+</blockquote>
 
-<p>3、结束计算机组成原理、数据结构。开始操作系统和计算机网络的复习。</p>
+<p>这下我放心了，100KB是可以放下的。但是我不免有点后怕，我并不确定我的程序到底会有多大的数据,如果下次我们数据是250KB怎么办？我并不想程序阻塞在这里，我得尽快抽身去忙活其它紧急的事情，那该怎么办呢？往下看。</p>
 
-<p>4、英语单词无论如何都要结束第二部分了，阅读理解恐怕也要开始了，感觉有点强行上阅读理解的意味。</p>
+<h3 id="如何解决write调用阻塞的问题">如何解决write调用阻塞的问题？</h3>
 
-<p>时间安排：</p>
+<ul>
+  <li>1.<strong>将accept返回的已连接TCP套接字设置成non-blocking</strong> —— 比方我要写100KB，但是操作系统只接收了64KB,这时候,write写了64KB之后会返回,程序不会阻塞在这里，而是继续运行。那么又会引入另一个问题,<strong>剩余的36KB数据怎么办？</strong></li>
+  <li>2.<strong>在程序中引入应用层缓冲区</strong>——对于应用程序来说,我只管产生数据,并调用sendMessage()函数,你最终要分几次发送我不管,但是你不能阻塞我。具体做法是,封装sendMessage()函数:
+    <blockquote>
+      <p>判断write函数的返回值,将剩余的数据丢给Buffer,注册POLLOUT事件,等到对应的fd可读时，再将数据写入。这时候还有<em>第二点好处</em>,当buffer有多余数据时，我们可以判断出socket缓冲区已经满了，我们不要调用write(),而是应该将数据添加到buffer中统一写入，这样做好处是什么：<strong>省了一次系统调用,岂不是美滋滋!</strong></p>
+    </blockquote>
+  </li>
+</ul>
 
-<p>1、早上再也不能像之前那样8点起床了，因为太热了! 提前到7点吧。</p>
+<h3 id="如何确定要多大的socket缓冲区是不是越大越好">如何确定要多大的socket缓冲区，是不是越大越好？</h3>
 
-<p>2、中午不打算回寝室睡觉了，在教室趴着睡觉吧。</p>
+<p>IBM是这么说的,<em><a href="https://www.ibm.com/support/knowledgecenter/en/SSQPD3_2.6.0/com.ibm.wllm.doc/UDPSocketBuffers.html">click heare link to IBM!</a></em></p>
 
-<p>3、晚上10.30之前说什么都要上床了。</p>
+<blockquote>
+  <p>On the Linux platform Tx ring buffer overruns can occur when transmission rates approach 1Gbps and the default send socket buffer is greater than 65536. It is therefore recommended to set the net.core.wmem_default kernel parameter to 65536 bytes on all Linux systems.</p>
+</blockquote>
 
-<p>4、所以具体的安排是:</p>
+<p>也就说在千兆以太网上，为了避免产生TX环形缓冲区溢出，我们最好将core/net/wmem_default设置成小于65536,也即64KB的一个值。但是这可是占内存的，如果我们给每一个socket都设置64KB，不考虑虚拟内存,假设机器内存是4GB，4GB / 64 KB = 16K，也即理论上在4G机器上，我们最多连接16K个TCP连接，这当然是不能接收的。所以这个问题要用毛泽东思想来解决：具体问题具体分析！</p>
 
-<p>4.1 早上7.45到达考研教室，高等数学干到9.45。10点开始线性代数和概率论。</p>
+<h3 id="如何确定应用层buffer的大小">如何确定应用层Buffer的大小？</h3>
 
-<p>4.2 中午11.30准时去吃饭，12.10开始睡觉，1.30睡醒。1.45开始专业课直到5点吃完饭。</p>
+<p>同样，这也是占内存的,我们不能过大也不能过少，这看起来好像也无解。</p>
 
-<p>4.3 6点开始学英语,直到8.30。</p>
+<p>这里推荐一个<strong><a href="https://github.com/chenshuo/muduo">Muduo网络库</a></strong>的做法:动态增长。具体做法是，给每个Buffer初始分配1024B字节，并在栈上分配一个65536字节的数组。</p>
+<ul>
+  <li>读取：使用readv,buffer作为第一个地址，数组作为第二个地址，这样超过1024的数据全都读到了数组上，等读取结束在将buffer扩增，将数组内的数据追加到buffer。</li>
+  <li>写入：比较简单，判断一下长度即可。</li>
+</ul>
 
-<p>4.4 跑步和仰卧起坐得抓紧时间了。</p>
-
-<h3 id="update-in-2017-9-9-night">update in 2017-9-9 night</h3>
-
-<p>明天就大四了，今天又是礼拜六，说不准有关心我的人时刻关注着我的状态。所以我来更新一下。</p>
-
-<p>总之，还行吧，具体细节不是完全符合上述目标，但是也差不多。</p>
-
-<p>呃，还是说点具体的吧。专业课总共四门，得益于大三之前的积累，所幸我和科班学生的差距没有
-想象中的大，很多知识点原来我已经知道了，只是我不知他们的专业术语，所以这次专业课的学习
-算的上是一次解惑，很多东西我一看发现，哦！原来它已经在我的脑子里，只是我叫不出来它
-的名字。</p>
-
-<p>唔，我的意思不是我对这些东西掌握的很好、我能得个高分。我只是想表达：你现在做的所有事情，
-在不久的将来也许都用的上。</p>
-
-<p>这一次了学习到的东西，价值远远超过了分数所能代表的意义。
-其中收获最大的是英语单词和计算机知识的扫盲。</p>
-
-<p>就考研来说，我认为最大的困难不是如何取解决难题获得更多的分数，而是尽量
-不失分，这肯定是考试的诀窍。所以我准备在这个方面试一试。高考的就是一个例子，我
-认为我已经尽力了，我不信我是真的stupid，肯定是哪里出问题了，我要用考研来验证一下。</p>
-
-<p>好吧，今天就说这么多。</p>
-
+<p>这样做利用了临时栈上空间，避免每个连接的初始Buffer过大造成内存浪费，也避免反复调用read()的系统开销。</p>
 
   
 </article>
