@@ -7,9 +7,123 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 30 Jan 2018 16:02:14 +0800</pubDate>
-    <lastBuildDate>Tue, 30 Jan 2018 16:02:14 +0800</lastBuildDate>
+    <pubDate>Tue, 30 Jan 2018 20:08:04 +0800</pubDate>
+    <lastBuildDate>Tue, 30 Jan 2018 20:08:04 +0800</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
+    
+      <item>
+        <title>TCP四次挥手中，Poll返回了几次？</title>
+        <description>&lt;hr /&gt;
+
+&lt;h3 id=&quot;问题&quot;&gt;问题&lt;/h3&gt;
+&lt;p&gt;我在给多线程TCP服务器写被动关闭逻辑时遇到了一个疑问，Poll返回的时机是什么时候？TCP四次挥手引起几次Poll返回？&lt;/p&gt;
+&lt;h3 id=&quot;如何引入的问题&quot;&gt;如何引入的问题&lt;/h3&gt;
+&lt;p&gt;一般的服务器编程逻辑，一般是由客户端发起的主动关闭，服务端实行被动关闭。按正常的流程是这样的:对端发送FIN，服务端发送ACK，如果没有多余数据，随即再发送FIN分节，对端继续发送ACK便进入熟知的TIME_WAIT状态，等待2MSL时间后进入CLOSE状态，本次TCP连接顺利断开。依照这个模型，我们只要在fd上注册一个回调函数，等poll返回时，用read系统调用即可判断是正常数据还是FIN分节，很容易得到如下回调函数伪代码:&lt;/p&gt;
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;handleRead&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;ssize_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; 
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//对端发来信息
+&lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;//正常处理信息
+&lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//说明对端发送了FIN分节
+&lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;freeMemory&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//整理一下这个连接的资源，
+&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;   &lt;span class=&quot;c1&quot;&gt;//发送FIN
+&lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;Error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;上述代码在实际的运行时，发生了错误，操作系统提示我一个关键词：&lt;strong&gt;double free&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;寻找症结&quot;&gt;寻找症结&lt;/h3&gt;
+
+&lt;p&gt;根据提示:我猜测是某些资源释放了多次。在多次复现问题后，最终发现这个问题出现在TCP连接断开的时候。&lt;/p&gt;
+
+&lt;p&gt;我用Linux下的NC工具模拟了客户端TCP连接，并用tcpdump试图分析出一点蛛丝马迹：&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;./TcpServer -l 65500     //在本地65500端口启动服务器
+    &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;nc 127.0.0.1 65500       //连接到服务器65500端口
+    &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;Ctrl-D                   //一段时间后，NC主动断开连接 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;以下是tcpdump本地抓包结果：
+&lt;img src=&quot;../material/POLL/tcpdump.png&quot; alt=&quot;TCPDUMP&quot; /&gt;
+首先是TCP三次握手，随后等我键入Ctrl-D断开连接，TCP四次挥手也很正常(由于FIN分节携带了ACK，所以表现出来是3个报文),然后服务端依然奔溃，并提示double free!&lt;/p&gt;
+
+&lt;p&gt;用netstat命令显示的TCP状态变化:&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;protocol&lt;/th&gt;
+      &lt;th&gt;port1&lt;/th&gt;
+      &lt;th&gt;port2&lt;/th&gt;
+      &lt;th&gt;status&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;tcp&lt;/td&gt;
+      &lt;td&gt;—65500—&lt;/td&gt;
+      &lt;td&gt;—59580—&lt;/td&gt;
+      &lt;td&gt;—–ESTABLISHED&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;tcp&lt;/td&gt;
+      &lt;td&gt;—59580—&lt;/td&gt;
+      &lt;td&gt;—65500—&lt;/td&gt;
+      &lt;td&gt;—–TIME_WAIT&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;说明连接是正常建立，正常断开的，一切都很正常!看来是一场硬仗，得调试代码了，由于当前还没有加入日志模块，用gdb又好像有点小题大作，先用printf大法试一下再说，最终发现&lt;strong&gt;在TCP四次挥手中，read() = 0 返回了两次！&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;引起poll返回的事件&quot;&gt;引起poll返回的事件&lt;/h3&gt;
+
+&lt;p&gt;根据我的代码结构，回调之前是poll，随即开始查资料，在《APUE》中发现，以下条件是引起poll返回的特定revent:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;有数据可读，专业的说法是：套接字接收缓冲区中的数据字节数大于等于套接字接收缓冲区低潮限度的当前值。可以使用套接字选项SO_RCVLOWAT来设置低潮限度，对于TCP和UDP套接字，其值缺省为1&lt;/li&gt;
+  &lt;li&gt;连接的读这一半关闭，也就是说接收了FIN的TCP连接。对这样的套接字的套接字将不阻塞且返回0（即文件结束符）&lt;/li&gt;
+  &lt;li&gt;套接字是一个监听套接字且已完成的连接数为非0，即连接建立后可读&lt;/li&gt;
+  &lt;li&gt;有一个套接字错误待处理。对这样的套接字的读操作将不阻塞且返回一个错误（-1），errno则设置成明确的错误条件。这些待处理的错误也可以通过指定套接口选项SO_ERROR调用getsockopt来取得并清除。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;«UNP»还有如下补充:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;所有TCP和UDP正规数据都被认为是普通数据&lt;/li&gt;
+  &lt;li&gt;TCP的待外数据被认为是优先级带数据&lt;/li&gt;
+  &lt;li&gt;当TCP连接的读半部关闭时(譬如收到一个对端的FIN)，也被认为是普通数据，随后的读操作将返回0&lt;/li&gt;
+  &lt;li&gt;…&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;那客户端进入TIME_WAIT状态时发送的最后一次ACK是不是一次普通数据呢?&lt;/strong&gt;在这个情况下，没有其它什么事件能够引起poll返回了，很明显了，罪魁祸首就是&lt;strong&gt;TCP四次挥手的第四次ACK！&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id=&quot;解决方案&quot;&gt;解决方案&lt;/h3&gt;
+&lt;p&gt;在read()返回0，后随机注销掉该socket_fd的一切事件。伪代码描述如下:&lt;/p&gt;
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;pollfd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;events&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//如果不懂,请查阅struct pollfd
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; 
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;修改代码，奏效了!&lt;/p&gt;
+&lt;h3 id=&quot;总结&quot;&gt;总结&lt;/h3&gt;
+&lt;p&gt;解决了上述问题后，我反思自己:当初看APUE和UNP的时候对上述问题之所以没有留下深刻的印象，原因恐怕是没有实际情况作为参照。想起一句名句:&lt;strong&gt;纸上得来终觉浅，绝知此事需躬行&lt;/strong&gt;&lt;/p&gt;
+</description>
+        <pubDate>Mon, 29 Jan 2018 15:13:17 +0800</pubDate>
+        <link>http://localhost:4000/Poll/</link>
+        <guid isPermaLink="true">http://localhost:4000/Poll/</guid>
+        
+        
+        <category>network</category>
+        
+        <category>program</category>
+        
+      </item>
     
       <item>
         <title>TCP缓冲区与write系统调用</title>
