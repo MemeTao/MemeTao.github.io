@@ -7,16 +7,71 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 30 Jan 2018 20:08:04 +0800</pubDate>
-    <lastBuildDate>Tue, 30 Jan 2018 20:08:04 +0800</lastBuildDate>
+    <pubDate>Thu, 01 Feb 2018 16:28:58 +0800</pubDate>
+    <lastBuildDate>Thu, 01 Feb 2018 16:28:58 +0800</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
+    
+      <item>
+        <title>TCP:多线程同时accept到底有没有必要?(惊群)</title>
+        <description>&lt;hr /&gt;
+
+&lt;h3 id=&quot;一问题&quot;&gt;一、问题&lt;/h3&gt;
+&lt;p&gt;最近在写一个TCP多线程服务器，模型是这样的：1个线程接受TCP新连接，从线程池中挑出一个EventLoop线程给这个TCP连接，以后这个TCP连接的所有操作都将由这个EventLoop线程负责。我疑惑的点是：&lt;strong&gt;仅由一个线程accept新连接，够么？能够处理多少并发量？&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;二分析问题&quot;&gt;二、分析问题&lt;/h3&gt;
+&lt;p&gt;已经知道的知识是，TCP有个半连接队列和已连接队列(等待应用层accept)，如下：
+&lt;img src=&quot;../material/ThunderingHerd/TCP connection.png&quot; alt=&quot;TcpConnectionProcess&quot; /&gt;
+(图片来源:https://segmentfault.com/a/1190000008224853)&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;SYNC队列:长度为 max(64, /proc/sys/net/ipv4/tcp_max_syn_backlog)，在我的机器上，后者的值是:128&lt;/li&gt;
+  &lt;li&gt;ACCEPT队列:长度为 min(backlog, somaxconn)，/proc/sys/net/core/somaxconn的值为128，表示最多有129的ESTABLISHED的连接等待accept()，而backlog的值则应该是由int listen(int sockfd, int backlog)中的第二个参数指定，listen里面的backlog可以有我们的应用程序去定义的。
+    &lt;h4 id=&quot;21当sync队列满了&quot;&gt;2.1当sync队列满了&lt;/h4&gt;
+    &lt;p&gt;当这个队列满了，不开启syncookies的时候，Server会丢弃新来的SYN包，而Client端在多次重发SYN包得不到响应而返回（connection time out）错误。但是，当Server端开启了syncookies=1，那么SYN半连接队列就没有逻辑上的最大值了，并且/proc/sys/net/ipv4/tcp_max_syn_backlog设置的值也会被忽略。&lt;/p&gt;
+    &lt;h4 id=&quot;22当accept队列满了&quot;&gt;2.2当accept队列满了&lt;/h4&gt;
+    &lt;p&gt;当accept队列满了之后，即使client继续向server发送ACK的包，也会不被响应，此时ListenOverflows+1，同时server通过/proc/sys/net/ipv4/tcp_abort_on_overflow来决定如何返回，0表示直接丢弃该ACK，1表示发送RST通知client；相应的，client则会分别返回read timeout 或者 connection reset by peer。&lt;/p&gt;
+    &lt;h4 id=&quot;23如何查看是否存在队列溢出&quot;&gt;2.3如何查看是否存在队列溢出&lt;/h4&gt;
+    &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;netstat -s | grep &lt;span class=&quot;s2&quot;&gt;&quot;listen|LISTEN&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+    &lt;p&gt;由于我电脑不是服务器，没有溢出的情况，暂时不能举例。&lt;/p&gt;
+    &lt;h4 id=&quot;24如果客户端第三个ack已达到但是服务端没有accept且客户端发送了信息这时发生什么&quot;&gt;2.4如果客户端第三个ACK已达到，但是服务端没有accept，且客户端发送了信息，这时发生什么?&lt;/h4&gt;
+    &lt;p&gt;我没有做相应的实验，查资料得知，服务端不做任何响应，客户端超时重传，直至断开连接。&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;三单线程accept的极限参数&quot;&gt;三、单线程accept的极限参数&lt;/h3&gt;
+&lt;p&gt;现在我们可以得到的结论是，高并发下，上述的队列参数的确会限制TCP并发连接数。可是具体参数是多少呢？我暂时不得而知，但我不久便会做个相应的实验(认真脸)!&lt;/p&gt;
+
+&lt;h3 id=&quot;四有没有必要&quot;&gt;四、有没有必要？&lt;/h3&gt;
+&lt;p&gt;假设我们的目标是使得单机承受100W个并发连接，并假设服务端成功的接收了上述的100W客户。&lt;/p&gt;
+&lt;h4 id=&quot;41我们先计算几个参数&quot;&gt;4.1我们先计算几个参数&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;服务端1s内给所有客户发送一个hello,world!报文占用的带宽:&lt;/li&gt;
+  &lt;li&gt;上述连接占用的内存&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;42内核是否能承受&quot;&gt;4.2内核是否能承受？&lt;/h4&gt;
+
+&lt;h3 id=&quot;五结论&quot;&gt;五、结论&lt;/h3&gt;
+&lt;p&gt;未完待续~~~&lt;/p&gt;
+</description>
+        <pubDate>Mon, 29 Jan 2018 15:13:17 +0800</pubDate>
+        <link>http://localhost:4000/ThunderingHerdProblem/</link>
+        <guid isPermaLink="true">http://localhost:4000/ThunderingHerdProblem/</guid>
+        
+        
+        <category>network</category>
+        
+        <category>program</category>
+        
+      </item>
     
       <item>
         <title>TCP四次挥手中，Poll返回了几次？</title>
         <description>&lt;hr /&gt;
 
 &lt;h3 id=&quot;问题&quot;&gt;问题&lt;/h3&gt;
-&lt;p&gt;我在给多线程TCP服务器写被动关闭逻辑时遇到了一个疑问，Poll返回的时机是什么时候？TCP四次挥手引起几次Poll返回？&lt;/p&gt;
+&lt;p&gt;我在给多线程TCP服务器写被动关闭逻辑时遇到了一个疑问，Poll返回的时机是什么时候？TCP四次挥手能够引起几次Poll返回？&lt;/p&gt;
 &lt;h3 id=&quot;如何引入的问题&quot;&gt;如何引入的问题&lt;/h3&gt;
 &lt;p&gt;一般的服务器编程逻辑，一般是由客户端发起的主动关闭，服务端实行被动关闭。按正常的流程是这样的:对端发送FIN，服务端发送ACK，如果没有多余数据，随即再发送FIN分节，对端继续发送ACK便进入熟知的TIME_WAIT状态，等待2MSL时间后进入CLOSE状态，本次TCP连接顺利断开。依照这个模型，我们只要在fd上注册一个回调函数，等poll返回时，用read系统调用即可判断是正常数据还是FIN分节，很容易得到如下回调函数伪代码:&lt;/p&gt;
 &lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;handleRead&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
@@ -28,8 +83,8 @@
 &lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
     &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//说明对端发送了FIN分节
 &lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;freeMemory&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//整理一下这个连接的资源，
-&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;   &lt;span class=&quot;c1&quot;&gt;//发送FIN
+        &lt;span class=&quot;n&quot;&gt;addTask&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;freeMemory&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//让其它空闲线程来处理这个连接的资源
+&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;          &lt;span class=&quot;c1&quot;&gt;//发送FIN
 &lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
     &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
         &lt;span class=&quot;n&quot;&gt;Error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
@@ -100,17 +155,24 @@
 &lt;/ul&gt;
 
 &lt;p&gt;&lt;strong&gt;那客户端进入TIME_WAIT状态时发送的最后一次ACK是不是一次普通数据呢?&lt;/strong&gt;在这个情况下，没有其它什么事件能够引起poll返回了，很明显了，罪魁祸首就是&lt;strong&gt;TCP四次挥手的第四次ACK！&lt;/strong&gt;&lt;/p&gt;
-&lt;h3 id=&quot;解决方案&quot;&gt;解决方案&lt;/h3&gt;
-&lt;p&gt;在read()返回0，后随机注销掉该socket_fd的一切事件。伪代码描述如下:&lt;/p&gt;
-&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;h3 id=&quot;问题的关键以及解决方案&quot;&gt;问题的关键以及解决方案&lt;/h3&gt;
+&lt;p&gt;之所以会出现这样的问题，是由于我的代码执行顺序的问题，由于是多线程，一个线程close(fd)使得tcp发送FIN分节，理论上，再此之前我们就应该注销掉这个连接的资源了。而我的代码试图将资源释放这个问题推迟一些以便于处理当下更紧急的其它任务，所以在poll所关注的事件列表中还有这个连接所关注的事件，所以引起了这个问题。清楚了原因之后，立马找到了解决方案：我只要注销掉poll中的该事件对应的fd即可，依然可以使得资源释放稍后执行。&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;方案一：具体是在read()返回0，后随机注销掉该socket_fd的一切事件。伪代码描述如下:
+    &lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
 &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;...&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;pollfd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;events&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//如果不懂,请查阅struct pollfd
-&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; 
+  &lt;span class=&quot;n&quot;&gt;pollfd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;events&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;   &lt;span class=&quot;c1&quot;&gt;//如果不懂,请查阅struct pollfd
+&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;addTask&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;freeMemory&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//让其他线程来处理该连接的资源
+&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; 
 &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;p&gt;修改代码，奏效了!&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;方案二:一个TCP连接的所以资源自始自终都由某一个线程管理，不要转移fd。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;我修改了代码，两种方案都可以达到预期目标，考虑代码结构的问题，我采用了方案二。&lt;/p&gt;
 &lt;h3 id=&quot;总结&quot;&gt;总结&lt;/h3&gt;
 &lt;p&gt;解决了上述问题后，我反思自己:当初看APUE和UNP的时候对上述问题之所以没有留下深刻的印象，原因恐怕是没有实际情况作为参照。想起一句名句:&lt;strong&gt;纸上得来终觉浅，绝知此事需躬行&lt;/strong&gt;&lt;/p&gt;
 </description>
