@@ -7,13 +7,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="author" content="songroger">
 
-  <title>TCP:多线程同时accept到底有没有必要?(惊群)</title>
+  <title>TCP:多线程同时accept到底有没有必要?</title>
 
   <meta name="description" content="&lt;hr /&gt;">
 
   <!-- Open graph data -->
   <meta property="og:site_name" content="Welcome my site">
-  <meta property="og:title" content="TCP:多线程同时accept到底有没有必要?(惊群)">
+  <meta property="og:title" content="TCP:多线程同时accept到底有没有必要?">
   <meta property="og:url" content="http://localhost:4000/ThunderingHerdProblem/">
   <meta property="og:type" content="article">
   <meta property="og:description" content="&lt;hr /&gt;">
@@ -62,7 +62,7 @@
 
 
 <article class="article">
-  <h2 class="article__title article__title--single">TCP:多线程同时accept到底有没有必要?(惊群)</h2>
+  <h2 class="article__title article__title--single">TCP:多线程同时accept到底有没有必要?</h2>
   <time class="article__date" datetime="2018-01-29"> 15:13 Jan.29-2018</time>
   
   <hr />
@@ -94,10 +94,30 @@
 <h3 id="三单线程accept的极限参数">三、单线程accept的极限参数</h3>
 <p>现在我们可以得到的结论是，高并发下，上述的队列参数的确会限制TCP并发连接数。可是具体参数是多少呢？我暂时不得而知，但我不久便会做个相应的实验(认真脸)!</p>
 
-<h3 id="四有没有必要">四、有没有必要？</h3>
-<p>假设我们的目标是使得单机承受100W个并发连接，并假设服务端成功的接收了上述的100W客户。</p>
-<h4 id="41我们先计算几个参数">4.1我们先计算几个参数</h4>
+<p>今天做了测试，模型是这样的: <strong>一个线程专门poll监听描述符号，有新连接就accept，然后将新fd交给其它线程，继续poll+accept</strong></p>
+
+<h4 id="测试记录">测试记录</h4>
 <ul>
+  <li><strong>电脑参数</strong>：双核+i5+4G 普通家用电脑</li>
+  <li><strong>发起连接数</strong>:50个进程，每个进程发起200个TCP连接，总共10K个连接，目标是 127.0.0.1:65500，发起连接后不管有无成功等待10S后，退出进程。</li>
+  <li><strong>服务端</strong>:监听65500端口，来一个接收一个。</li>
+  <li><strong>现象</strong>:服务端syn和accept队列被挤满，”netstat -s ]  grep listen”发现大量overflowed, ，1S内接收的TCP连接，最大时达到1200。</li>
+  <li><strong>问题</strong>:有时服务端会残留少量已连接TCP ，netstat ] grep localhost*.65500 可看到该问题 。可是客户端都已经关闭了，按理说每个连接都发送FIN分节。更加有意思的是，若在发起几波TCP连接，这些残留TCP会自动被服务端注销。</li>
+</ul>
+
+<h4 id="对测试结果的总结与思考">对测试结果的总结与思考</h4>
+<ul>
+  <li>关于残留TCP连接，我怀疑是Localhost的原因，由于数据量真的有点大了，我没有很好的办法追踪这个问题，只能暂时留个坑了。好在，结果是正确的，影响很小。</li>
+  <li>将poll换成epoll，如果仅仅是对于提高“接收TCP新连接”性能来说可能帮助并不大，因为要监听的端口号仅1个。</li>
+  <li>测试结果和电脑硬件有一定关系，但是数量级肯定是K级别，由于本地瞬间出现了大量的临时进程(50个发起10000TCP连接的进程），大量占用了CPU时间，所以实际上的结果肯定是偏小的。</li>
+  <li>因为是localhost，不经过数据链路层、网络层，有一定影响，但不大(猜测）</li>
+  <li>由于连接的断开也是该线程负责，但是每个客户端都预留了10S维持该连接，所以，poll+accept 循环间隔已经很短了。所以，测试的结果和可信。</li>
+  <li>如果以后有机会，换台高配主机，远程发起连接，再测试一回(认真脸)
+    <h3 id="四有没有必要">四、有没有必要？</h3>
+    <p>好了，现在继续。有了单线程accept的数据，我做大胆的分析：<strong>如果是为了提高TCP新连接并发数，多线程accept是可以的。</strong>
+假设我们的目标是使得单机承受100W个并发连接，并假设服务端成功的接收了上述的100W客户。</p>
+    <h4 id="41我们先计算几个参数">4.1我们先计算几个参数</h4>
+  </li>
   <li>服务端1s内给所有客户发送一个hello,world!报文占用的带宽:</li>
   <li>上述连接占用的内存</li>
 </ul>
@@ -105,7 +125,8 @@
 <h4 id="42内核是否能承受">4.2内核是否能承受？</h4>
 
 <h3 id="五结论">五、结论</h3>
-<p>未完待续~~~</p>
+<p>未完待续~<del>2018-1-29
+我暂时还是无法得出结论，但是主流网络库都是1个线程进行accept。我还会继续在这个问题上学习，网络上关于这个问题的讨论，真知灼见貌似寥寥无几。未完待续</del>~2018-2-10</p>
 
   
 </article>

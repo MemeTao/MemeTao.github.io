@@ -7,9 +7,25 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 11 Feb 2018 19:21:37 +0800</pubDate>
-    <lastBuildDate>Sun, 11 Feb 2018 19:21:37 +0800</lastBuildDate>
+    <pubDate>Tue, 13 Feb 2018 13:36:14 +0800</pubDate>
+    <lastBuildDate>Tue, 13 Feb 2018 13:36:14 +0800</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
+    
+      <item>
+        <title>TCP:参数优化</title>
+        <description>&lt;hr /&gt;
+&lt;p&gt;等待写…&lt;/p&gt;
+</description>
+        <pubDate>Mon, 12 Feb 2018 15:13:17 +0800</pubDate>
+        <link>http://localhost:4000/TcpParameterOptimization/</link>
+        <guid isPermaLink="true">http://localhost:4000/TcpParameterOptimization/</guid>
+        
+        
+        <category>network</category>
+        
+        <category>program</category>
+        
+      </item>
     
       <item>
         <title>Socket注意事项:非阻塞connect的返回值</title>
@@ -55,7 +71,7 @@
       </item>
     
       <item>
-        <title>TCP:多线程同时accept到底有没有必要?(惊群)</title>
+        <title>TCP:多线程同时accept到底有没有必要?</title>
         <description>&lt;hr /&gt;
 
 &lt;h3 id=&quot;一问题&quot;&gt;一、问题&lt;/h3&gt;
@@ -85,10 +101,30 @@
 &lt;h3 id=&quot;三单线程accept的极限参数&quot;&gt;三、单线程accept的极限参数&lt;/h3&gt;
 &lt;p&gt;现在我们可以得到的结论是，高并发下，上述的队列参数的确会限制TCP并发连接数。可是具体参数是多少呢？我暂时不得而知，但我不久便会做个相应的实验(认真脸)!&lt;/p&gt;
 
-&lt;h3 id=&quot;四有没有必要&quot;&gt;四、有没有必要？&lt;/h3&gt;
-&lt;p&gt;假设我们的目标是使得单机承受100W个并发连接，并假设服务端成功的接收了上述的100W客户。&lt;/p&gt;
-&lt;h4 id=&quot;41我们先计算几个参数&quot;&gt;4.1我们先计算几个参数&lt;/h4&gt;
+&lt;p&gt;今天做了测试，模型是这样的: &lt;strong&gt;一个线程专门poll监听描述符号，有新连接就accept，然后将新fd交给其它线程，继续poll+accept&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;测试记录&quot;&gt;测试记录&lt;/h4&gt;
 &lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;电脑参数&lt;/strong&gt;：双核+i5+4G 普通家用电脑&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;发起连接数&lt;/strong&gt;:50个进程，每个进程发起200个TCP连接，总共10K个连接，目标是 127.0.0.1:65500，发起连接后不管有无成功等待10S后，退出进程。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;服务端&lt;/strong&gt;:监听65500端口，来一个接收一个。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;现象&lt;/strong&gt;:服务端syn和accept队列被挤满，”netstat -s ]  grep listen”发现大量overflowed, ，1S内接收的TCP连接，最大时达到1200。&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;问题&lt;/strong&gt;:有时服务端会残留少量已连接TCP ，netstat ] grep localhost*.65500 可看到该问题 。可是客户端都已经关闭了，按理说每个连接都发送FIN分节。更加有意思的是，若在发起几波TCP连接，这些残留TCP会自动被服务端注销。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;对测试结果的总结与思考&quot;&gt;对测试结果的总结与思考&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;关于残留TCP连接，我怀疑是Localhost的原因，由于数据量真的有点大了，我没有很好的办法追踪这个问题，只能暂时留个坑了。好在，结果是正确的，影响很小。&lt;/li&gt;
+  &lt;li&gt;将poll换成epoll，如果仅仅是对于提高“接收TCP新连接”性能来说可能帮助并不大，因为要监听的端口号仅1个。&lt;/li&gt;
+  &lt;li&gt;测试结果和电脑硬件有一定关系，但是数量级肯定是K级别，由于本地瞬间出现了大量的临时进程(50个发起10000TCP连接的进程），大量占用了CPU时间，所以实际上的结果肯定是偏小的。&lt;/li&gt;
+  &lt;li&gt;因为是localhost，不经过数据链路层、网络层，有一定影响，但不大(猜测）&lt;/li&gt;
+  &lt;li&gt;由于连接的断开也是该线程负责，但是每个客户端都预留了10S维持该连接，所以，poll+accept 循环间隔已经很短了。所以，测试的结果和可信。&lt;/li&gt;
+  &lt;li&gt;如果以后有机会，换台高配主机，远程发起连接，再测试一回(认真脸)
+    &lt;h3 id=&quot;四有没有必要&quot;&gt;四、有没有必要？&lt;/h3&gt;
+    &lt;p&gt;好了，现在继续。有了单线程accept的数据，我做大胆的分析：&lt;strong&gt;如果是为了提高TCP新连接并发数，多线程accept是可以的。&lt;/strong&gt;
+假设我们的目标是使得单机承受100W个并发连接，并假设服务端成功的接收了上述的100W客户。&lt;/p&gt;
+    &lt;h4 id=&quot;41我们先计算几个参数&quot;&gt;4.1我们先计算几个参数&lt;/h4&gt;
+  &lt;/li&gt;
   &lt;li&gt;服务端1s内给所有客户发送一个hello,world!报文占用的带宽:&lt;/li&gt;
   &lt;li&gt;上述连接占用的内存&lt;/li&gt;
 &lt;/ul&gt;
@@ -96,7 +132,8 @@
 &lt;h4 id=&quot;42内核是否能承受&quot;&gt;4.2内核是否能承受？&lt;/h4&gt;
 
 &lt;h3 id=&quot;五结论&quot;&gt;五、结论&lt;/h3&gt;
-&lt;p&gt;未完待续~~~&lt;/p&gt;
+&lt;p&gt;未完待续~&lt;del&gt;2018-1-29
+我暂时还是无法得出结论，但是主流网络库都是1个线程进行accept。我还会继续在这个问题上学习，网络上关于这个问题的讨论，真知灼见貌似寥寥无几。未完待续&lt;/del&gt;~2018-2-10&lt;/p&gt;
 </description>
         <pubDate>Mon, 29 Jan 2018 15:13:17 +0800</pubDate>
         <link>http://localhost:4000/ThunderingHerdProblem/</link>
@@ -891,291 +928,6 @@ hanmingDis = dis;
         
         
         <category>algorithm</category>
-        
-      </item>
-    
-      <item>
-        <title>Markdown</title>
-        <description>&lt;hr /&gt;
-&lt;p&gt;Markdown manual&lt;/p&gt;
-
-&lt;h3 id=&quot;1-斜体和粗体&quot;&gt;1. 斜体和粗体&lt;/h3&gt;
-
-&lt;p&gt;使用 * 和 ** 表示斜体和粗体。&lt;/p&gt;
-
-&lt;p&gt;示例：&lt;/p&gt;
-
-&lt;p&gt;这是 &lt;em&gt;斜体&lt;/em&gt;，这是 &lt;strong&gt;粗体&lt;/strong&gt;。&lt;/p&gt;
-
-&lt;h3 id=&quot;2-分级标题&quot;&gt;2. 分级标题&lt;/h3&gt;
-
-&lt;p&gt;使用 === 表示一级标题，使用 — 表示二级标题。&lt;/p&gt;
-
-&lt;p&gt;示例：&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;这是一个一级标题
-============================
-
-这是一个二级标题
---------------------------------------------------
-
-### 这是一个三级标题
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;你也可以选择在行首加井号表示不同级别的标题 (H1-H6)，例如：# H1, ## H2, ### H3，#### H4。&lt;/p&gt;
-
-&lt;h3 id=&quot;3-外链接&quot;&gt;3. 外链接&lt;/h3&gt;
-
-&lt;p&gt;使用 [描述](链接地址) 为文字增加外链接。&lt;/p&gt;
-
-&lt;p&gt;示例：&lt;/p&gt;
-
-&lt;p&gt;这是去往 &lt;a href=&quot;http://github.com&quot;&gt;本人博客&lt;/a&gt; 的链接。&lt;/p&gt;
-
-&lt;h3 id=&quot;4-无序列表&quot;&gt;4. 无序列表&lt;/h3&gt;
-
-&lt;p&gt;使用 *，+，- 表示无序列表。&lt;/p&gt;
-
-&lt;p&gt;示例：&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;无序列表项 一&lt;/li&gt;
-  &lt;li&gt;无序列表项 二&lt;/li&gt;
-  &lt;li&gt;无序列表项 三&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;5-有序列表&quot;&gt;5. 有序列表&lt;/h3&gt;
-
-&lt;p&gt;使用数字和点表示有序列表。&lt;/p&gt;
-
-&lt;p&gt;示例：&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;有序列表项 一&lt;/li&gt;
-  &lt;li&gt;有序列表项 二&lt;/li&gt;
-  &lt;li&gt;有序列表项 三&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&quot;6-文字引用&quot;&gt;6. 文字引用&lt;/h3&gt;
-
-&lt;p&gt;使用 &amp;gt; 表示文字引用。&lt;/p&gt;
-
-&lt;p&gt;示例：&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;野火烧不尽，春风吹又生。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h3 id=&quot;7-行内代码块&quot;&gt;7. 行内代码块&lt;/h3&gt;
-
-&lt;p&gt;使用 `代码` 表示行内代码块。&lt;/p&gt;
-
-&lt;p&gt;示例：&lt;/p&gt;
-
-&lt;p&gt;让我们聊聊 &lt;code class=&quot;highlighter-rouge&quot;&gt;html&lt;/code&gt;。&lt;/p&gt;
-
-&lt;h3 id=&quot;8--代码块&quot;&gt;8.  代码块&lt;/h3&gt;
-
-&lt;p&gt;使用 四个缩进空格 表示代码块。&lt;/p&gt;
-
-&lt;p&gt;示例：&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;这是一个代码块，此行左侧有四个不可见的空格。
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h3 id=&quot;9--插入图像&quot;&gt;9.  插入图像&lt;/h3&gt;
-
-&lt;p&gt;使用 ![描述](图片链接地址) 插入图像。&lt;/p&gt;
-
-&lt;p&gt;示例：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://en.wikipedia.org/static/images/project-logos/enwiki-2x.png&quot; alt=&quot;我的头像&quot; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;markdown-高阶语法手册&quot;&gt;Markdown 高阶语法手册&lt;/h2&gt;
-
-&lt;h3 id=&quot;1-标签分类&quot;&gt;1. 标签分类&lt;/h3&gt;
-
-&lt;p&gt;在编辑区任意行的列首位置输入以下代码给文稿标签：&lt;/p&gt;
-
-&lt;p&gt;标签： 数学 英语 Markdown&lt;/p&gt;
-
-&lt;p&gt;或者&lt;/p&gt;
-
-&lt;p&gt;Tags： 数学 英语 Markdown&lt;/p&gt;
-
-&lt;h3 id=&quot;2-删除线&quot;&gt;2. 删除线&lt;/h3&gt;
-
-&lt;p&gt;使用 ~~ 表示删除线。&lt;/p&gt;
-
-&lt;p&gt;&lt;del&gt;这是一段错误的文本。&lt;/del&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;3-注脚&quot;&gt;3. 注脚&lt;/h3&gt;
-
-&lt;p&gt;使用 [^keyword] 表示注脚。&lt;/p&gt;
-
-&lt;p&gt;这是一个注脚&lt;sup id=&quot;fnref:footnote&quot;&gt;&lt;a href=&quot;#fn:footnote&quot; class=&quot;footnote&quot;&gt;1&lt;/a&gt;&lt;/sup&gt;的样例。&lt;/p&gt;
-
-&lt;p&gt;这是第二个注脚&lt;sup id=&quot;fnref:footnote2&quot;&gt;&lt;a href=&quot;#fn:footnote2&quot; class=&quot;footnote&quot;&gt;2&lt;/a&gt;&lt;/sup&gt;的样例。&lt;/p&gt;
-
-&lt;h3 id=&quot;4-加强的代码块&quot;&gt;4. 加强的代码块&lt;/h3&gt;
-
-&lt;p&gt;支持四十一种编程语言的语法高亮的显示，行号显示。&lt;/p&gt;
-
-&lt;p&gt;非代码示例：&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ sudo apt-get install vim-gnome
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;Python 示例：&lt;/p&gt;
-
-&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nd&quot;&gt;@requires_authorization&lt;/span&gt;
-&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;somefunc&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param1&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;param2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;):&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;'''A docstring'''&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;param1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;param2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;c&quot;&gt;# interesting&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;print&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'Greater'&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;param2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;param1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;ow&quot;&gt;or&lt;/span&gt; &lt;span class=&quot;bp&quot;&gt;None&lt;/span&gt;
-
-&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;SomeClass&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;pass&lt;/span&gt;
-
-&lt;span class=&quot;o&quot;&gt;&amp;gt;&amp;gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;message&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'''interpreter
-... prompt'''&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;JavaScript 示例：&lt;/p&gt;
-
-&lt;div class=&quot;language-javascript highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cm&quot;&gt;/**
-* nth element in the fibonacci series.
-* @param n &amp;gt;= 0
-* @return the nth element, &amp;gt;= 0.
-*/&lt;/span&gt;
-&lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;fib&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-  &lt;span class=&quot;kd&quot;&gt;var&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;tmp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;--&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;tmp&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;nx&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;tmp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-  &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-  &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;write&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;fib&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;10&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h3 id=&quot;5-定义型列表&quot;&gt;5. 定义型列表&lt;/h3&gt;
-
-&lt;dl&gt;
-  &lt;dt&gt;名词 1&lt;/dt&gt;
-  &lt;dd&gt;定义 1（左侧有一个可见的冒号和四个不可见的空格）&lt;/dd&gt;
-  &lt;dt&gt;代码块 2&lt;/dt&gt;
-  &lt;dd&gt;这是代码块的定义（左侧有一个可见的冒号和四个不可见的空格）
-
-    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;代码块（左侧有八个不可见的空格）
-&lt;/code&gt;&lt;/pre&gt;
-    &lt;/div&gt;
-  &lt;/dd&gt;
-&lt;/dl&gt;
-
-&lt;h3 id=&quot;6-html-标签&quot;&gt;6. Html 标签&lt;/h3&gt;
-
-&lt;p&gt;本站支持在 Markdown 语法中嵌套 Html 标签，譬如，你可以用 Html 写一个纵跨两行的表格：&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;table&amp;gt;
-    &amp;lt;tr&amp;gt;
-        &amp;lt;th rowspan=&quot;2&quot;&amp;gt;值班人员&amp;lt;/th&amp;gt;
-        &amp;lt;th&amp;gt;星期一&amp;lt;/th&amp;gt;
-        &amp;lt;th&amp;gt;星期二&amp;lt;/th&amp;gt;
-        &amp;lt;th&amp;gt;星期三&amp;lt;/th&amp;gt;
-    &amp;lt;/tr&amp;gt;
-    &amp;lt;tr&amp;gt;
-        &amp;lt;td&amp;gt;李强&amp;lt;/td&amp;gt;
-        &amp;lt;td&amp;gt;张明&amp;lt;/td&amp;gt;
-        &amp;lt;td&amp;gt;王平&amp;lt;/td&amp;gt;
-    &amp;lt;/tr&amp;gt;
-&amp;lt;/table&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;table&gt;
-    &lt;tr&gt;
-        &lt;th rowspan=&quot;2&quot;&gt;值班人员&lt;/th&gt;
-        &lt;th&gt;星期一&lt;/th&gt;
-        &lt;th&gt;星期二&lt;/th&gt;
-        &lt;th&gt;星期三&lt;/th&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-        &lt;td&gt;李强&lt;/td&gt;
-        &lt;td&gt;张明&lt;/td&gt;
-        &lt;td&gt;王平&lt;/td&gt;
-    &lt;/tr&gt;
-&lt;/table&gt;
-
-&lt;h3 id=&quot;7-待办事宜-todo-列表&quot;&gt;7. 待办事宜 Todo 列表&lt;/h3&gt;
-
-&lt;p&gt;使用带有 [ ] 或 [x] （未完成或已完成）项的列表语法撰写一个待办事宜列表，并且支持子列表嵌套以及混用Markdown语法，例如：&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;- [ ] **Cmd Markdown 开发**
-    - [ ] 改进 Cmd 渲染算法，使用局部渲染技术提高渲染效率
-    - [ ] 支持以 PDF 格式导出文稿
-    - [x] 新增Todo列表功能 [语法参考](https://github.com/)
-    - [x] 改进 LaTex 功能
-        - [x] 修复 LaTex 公式渲染问题
-        - [x] 新增 LaTex 公式编号功能 [语法参考](http://docs.mathjax.org)
-- [ ] **七月旅行准备**
-    - [ ] 准备邮轮上需要携带的物品
-    - [ ] 浏览日本免税店的物品
-    - [x] 购买蓝宝石公主号七月一日的船票
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;对应显示如下待办事宜 Todo 列表：&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;[ ] &lt;strong&gt;Cmd Markdown 开发&lt;/strong&gt;
-    &lt;ul&gt;
-      &lt;li&gt;[ ] 改进 Cmd 渲染算法，使用局部渲染技术提高渲染效率&lt;/li&gt;
-      &lt;li&gt;[ ] 支持以 PDF 格式导出文稿&lt;/li&gt;
-      &lt;li&gt;[x] 新增Todo列表功能 &lt;a href=&quot;https://github.com/blog/1375-task-lists-in-gfm-issues-pulls-comments&quot;&gt;语法参考&lt;/a&gt;&lt;/li&gt;
-      &lt;li&gt;[x] 改进 LaTex 功能
-        &lt;ul&gt;
-          &lt;li&gt;[x] 修复 LaTex 公式渲染问题&lt;/li&gt;
-          &lt;li&gt;[x] 新增 LaTex 公式编号功能 &lt;a href=&quot;http://docs.mathjax.org/en/latest/tex.html#tex-eq-numbers&quot;&gt;语法参考&lt;/a&gt;&lt;/li&gt;
-        &lt;/ul&gt;
-      &lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;[ ] &lt;strong&gt;七月旅行准备&lt;/strong&gt;
-    &lt;ul&gt;
-      &lt;li&gt;[ ] 准备邮轮上需要携带的物品&lt;/li&gt;
-      &lt;li&gt;[ ] 浏览日本免税店的物品&lt;/li&gt;
-      &lt;li&gt;[x] 购买蓝宝石公主号七月一日的船票&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;div class=&quot;footnotes&quot;&gt;
-  &lt;ol&gt;
-    &lt;li id=&quot;fn:footnote&quot;&gt;
-      &lt;p&gt;这是一个 &lt;em&gt;注脚&lt;/em&gt; 的 &lt;strong&gt;文本&lt;/strong&gt;。&amp;nbsp;&lt;a href=&quot;#fnref:footnote&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
-    &lt;/li&gt;
-    &lt;li id=&quot;fn:footnote2&quot;&gt;
-      &lt;p&gt;这是另一个 &lt;em&gt;注脚&lt;/em&gt; 的 &lt;strong&gt;文本&lt;/strong&gt;。&amp;nbsp;&lt;a href=&quot;#fnref:footnote2&quot; class=&quot;reversefootnote&quot;&gt;&amp;#8617;&lt;/a&gt;&lt;/p&gt;
-    &lt;/li&gt;
-  &lt;/ol&gt;
-&lt;/div&gt;
-</description>
-        <pubDate>Wed, 12 Oct 2016 17:13:17 +0800</pubDate>
-        <link>http://localhost:4000/markdown-manual/</link>
-        <guid isPermaLink="true">http://localhost:4000/markdown-manual/</guid>
-        
-        
-        <category>diary</category>
         
       </item>
     
