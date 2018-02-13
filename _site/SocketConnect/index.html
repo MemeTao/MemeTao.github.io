@@ -7,19 +7,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="author" content="songroger">
 
-  <title>Archive</title>
+  <title>Socket注意事项:非阻塞connect的返回值</title>
 
-  <meta name="description" content="中国计量大学本科 通信工程 在读(2017) ">
+  <meta name="description" content="&lt;hr /&gt;">
 
   <!-- Open graph data -->
   <meta property="og:site_name" content="Welcome my site">
-  <meta property="og:title" content="Archive">
-  <meta property="og:url" content="http://localhost:4000/archive/page2/">
+  <meta property="og:title" content="Socket注意事项:非阻塞connect的返回值">
+  <meta property="og:url" content="http://localhost:4000/SocketConnect/">
   <meta property="og:type" content="article">
-  <meta property="og:description" content="中国计量大学本科 通信工程 在读(2017) ">
+  <meta property="og:description" content="&lt;hr /&gt;">
 
   <!-- Standard Stuff -->
-  <link rel="canonical" href="http://localhost:4000/archive/page2/"/>
+  <link rel="canonical" href="http://localhost:4000/SocketConnect/"/>
   <link rel="alternate" type="application/rss+xml" title="Welcome my site" href="http://localhost:4000/feed.xml"/>
 
   <!-- Favicons -->
@@ -61,62 +61,43 @@
   <main class="col">
 
 
-<h2 class="article__title article__title--single">Archive</h2>
-<ul>
+<article class="article">
+  <h2 class="article__title article__title--single">Socket注意事项:非阻塞connect的返回值</h2>
+  <time class="article__date" datetime="2018-02-10"> 15:13 Feb.10-2018</time>
   
-    <div class="arch-item">
-      <li>
-        <a href="/functionClass/" class="arch-title">C++fucnion模板类与函数指针</a>
-        <time>Jun.07, 2017</time>
-      </li>
-      
-    </div>
-  
-    <div class="arch-item">
-      <li>
-        <a href="/callback/" class="arch-title">当回调函数是C++类成员函数</a>
-        <time>May.20, 2017</time>
-      </li>
-      
-    </div>
-  
-    <div class="arch-item">
-      <li>
-        <a href="/mytracks/" class="arch-title">我的这一次选择</a>
-        <time>May.07, 2017</time>
-      </li>
-      
-    </div>
-  
-    <div class="arch-item">
-      <li>
-        <a href="/VBIT/" class="arch-title">维特比算法的实现</a>
-        <time>Apr.12, 2017</time>
-      </li>
-      
-    </div>
-  
-    <div class="arch-item">
-      <li>
-        <a href="/markdown-manual/" class="arch-title">Markdown</a>
-        <time>Oct.12, 2016</time>
-      </li>
-      <div class="arch-desc">love markdown, love plain texts. Enjoy its manual</div>
-    </div>
-  
-</ul>
+  <hr />
 
-    <nav class="blocks blocks--space">
-      <div class="blocks__item">
-        <a href="/archive/">Previous</a>
-      </div>
-      <div class="blocks__item">
-        Page: 2 of 2
-      </div>
-      <div class="blocks__item">
-        
-      </div>
-    </nav>
+<h3 id="问题引入">问题引入：</h3>
+<p>为了测试1S内TCP服务器单线程能accept多少并发TCP连接，由于正常的TCP建立可能需要几十毫秒，所以客户端发起的连接应该是这样子的:</p>
+<div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="kt">bool</span> <span class="nf">connect</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">fd</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span><span class="n">SOCK_STREAM</span> <span class="o">|</span> <span class="n">SOCK_NONBLOCK</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span><span class="c1">//非阻塞connect
+</span>    <span class="n">res</span> <span class="o">=</span> <span class="n">connect</span><span class="p">(</span><span class="n">fd_</span><span class="p">,</span><span class="n">serverAddr</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span><span class="p">));</span>
+    <span class="k">return</span> <span class="n">res</span> <span class="o">==</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+<p>代码运行后，我发现connect()返回值一直是false，但是使用tcpdump抓包发现tcp三次握手正常，也就是说仅仅是connect函数的返回值不符合预期。</p>
+
+<h3 id="解决问题">解决问题</h3>
+<p>我再一次翻开«UNP»，在书上发现：<strong>当在一个非阻塞的TCP套接字上调用connect时，将立即返回一个EINPROGRESS错误，不过已经发起的TCP三路握手继续进行</strong>，
+这样问题就清晰了，修改代码如下：</p>
+<div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="kt">bool</span> <span class="nf">connect</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="n">fd</span> <span class="o">=</span> <span class="n">socket</span><span class="p">(</span><span class="n">AF_INET</span><span class="p">,</span><span class="n">SOCK_STREAM</span> <span class="o">|</span> <span class="n">SOCK_NONBLOCK</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span><span class="c1">//非阻塞connect
+</span>    <span class="n">res</span> <span class="o">=</span> <span class="n">connect</span><span class="p">(</span><span class="n">fd_</span><span class="p">,</span><span class="n">serverAddr</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="k">struct</span> <span class="n">sockaddr</span><span class="p">));</span>
+    <span class="k">return</span> <span class="n">res</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">errno</span> <span class="o">==</span> <span class="n">EINPROGRESS</span> <span class="p">;</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+<p>注:errno是线程安全的，每个线程都保留一份errno。</p>
+<h3 id="总结">总结</h3>
+<p><strong>纸上得来终觉浅，绝知此事需躬行</strong></p>
+
+
+  
+</article>
+
 
 
 
