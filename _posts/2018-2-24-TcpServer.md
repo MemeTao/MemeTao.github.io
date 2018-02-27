@@ -88,3 +88,44 @@ void Channel::handleEvent()
 我大致描述一下上面的过程:**首先，loop调用poll()进入内核，内核返回活动的fd,并将每一个活动的fd所发生的事件类型记录在revents_上。一个fd对应一个channel(poller中)，因此我们可以快速找到channel，并根据channel的revents_执行对应的回调函数。**
 
 PS:如今回过头来看，发现Reactor也就是这么一回事儿。
+### 第二部分 定时器
+一个网络程序，少不了定时器功能。为了将定时器融入上述的Reactor模式，我使用了Linux timerfd，这会使得代码一致性更好，因为我们可以用一个fd代表一个timer，从而融入evnetloop。
+Linux 新增的timer_create()用来创建一个定时器,详见：http://man7.org/linux/man-pages/man2/timer_create.2.html
+用法是这样的：我创建一个定时器，返回一个fd，当超时到来时，fd变为可读，在fd上读取8个字节，内核会取消该定时器的超时事件。
+
+考虑一个问题，假设当前时间是AM6.00我有需要在PM 10.00、PM 11.00、AM 7.20、AM 8.36定点执行任务，我应该怎么办？直接的做法是创建四个定时器。但是如果业务复杂，定点任务非常多，需要1000个定时器怎么办？注册1000个是不是会严重拖累内核?正确的做法是：仅仅注册时间离当前时间最近的定时器。上例中，我们仅需要注册AM7.20。当7.20时，我们先不执行回调，而是将定时器时间换为AM8.36，然后再去执行回调。这样，内核任务就不重了。我用std::set管理定时器，取出离当前最近的定时器，仅需要O(Log N)，很高效。取出超时定时器的时候需要特别注意：**从我们发现定时器超时到取定时器的这段时间里，可能已经有新的定时器超时了，因为我们可能在其他地方耽误了一些时间。所以我们先要获取一下当前时间，然后使用set<T>::lower_bound()函数，一次性取出所有早于当前时间的定时器。**
+```c++
+class TimerQueue{
+    typedef std::pair<Timestamp,std::shared_ptr <Timer> >Entry;
+    typedef std::set< Entry > TimerList;
+public:
+    TimerQueue(EventLoop* loop);
+    ~TimerQueue();
+    void addTimer(Timestamp& when,double interval,const TimerCallBack&);//新增定时器
+    std::vector<TimerQueue::Entry> getExpired(Timestamp& now);         //取出超时的定时器
+private:
+    void handleRead(void);  //timerfd_ 可读的处理入口
+    void addTimerInLoop(std::shared_ptr<Timer>);                        
+    bool insertTimer(shared_ptr<Timer> timer);
+    void reset(std::vector<Entry>&,const Timestamp&);                  //重置定时器
+    EventLoop* loop_;                                                  //所属Loop
+    const int timerfd_;                                                //即将超时的定时器
+    Channel timerfdChannel_;                                           //为了融入loop，需要channel
+    TimerList timers_;
+};
+```
+定时器部分总体思路就是这样子的，不多介绍了。
+
+**ps:在如今的X86上，取得时间已经不是系统调用。**
+### 第三部分  TCP服务器
+
+有了以上的reactor结构，构建一个tcp server的任务就轻松了一些，只是相对轻松一些。
+考虑下面问题：
+* 1、可否将一个tcp连接的fd，暴露给多个线程？考虑一个场景，线程1正在往fd写数据，线程2检测到了该fd的FIN，执行被动关闭，调用了close(fd),这意味着所有与这tcp连接相关的资源都将一一释放，线程1怎么办？这时候，进程奔溃恐怕是最好的结果。当然，我们也可以使用shared_ptr<T>包裹这个tcp connection，当connection.use_count() > 1时，线程2 sleep()一会，sleep()正确么？又该sleep()几秒呢？恐怕行不通。
+* 2、如果两个线程同时read一个fd,两个线程各自收到一部分数据，怎么合并成一条完整的数据？
+* 3、一个更糟糕的问题：一个线程正准备read某个socket,而另一个线程close()了此socket，第三个线程恰好open()了另一个文件描述符，其fd恰好与前面的socket相同。这时候，恐怕要串话了！	
+
+因为是多线程环境，如果框架不合理，资源的安全释放很难做到。
+```c++
+```
+
