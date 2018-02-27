@@ -7,15 +7,16 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 27 Feb 2018 19:32:44 +0800</pubDate>
-    <lastBuildDate>Tue, 27 Feb 2018 19:32:44 +0800</lastBuildDate>
+    <pubDate>Tue, 27 Feb 2018 19:49:27 +0800</pubDate>
+    <lastBuildDate>Tue, 27 Feb 2018 19:49:27 +0800</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
     
       <item>
         <title>tcp多线程服务器总结</title>
         <description>&lt;hr /&gt;
-&lt;p&gt;2018-2-13 更新：完善reactor部分描述
-2018-2-27 更新：tcp 部分描述的不太清楚，删掉重改&lt;/p&gt;
+&lt;p&gt;2018-2-13 更新：完善reactor部分描述&lt;/p&gt;
+
+&lt;p&gt;2018-2-27 更新：tcp 部分描述的不太清楚，删掉重改&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;我试图用几千字描述完我这一个月的学习成果，所以，很多地方只能做个大致介绍。&lt;/strong&gt;&lt;/p&gt;
 &lt;h3 id=&quot;服务器总体结构&quot;&gt;服务器总体结构&lt;/h3&gt;
@@ -139,8 +140,21 @@ Linux 新增的timer_create()用来创建一个定时器,详见：http://man7.or
   &lt;li&gt;3、一个更糟糕的问题：一个线程正准备read某个socket,而另一个线程close()了此socket，第三个线程恰好open()了另一个文件描述符，其fd恰好与前面的socket相同。这时候，恐怕要串话了！&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;&lt;strong&gt;因为是多线程环境，如果框架不合理，资源的安全释放很难做到。&lt;/strong&gt;
-这是TCP Server单线程时候的样子：&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;因为是多线程环境，如果框架不合理，资源的安全释放很难做到。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;我分几部分介绍TCP SERVER：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;单线程环境下 Acceptor连接器、TcpConnetion连接类、TcpServer类&lt;/li&gt;
+  &lt;li&gt;TCP连接的断开&lt;/li&gt;
+  &lt;li&gt;TCP读写&lt;/li&gt;
+  &lt;li&gt;应用层Buffer&lt;/li&gt;
+  &lt;li&gt;多线程前置准备：RAII互斥锁、条件变量、线程池&lt;/li&gt;
+  &lt;li&gt;多线程环境下的 Acceptor连接器、TcpConnetion连接类、TcpServer类的改动&lt;/li&gt;
+  &lt;li&gt;多线程下的TCP连接的断开和TCP的读写&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;以下为草稿&quot;&gt;以下为草稿&lt;/h3&gt;
+&lt;p&gt;这是TCP Server单线程时候的样子：&lt;/p&gt;
 &lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;TcpServer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
 &lt;span class=&quot;k&quot;&gt;public&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
     &lt;span class=&quot;n&quot;&gt;TcpServer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;InetAddress&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;listenAddr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
@@ -185,7 +199,7 @@ Linux 新增的timer_create()用来创建一个定时器,详见：http://man7.or
 &lt;h4 id=&quot;tcp读写&quot;&gt;tcp读写&lt;/h4&gt;
 &lt;ul&gt;
   &lt;li&gt;读取就是上述的messageCallback();&lt;/li&gt;
-  &lt;li&gt;写就比较麻烦了，涉及到socket缓冲区的问题。只能再开一篇文章介绍：
+  &lt;li&gt;写就比较麻烦了，涉及到socket缓冲区的问题。只能再开一篇文章介绍:https://memetao.github.io/TcpBuffer/
     &lt;h4 id=&quot;应用层buffer&quot;&gt;应用层Buffer&lt;/h4&gt;
     &lt;p&gt;举个例子：我们往fd写100KB数据，但是涉及缓冲区的问题，我们也许只能写入64KB，剩下的数据怎么办？程序不可能等到这里直到TCP把64KB发送出去。应用程序的编写者不希望自己的程序阻塞在这里，他要抽身去忙活其他的事情。所以就需要一个Buffer缓存剩下的36KB数据，监视tcp fd，等到tcp发送完64KB数据，会使得可读事件发生，立即将36KB数据写入。这样子，在应用程序的编写看来，他是一次性完成了100KB的数据的写入的，他只需要调用buffer.write(data)，我们的tcp服务器程序会接管剩下的数据。&lt;/p&gt;
     &lt;h4 id=&quot;解码器接口&quot;&gt;解码器接口&lt;/h4&gt;
@@ -193,6 +207,10 @@ Linux 新增的timer_create()用来创建一个定时器,详见：http://man7.or
   &lt;/li&gt;
   &lt;li&gt;当对端写入一条信息，但是发生了tcp分包，数据不是一次性的到达服务端，但是服务端会接收到达的每一段数据，如何知道一条的消息已经到达?&lt;/li&gt;
   &lt;li&gt;当服务端繁忙时，某一个tcp连接达到的数据可能已经包含好几条消息，等到应用层read()，这时，我们怎么分开数据?
+    &lt;h4 id=&quot;多线程前置准备&quot;&gt;多线程前置准备&lt;/h4&gt;
+    &lt;h5 id=&quot;raii互斥锁待写&quot;&gt;RAII互斥锁(待写)&lt;/h5&gt;
+    &lt;h5 id=&quot;raii条件变量待写&quot;&gt;RAII条件变量(待写)&lt;/h5&gt;
+    &lt;h5 id=&quot;线程池待写&quot;&gt;线程池(待写)&lt;/h5&gt;
     &lt;h4 id=&quot;引入多线程&quot;&gt;引入多线程&lt;/h4&gt;
     &lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;//新增部分
 &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;class&lt;/span&gt; &lt;span class=&quot;nc&quot;&gt;TcpServer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
@@ -209,7 +227,7 @@ Linux 新增的timer_create()用来创建一个定时器,详见：http://man7.or
     &lt;/div&gt;
     &lt;p&gt;说明：&lt;/p&gt;
   &lt;/li&gt;
-  &lt;li&gt;引入线程池，使得tcp server直属loop仅接收tcp连接&lt;/li&gt;
+  &lt;li&gt;引入线程池，使得tcp server直属loop仅接收tcp连接。&lt;/li&gt;
   &lt;li&gt;对于每个新来的连接，我都为其分配一个loop线程，采用循环分配的方式，平衡每一个线程的压力&lt;/li&gt;
   &lt;li&gt;由于每一个tcp连接仅属于某一个线程，故大大减少的多线程编程的复杂性&lt;/li&gt;
 &lt;/ul&gt;

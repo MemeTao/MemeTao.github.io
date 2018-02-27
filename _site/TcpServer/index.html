@@ -9,14 +9,14 @@
 
   <title>tcp多线程服务器总结</title>
 
-  <meta name="description" content="&lt;hr /&gt;&lt;p&gt;2018-2-13 更新：完善reactor部分描述2018-2-27 更新：tcp 部分描述的不太清楚，删掉重改&lt;/p&gt;">
+  <meta name="description" content="&lt;hr /&gt;&lt;p&gt;2018-2-13 更新：完善reactor部分描述&lt;/p&gt;">
 
   <!-- Open graph data -->
   <meta property="og:site_name" content="Welcome my site">
   <meta property="og:title" content="tcp多线程服务器总结">
   <meta property="og:url" content="http://localhost:4000/TcpServer/">
   <meta property="og:type" content="article">
-  <meta property="og:description" content="&lt;hr /&gt;&lt;p&gt;2018-2-13 更新：完善reactor部分描述2018-2-27 更新：tcp 部分描述的不太清楚，删掉重改&lt;/p&gt;">
+  <meta property="og:description" content="&lt;hr /&gt;&lt;p&gt;2018-2-13 更新：完善reactor部分描述&lt;/p&gt;">
 
   <!-- Standard Stuff -->
   <link rel="canonical" href="http://localhost:4000/TcpServer/"/>
@@ -66,8 +66,9 @@
   <time class="article__date" datetime="2018-02-12"> 15:13 Feb.12-2018</time>
   
   <hr />
-<p>2018-2-13 更新：完善reactor部分描述
-2018-2-27 更新：tcp 部分描述的不太清楚，删掉重改</p>
+<p>2018-2-13 更新：完善reactor部分描述</p>
+
+<p>2018-2-27 更新：tcp 部分描述的不太清楚，删掉重改</p>
 
 <p><strong>我试图用几千字描述完我这一个月的学习成果，所以，很多地方只能做个大致介绍。</strong></p>
 <h3 id="服务器总体结构">服务器总体结构</h3>
@@ -191,8 +192,21 @@ Linux 新增的timer_create()用来创建一个定时器,详见：http://man7.or
   <li>3、一个更糟糕的问题：一个线程正准备read某个socket,而另一个线程close()了此socket，第三个线程恰好open()了另一个文件描述符，其fd恰好与前面的socket相同。这时候，恐怕要串话了！</li>
 </ul>
 
-<p><strong>因为是多线程环境，如果框架不合理，资源的安全释放很难做到。</strong>
-这是TCP Server单线程时候的样子：</p>
+<p><strong>因为是多线程环境，如果框架不合理，资源的安全释放很难做到。</strong></p>
+
+<p>我分几部分介绍TCP SERVER：</p>
+<ul>
+  <li>单线程环境下 Acceptor连接器、TcpConnetion连接类、TcpServer类</li>
+  <li>TCP连接的断开</li>
+  <li>TCP读写</li>
+  <li>应用层Buffer</li>
+  <li>多线程前置准备：RAII互斥锁、条件变量、线程池</li>
+  <li>多线程环境下的 Acceptor连接器、TcpConnetion连接类、TcpServer类的改动</li>
+  <li>多线程下的TCP连接的断开和TCP的读写</li>
+</ul>
+
+<h3 id="以下为草稿">以下为草稿</h3>
+<p>这是TCP Server单线程时候的样子：</p>
 <div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">TcpServer</span><span class="p">{</span>
 <span class="k">public</span><span class="o">:</span>
     <span class="n">TcpServer</span><span class="p">(</span><span class="n">InetAddress</span> <span class="n">listenAddr</span><span class="p">);</span>
@@ -237,7 +251,7 @@ Linux 新增的timer_create()用来创建一个定时器,详见：http://man7.or
 <h4 id="tcp读写">tcp读写</h4>
 <ul>
   <li>读取就是上述的messageCallback();</li>
-  <li>写就比较麻烦了，涉及到socket缓冲区的问题。只能再开一篇文章介绍：
+  <li>写就比较麻烦了，涉及到socket缓冲区的问题。只能再开一篇文章介绍:https://memetao.github.io/TcpBuffer/
     <h4 id="应用层buffer">应用层Buffer</h4>
     <p>举个例子：我们往fd写100KB数据，但是涉及缓冲区的问题，我们也许只能写入64KB，剩下的数据怎么办？程序不可能等到这里直到TCP把64KB发送出去。应用程序的编写者不希望自己的程序阻塞在这里，他要抽身去忙活其他的事情。所以就需要一个Buffer缓存剩下的36KB数据，监视tcp fd，等到tcp发送完64KB数据，会使得可读事件发生，立即将36KB数据写入。这样子，在应用程序的编写看来，他是一次性完成了100KB的数据的写入的，他只需要调用buffer.write(data)，我们的tcp服务器程序会接管剩下的数据。</p>
     <h4 id="解码器接口">解码器接口</h4>
@@ -245,6 +259,10 @@ Linux 新增的timer_create()用来创建一个定时器,详见：http://man7.or
   </li>
   <li>当对端写入一条信息，但是发生了tcp分包，数据不是一次性的到达服务端，但是服务端会接收到达的每一段数据，如何知道一条的消息已经到达?</li>
   <li>当服务端繁忙时，某一个tcp连接达到的数据可能已经包含好几条消息，等到应用层read()，这时，我们怎么分开数据?
+    <h4 id="多线程前置准备">多线程前置准备</h4>
+    <h5 id="raii互斥锁待写">RAII互斥锁(待写)</h5>
+    <h5 id="raii条件变量待写">RAII条件变量(待写)</h5>
+    <h5 id="线程池待写">线程池(待写)</h5>
     <h4 id="引入多线程">引入多线程</h4>
     <div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="c1">//新增部分
 </span><span class="k">class</span> <span class="nc">TcpServer</span><span class="p">{</span>
@@ -261,7 +279,7 @@ Linux 新增的timer_create()用来创建一个定时器,详见：http://man7.or
     </div>
     <p>说明：</p>
   </li>
-  <li>引入线程池，使得tcp server直属loop仅接收tcp连接</li>
+  <li>引入线程池，使得tcp server直属loop仅接收tcp连接。</li>
   <li>对于每个新来的连接，我都为其分配一个loop线程，采用循环分配的方式，平衡每一个线程的压力</li>
   <li>由于每一个tcp连接仅属于某一个线程，故大大减少的多线程编程的复杂性</li>
 </ul>
