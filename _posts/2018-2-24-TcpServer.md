@@ -7,13 +7,16 @@ location: HangZhou,China
 description:  
 ---
 ---
+2018-2-13 更新：完善reactor部分描述
+2018-2-27 更新：tcp 部分描述的不太清楚，删掉重改
+
 **我试图用几千字描述完我这一个月的学习成果，所以，很多地方只能做个大致介绍。**
 ### 服务器总体结构
 ![framework](../material/TCPSERVER/tcp_framework.png)
 
-#### 为什么要采用多线程结构？可以带来哪些优势？
+* **为什么要采用多线程结构？可以带来哪些优势？**
 因为现在的CPU都是多核，线程比较廉价。多线程结构可以提高响应速度，让IO与计算相互重叠，降低latency。
-#### 多线程带来的编程复杂性怎么解决?
+* **多线程带来的编程复杂性怎么解决?**
 One loop one thread！使得线程间的耦合降到最低，仅少数地方加锁。
 
 #### 我主要分三部分介绍，Reactor事件循环、定时器、TCP服务器
@@ -68,8 +71,8 @@ Channel{
     handleEvent();
     EventLoop*  loop_;      //所属的Loop
     int fd;                 // 对应的文件描述符
-    int events_;			//关注的事件
-    int revents_;			//该文件描述符上正在发生的事件(由poll得知)
+    int events_;            //关注的事件
+    int revents_;           //该文件描述符上正在发生的事件(由poll得知)
     CallBack readCallback_; //回调函数
     CallBack writeCallback_;
     CallBack errorCallback_;
@@ -125,7 +128,96 @@ private:
 * 2、如果两个线程同时read一个fd,两个线程各自收到一部分数据，怎么合并成一条完整的数据？
 * 3、一个更糟糕的问题：一个线程正准备read某个socket,而另一个线程close()了此socket，第三个线程恰好open()了另一个文件描述符，其fd恰好与前面的socket相同。这时候，恐怕要串话了！	
 
-因为是多线程环境，如果框架不合理，资源的安全释放很难做到。
+**因为是多线程环境，如果框架不合理，资源的安全释放很难做到。**
+这是TCP Server单线程时候的样子：
 ```c++
+class TcpServer{
+public:
+    TcpServer(InetAddress listenAddr);
+    void setMessageCallback(const MessageCallback&& cb);
+    void removeConnection(int fd,EventLoop* loop); 
+    void stat();
+private:
+    void newConnetion(int fd,const InetAddress& addr);
+    std::shared_ptr<EventLoop>   loop_;
+    std::shared_ptr<TcpAcceptor> acceptor_;
+    ConnectedMap                 connections_;
+
+    MessageCallback              messageCallback_;
+};
+void TcpServer::newConnetion(int fd,const InetAddress& addr)
+{
+    shared_ptr<TcpConnection> newConn = std::make_shared<TcpConnection>(loop_,fd,addr);
+    connections_[fd] = newConn;
+    newConn->setMessageCallback(messageCallback_);
+}
 ```
+三言两语说清楚太不容易了，一个简化的过程是这样的：当新连接到达时，acceptor会回调newConnection(),实例化一个TCP连接对象，并记录。TCP连接对象:TcpConnection。它会接管该具体的TCP连接，因为accept()会返回一个fd，我根据这个fd，创建一个channel，添加到eventloop中。这样，当这个tcp连接的读写事件到达时，就可以根据channel执行对应的回调了,比如tcp fd可读：
+```c++
+void TcpConnection::handleRead()
+{
+    int n = read(fd_);
+    if( n > 0)
+    {
+        messageCallback_(shared_from_this(),inputBuffer_,socket_->fd());
+    }
+    else if(n == 0) //FIN 分节
+    {
+        handleClose();
+    }
+    else
+    {
+        handleError();
+    }
+}
+```
+#### tcp读写
+* 读取就是上述的messageCallback();
+* 写就比较麻烦了，涉及到socket缓冲区的问题。只能再开一篇文章介绍：
+#### 应用层Buffer 
+举个例子：我们往fd写100KB数据，但是涉及缓冲区的问题，我们也许只能写入64KB，剩下的数据怎么办？程序不可能等到这里直到TCP把64KB发送出去。应用程序的编写者不希望自己的程序阻塞在这里，他要抽身去忙活其他的事情。所以就需要一个Buffer缓存剩下的36KB数据，监视tcp fd，等到tcp发送完64KB数据，会使得可读事件发生，立即将36KB数据写入。这样子，在应用程序的编写看来，他是一次性完成了100KB的数据的写入的，他只需要调用buffer.write(data)，我们的tcp服务器程序会接管剩下的数据。
+#### 解码器接口
+举个例子：
+* 当对端写入一条信息，但是发生了tcp分包，数据不是一次性的到达服务端，但是服务端会接收到达的每一段数据，如何知道一条的消息已经到达?
+* 当服务端繁忙时，某一个tcp连接达到的数据可能已经包含好几条消息，等到应用层read()，这时，我们怎么分开数据?
+#### 引入多线程
+```c++
+//新增部分
+class TcpServer{
+public:
+    void setThreadNum(int loopThreadNum,int taskThreadNum );
+    void removeConnection(int fd,EventLoop* loop); 
+    //给用户提供线程池,方便配送任务
+    std::shared_ptr<ThreadPool> getThreadPool() { return threadPool_;} 
+private:
+    void removeConnInLoop(int fd,EventLoop* loop);
+    std::shared_ptr<ThreadPool>  threadPool_;
+};
+```
+说明：
+* 引入线程池，使得tcp server直属loop仅接收tcp连接
+* 对于每个新来的连接，我都为其分配一个loop线程，采用循环分配的方式，平衡每一个线程的压力
+* 由于每一个tcp连接仅属于某一个线程，故大大减少的多线程编程的复杂性
+
+#### 多线程环境下接受tcp新连接
+来一个tcp连接，我们要做的是为其分配一个Loop线程，并配置好回调函数
+```c++
+void TcpServer::newConnetion(int fd,const InetAddress& addr)
+{
+    loop_->assertInLoopThread();  //断言检查是否为所属Loop线程
+    EventLoop* newLoop = threadPool_->getLoop(); //获取一个Loop线程
+    if(newLoop == nullptr)        //线程池里面没有LoopThread,也就是单线程模式
+    {
+        newLoop = loop_.get();    //使用主线程的Loop
+    }
+    shared_ptr<TcpConnection> newConn = std::make_shared<TcpConnection>(newLoop,fd,addr);
+    assert(connections_.find(fd) == connections_.end());
+    connections_[fd] = newConn;
+
+    newConn->setMessageCallback(messageCallback_);
+    newLoop->runInLoop(std::bind(&TcpConnection::established,newConn));
+}
+```
+#### 断开TCP连接
+这是最复杂的。
 
