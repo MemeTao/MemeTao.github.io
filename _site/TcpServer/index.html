@@ -9,14 +9,14 @@
 
   <title>tcp多线程服务器总结</title>
 
-  <meta name="description" content="&lt;hr /&gt;&lt;p&gt;等待写..&lt;/p&gt;">
+  <meta name="description" content="&lt;hr /&gt;&lt;p&gt;&lt;strong&gt;我试图用几千字描述完我这一个月的学习成果，所以，很多地方只能做个大致介绍。&lt;/strong&gt;&lt;/p&gt;&lt;h3 id=&quot;服务器总体结构&quot;&gt;服务器总体结构&lt;/h3&gt;&lt;p&gt;...">
 
   <!-- Open graph data -->
   <meta property="og:site_name" content="Welcome my site">
   <meta property="og:title" content="tcp多线程服务器总结">
   <meta property="og:url" content="http://localhost:4000/TcpServer/">
   <meta property="og:type" content="article">
-  <meta property="og:description" content="&lt;hr /&gt;&lt;p&gt;等待写..&lt;/p&gt;">
+  <meta property="og:description" content="&lt;hr /&gt;&lt;p&gt;&lt;strong&gt;我试图用几千字描述完我这一个月的学习成果，所以，很多地方只能做个大致介绍。&lt;/strong&gt;&lt;/p&gt;&lt;h3 id=&quot;服务器总体结构&quot;&gt;服务器总体结构&lt;/h3&gt;&lt;p&gt;...">
 
   <!-- Standard Stuff -->
   <link rel="canonical" href="http://localhost:4000/TcpServer/"/>
@@ -66,7 +66,87 @@
   <time class="article__date" datetime="2018-02-12"> 15:13 Feb.12-2018</time>
   
   <hr />
-<p>等待写..</p>
+<p><strong>我试图用几千字描述完我这一个月的学习成果，所以，很多地方只能做个大致介绍。</strong></p>
+<h3 id="服务器总体结构">服务器总体结构</h3>
+<p><img src="../material/TCPSERVER/tcp_framework.png" alt="framework" /></p>
+
+<h4 id="为什么要采用多线程结构可以带来哪些优势">为什么要采用多线程结构？可以带来哪些优势？</h4>
+<p>因为现在的CPU都是多核，线程比较廉价。多线程结构可以提高响应速度，让IO与计算相互重叠，降低latency。</p>
+<h4 id="多线程带来的编程复杂性怎么解决">多线程带来的编程复杂性怎么解决?</h4>
+<p>One loop one thread！使得线程间的耦合降到最低，仅少数地方加锁。</p>
+
+<h4 id="我主要分三部分介绍reactor事件循环定时器tcp服务器">我主要分三部分介绍，Reactor事件循环、定时器、TCP服务器</h4>
+
+<h3 id="第一部分-reactor事件循环">第一部分 Reactor事件循环</h3>
+<p>reactor由三个基本的类购成，EventLoop、Poller、channel，前者是后者的数据成员。</p>
+<h4 id="eventloop的功能找出活动的事件执行该事件的回调">EventLoop的功能:找出活动的事件，执行该事件的回调。</h4>
+<p>EventLoop的一个样子:</p>
+<div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">EventLoop</span><span class="p">{</span>
+    <span class="n">loop</span><span class="p">();</span>
+    <span class="n">Poller</span> <span class="n">poller_</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="kt">void</span> <span class="n">EventLoop</span><span class="o">::</span><span class="n">loop</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="k">while</span><span class="p">(</span><span class="nb">true</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">activeChannels</span><span class="p">;</span>
+        <span class="n">poller_</span><span class="p">(</span><span class="o">&amp;</span><span class="n">acctiveChannels</span><span class="p">);</span><span class="c1">//将活动事件填充到activeChannel
+</span>        <span class="k">for</span><span class="p">(</span><span class="k">auto</span> <span class="n">it</span> <span class="o">:</span> <span class="n">activeChannels</span><span class="p">)</span>
+            <span class="n">it</span><span class="o">-&gt;</span><span class="n">handleEvent</span><span class="p">();</span>              <span class="c1">//执行对应事件的回调	
+</span>    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+<p>暂时将poller看作是一个黑盒子，下文介绍。
+事实上，EventLoop还有一些非常重要的数据管理函数，如runInLoop():它可以在线程间分配任务,起到消除race condition的作用，我稍后介绍。</p>
+<h4 id="poller的功能监视所有建立的文件描述符fd找出其中处于活动状态的fd">Poller的功能：监视所有建立的文件描述符(fd)，找出其中处于活动状态的fd.</h4>
+<p>Poller的样子：</p>
+<div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">Poller</span><span class="p">{</span>
+    <span class="n">poll</span><span class="p">();</span>
+    <span class="n">fds_</span><span class="p">;</span>    <span class="c1">//所有fd
+</span>    <span class="n">map</span><span class="o">&lt;</span><span class="kt">int</span><span class="p">,</span><span class="n">Channel</span><span class="o">*&gt;</span> <span class="n">channelMap_</span><span class="p">;</span> <span class="c1">//每一个fd对应的channel
+</span><span class="p">};</span>
+<span class="kt">void</span> <span class="n">Poller</span><span class="o">::</span><span class="n">poll</span><span class="p">(</span><span class="kt">int</span> <span class="n">timeoutMs</span><span class="p">,</span><span class="n">ChannelList</span><span class="o">*</span> <span class="n">activeChannels</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">int</span> <span class="n">numEvents</span> <span class="o">=</span> <span class="o">::</span><span class="n">poll</span><span class="p">(</span><span class="o">&amp;*</span><span class="n">fds_</span><span class="p">.</span><span class="n">begin</span><span class="p">(),</span><span class="n">fds_</span><span class="p">.</span><span class="n">size</span><span class="p">(),</span><span class="n">timeoutMs</span><span class="p">);</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">numEvents</span> <span class="o">&gt;</span><span class="mi">0</span> <span class="p">)</span>
+    <span class="p">{</span>
+        <span class="n">fillActiveChannels</span><span class="p">(</span><span class="n">numEvents</span><span class="p">,</span><span class="n">activeChannels</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre>
+</div>
+<p>Poller::poll最终调用Linux IO multiplexing函数poll，可以使用epoll提高性能。
+暂时将其中的channel看作是黑盒子，它的功能是：事件分发，即回调该fd上活动事件，如tcp可读、定时器超时。
+事实上，Poller还有一些非常重要的数据管理函数，有兴趣的可以查看代码。</p>
+
+<h4 id="channel的功能事件分发">Channel的功能：事件分发</h4>
+<div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="n">channel</span><span class="err">的样子：</span>
+<span class="n">Channel</span><span class="p">{</span>
+    <span class="n">handleEvent</span><span class="p">();</span>
+    <span class="n">EventLoop</span><span class="o">*</span>  <span class="n">loop_</span><span class="p">;</span>      <span class="c1">//所属的Loop
+</span>    <span class="kt">int</span> <span class="n">fd</span><span class="p">;</span>                 <span class="c1">// 对应的文件描述符
+</span>    <span class="kt">int</span> <span class="n">events_</span><span class="p">;</span>			<span class="c1">//关注的事件
+</span>    <span class="kt">int</span> <span class="n">revents_</span><span class="p">;</span>			<span class="c1">//该文件描述符上正在发生的事件(由poll得知)
+</span>    <span class="n">CallBack</span> <span class="n">readCallback_</span><span class="p">;</span> <span class="c1">//回调函数
+</span>    <span class="n">CallBack</span> <span class="n">writeCallback_</span><span class="p">;</span>
+    <span class="n">CallBack</span> <span class="n">errorCallback_</span><span class="p">;</span>
+<span class="p">};</span>
+<span class="c1">//以fd可读为例
+</span><span class="kt">void</span> <span class="n">Channel</span><span class="o">::</span><span class="n">handleEvent</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">//poller会将revents_更新
+</span>    <span class="k">if</span><span class="p">(</span><span class="n">revents_</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">POLLIN</span> <span class="o">|</span> <span class="n">POLLPRI</span> <span class="o">|</span> <span class="n">POLLRDHUP</span><span class="p">)</span> <span class="c1">//说明fd上出现可读事件
+</span>        <span class="n">readCallback_</span><span class="p">();</span>  <span class="c1">//执行相应的回调
+</span><span class="p">}</span>
+</code></pre>
+</div>
+
+<p><strong>以上三个类及其简陋，但是构成了Reactor的核心结构，请看时序图</strong>
+<img src="../material/TCPSERVER/timemap.png" alt="timemap" />
+我大致描述一下上面的过程:<strong>首先，loop调用poll()进入内核，内核返回活动的fd,并将每一个活动的fd所发生的事件类型记录在revents_上。一个fd对应一个channel(poller中)，因此我们可以快速找到channel，并根据channel的revents_执行对应的回调函数。</strong></p>
+
+<p>PS:如今回过头来看，发现Reactor也就是这么一回事儿。</p>
 
   
 </article>
