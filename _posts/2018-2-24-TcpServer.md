@@ -139,7 +139,108 @@ private:
 * 多线程前置准备：RAII互斥锁、条件变量、线程池
 * 多线程环境下的 Acceptor连接器、TcpConnetion连接类、TcpServer类的改动
 * 多线程下的TCP连接的断开和TCP的读写
-
+### 单线程环境下Acceptor接收TCP连接
+```c++
+class TcpAcceptor{
+public:
+    TcpAcceptor(EventLoop* loop,const InetAddress& listenAddr);
+    void listen();
+    void handleRead();
+    void setCallback(const NewConnectionCallback&& cb) { callback_ = std::move(cb);}
+private:
+    EventLoop* loop_;
+    Socket acceptSocket_;
+    Channel acceptChannel_;
+    NewConnectionCallback callback_;   //连接后的回调
+    bool listening_;
+};
+```
+这个类用来接收TCP连接，过程如下：
+* 1.创建非阻塞套接字,fd = socket();
+* 2.将fd添加进EventLoop(通过Channel可以轻松做到)，设置回调函数:handleRead
+* 3.监听这个套接字,listen(fd);
+* 4.等到fd可读，说明三次握手已经成功。
+* 5.利用accept获得一个TCP连接，交给Loop
+以下为各个步骤代码:
+``` c++
+//步骤1.2
+TcpAcceptor::TcpAcceptor(EventLoop* loop,const InetAddress& listenAddr)
+    :loop_(loop),
+    acceptSocket_(),
+    acceptChannel_(loop_,acceptSocket_.fd()),
+    listening_(false)
+{
+    acceptSocket_.setReuseAddr(true); //Ip别名
+    acceptSocket_.setReusePort(true); //惊群现象
+    acceptSocket_.bindAddr(listenAddr);
+    acceptChannel_.setReadCallback(std::bind(&TcpAcceptor::handleRead,this));
+}
+//步骤3
+{
+    acceptSocket_.listen();
+    acceptChannel_.enableReading();
+}
+void Socket::listen(void)
+{
+#ifdef SOMAXCONN
+    ::listen(fd_,SOMAXCONN);
+#else
+    //下面是《UNP卷一》确定的方法
+    int backlog = 0;
+    char* ptr = getenv("LISTENQ");
+    if(ptr != nullptr)
+        backlog = atoi(ptr);
+    else
+        backlog = 128;  //Linux version 4.10.0-42-generic 
+    ::listen(fd_,backlog);
+#endif
+}
+//步骤4,fd可读，执行回调函数
+void TcpAcceptor::handleRead()
+{
+    InetAddress clinetAddr;
+    int fd = acceptSocket_.accept(clinetAddr);
+    if(fd > 0)
+    {
+        if(callback_)
+            callback_(fd,clinetAddr);
+        else
+            ::close(fd);
+    }
+    else  //accept失败
+    {
+        int err = errno;
+        switch(err)
+        {
+           //暂时没有出错回调
+           //<<UNP卷一>>建议忽略以下这种异常情况
+           //即：客户在服务端accept之前发送RST
+        case EWOULDBLOCK:   //Berkeley
+        case ECONNABORTED:  //POSIX
+        case EPROTO:
+        default:break;
+        }
+    }
+}
+//最后一步：把这个“连接”交给loop，通过上述的回调函数:callback_(fd,clinetAddr)
+void TcpServer::newConnetion(int fd,const InetAddress& addr)
+{
+    //用到了TcpConnection\TcpServer类，稍后介绍
+    shared_ptr<TcpConnection> newConn = std::make_shared<TcpConnection>(loop_,fd,addr);
+    assert(connections_.find(fd) == connections_.end());
+    connections_[fd] = newConn;
+    if(messageCallback_)
+    {
+        newConn->setMessageCallback(messageCallback_);
+    }
+    newConn->setCloseCallback(std::bind(&TcpServer::removeConnection,this,_1,_2));
+    newLoop->runInLoop(std::bind(&TcpConnection::established,newConn));
+    //...
+}
+```
+这样以后，loop会对负责这个连接上的任何事件。
+### TcpConnection类
+(未完待续...)
 ### 以下为草稿
 这是TCP Server单线程时候的样子：
 ```c++

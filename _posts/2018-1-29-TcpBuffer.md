@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "TCP缓冲区与write系统调用"
-date:   2018-1-29 15:13:17 +0800
+date:   2018-1-15 15:13:17 +0800
 categories: network program 
 location: HangZhou,China 
 description:  
