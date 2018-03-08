@@ -202,54 +202,155 @@ Linux 新增的timer_create()用来创建一个定时器,详见：http://man7.or
   <li>应用层Buffer</li>
   <li>多线程前置准备：RAII互斥锁、条件变量、线程池</li>
   <li>多线程环境下的 Acceptor连接器、TcpConnetion连接类、TcpServer类的改动</li>
-  <li>多线程下的TCP连接的断开和TCP的读写</li>
-</ul>
-
-<h3 id="以下为草稿">以下为草稿</h3>
-<p>这是TCP Server单线程时候的样子：</p>
-<div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">TcpServer</span><span class="p">{</span>
+  <li>多线程下的TCP连接的断开和TCP的读写
+    <h3 id="单线程环境下acceptor接收tcp连接">单线程环境下Acceptor接收TCP连接</h3>
+    <div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">TcpAcceptor</span><span class="p">{</span>
 <span class="k">public</span><span class="o">:</span>
-    <span class="n">TcpServer</span><span class="p">(</span><span class="n">InetAddress</span> <span class="n">listenAddr</span><span class="p">);</span>
-    <span class="kt">void</span> <span class="n">setMessageCallback</span><span class="p">(</span><span class="k">const</span> <span class="n">MessageCallback</span><span class="o">&amp;&amp;</span> <span class="n">cb</span><span class="p">);</span>
-    <span class="kt">void</span> <span class="n">removeConnection</span><span class="p">(</span><span class="kt">int</span> <span class="n">fd</span><span class="p">,</span><span class="n">EventLoop</span><span class="o">*</span> <span class="n">loop</span><span class="p">);</span> 
-    <span class="kt">void</span> <span class="n">stat</span><span class="p">();</span>
+  <span class="n">TcpAcceptor</span><span class="p">(</span><span class="n">EventLoop</span><span class="o">*</span> <span class="n">loop</span><span class="p">,</span><span class="k">const</span> <span class="n">InetAddress</span><span class="o">&amp;</span> <span class="n">listenAddr</span><span class="p">);</span>
+  <span class="kt">void</span> <span class="n">listen</span><span class="p">();</span>
+  <span class="kt">void</span> <span class="n">handleRead</span><span class="p">();</span>
+  <span class="kt">void</span> <span class="nf">setCallback</span><span class="p">(</span><span class="k">const</span> <span class="n">NewConnectionCallback</span><span class="o">&amp;&amp;</span> <span class="n">cb</span><span class="p">)</span> <span class="p">{</span> <span class="n">callback_</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">move</span><span class="p">(</span><span class="n">cb</span><span class="p">);}</span>
 <span class="k">private</span><span class="o">:</span>
-    <span class="kt">void</span> <span class="n">newConnetion</span><span class="p">(</span><span class="kt">int</span> <span class="n">fd</span><span class="p">,</span><span class="k">const</span> <span class="n">InetAddress</span><span class="o">&amp;</span> <span class="n">addr</span><span class="p">);</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">EventLoop</span><span class="o">&gt;</span>   <span class="n">loop_</span><span class="p">;</span>
-    <span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">TcpAcceptor</span><span class="o">&gt;</span> <span class="n">acceptor_</span><span class="p">;</span>
-    <span class="n">ConnectedMap</span>                 <span class="n">connections_</span><span class="p">;</span>
+  <span class="n">EventLoop</span><span class="o">*</span> <span class="n">loop_</span><span class="p">;</span>
+  <span class="n">Socket</span> <span class="n">acceptSocket_</span><span class="p">;</span>
+  <span class="n">Channel</span> <span class="n">acceptChannel_</span><span class="p">;</span>
+  <span class="n">NewConnectionCallback</span> <span class="n">callback_</span><span class="p">;</span>   <span class="c1">//连接后的回调
+</span>  <span class="kt">bool</span> <span class="n">listening_</span><span class="p">;</span>
+<span class="p">};</span>
+</code></pre>
+    </div>
+    <p>这个类用来接收TCP连接，过程如下：</p>
+  </li>
+  <li>1.创建非阻塞套接字,fd = socket();</li>
+  <li>2.将fd添加进EventLoop(通过Channel可以轻松做到)，设置回调函数:handleRead</li>
+  <li>3.监听这个套接字,listen(fd);</li>
+  <li>4.等到fd可读，说明三次握手已经成功。</li>
+  <li>5.利用accept获得一个TCP连接，交给Loop
+以下为各个步骤代码:
+    <div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="c1">//步骤1.2
+</span><span class="n">TcpAcceptor</span><span class="o">::</span><span class="n">TcpAcceptor</span><span class="p">(</span><span class="n">EventLoop</span><span class="o">*</span> <span class="n">loop</span><span class="p">,</span><span class="k">const</span> <span class="n">InetAddress</span><span class="o">&amp;</span> <span class="n">listenAddr</span><span class="p">)</span>
+  <span class="o">:</span><span class="n">loop_</span><span class="p">(</span><span class="n">loop</span><span class="p">),</span>
+  <span class="n">acceptSocket_</span><span class="p">(),</span>
+  <span class="n">acceptChannel_</span><span class="p">(</span><span class="n">loop_</span><span class="p">,</span><span class="n">acceptSocket_</span><span class="p">.</span><span class="n">fd</span><span class="p">()),</span>
+  <span class="n">listening_</span><span class="p">(</span><span class="nb">false</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">acceptSocket_</span><span class="p">.</span><span class="n">setReuseAddr</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span> <span class="c1">//Ip别名
+</span>  <span class="n">acceptSocket_</span><span class="p">.</span><span class="n">setReusePort</span><span class="p">(</span><span class="nb">true</span><span class="p">);</span> <span class="c1">//惊群现象
+</span>  <span class="n">acceptSocket_</span><span class="p">.</span><span class="n">bindAddr</span><span class="p">(</span><span class="n">listenAddr</span><span class="p">);</span>
+  <span class="n">acceptChannel_</span><span class="p">.</span><span class="n">setReadCallback</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">TcpAcceptor</span><span class="o">::</span><span class="n">handleRead</span><span class="p">,</span><span class="k">this</span><span class="p">));</span>
+<span class="p">}</span>
+<span class="c1">//步骤3
+</span><span class="p">{</span>
+  <span class="n">acceptSocket_</span><span class="p">.</span><span class="n">listen</span><span class="p">();</span>
+  <span class="n">acceptChannel_</span><span class="p">.</span><span class="n">enableReading</span><span class="p">();</span>
+<span class="p">}</span>
+<span class="kt">void</span> <span class="n">Socket</span><span class="o">::</span><span class="n">listen</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span>
+<span class="p">{</span>
+<span class="cp">#ifdef SOMAXCONN
+</span>  <span class="o">::</span><span class="n">listen</span><span class="p">(</span><span class="n">fd_</span><span class="p">,</span><span class="n">SOMAXCONN</span><span class="p">);</span>
+<span class="cp">#else
+</span>  <span class="c1">//下面是《UNP卷一》确定的方法
+</span>  <span class="kt">int</span> <span class="n">backlog</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="kt">char</span><span class="o">*</span> <span class="n">ptr</span> <span class="o">=</span> <span class="n">getenv</span><span class="p">(</span><span class="s">"LISTENQ"</span><span class="p">);</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">ptr</span> <span class="o">!=</span> <span class="nb">nullptr</span><span class="p">)</span>
+      <span class="n">backlog</span> <span class="o">=</span> <span class="n">atoi</span><span class="p">(</span><span class="n">ptr</span><span class="p">);</span>
+  <span class="k">else</span>
+      <span class="n">backlog</span> <span class="o">=</span> <span class="mi">128</span><span class="p">;</span>  <span class="c1">//Linux version 4.10.0-42-generic 
+</span>  <span class="o">::</span><span class="n">listen</span><span class="p">(</span><span class="n">fd_</span><span class="p">,</span><span class="n">backlog</span><span class="p">);</span>
+<span class="cp">#endif
+</span><span class="p">}</span>
+<span class="c1">//步骤4,fd可读，执行回调函数
+</span><span class="kt">void</span> <span class="n">TcpAcceptor</span><span class="o">::</span><span class="n">handleRead</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="n">InetAddress</span> <span class="n">clinetAddr</span><span class="p">;</span>
+  <span class="kt">int</span> <span class="n">fd</span> <span class="o">=</span> <span class="n">acceptSocket_</span><span class="p">.</span><span class="n">accept</span><span class="p">(</span><span class="n">clinetAddr</span><span class="p">);</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">fd</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+  <span class="p">{</span>
+      <span class="k">if</span><span class="p">(</span><span class="n">callback_</span><span class="p">)</span>
+          <span class="n">callback_</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span><span class="n">clinetAddr</span><span class="p">);</span>
+      <span class="k">else</span>
+          <span class="o">::</span><span class="n">close</span><span class="p">(</span><span class="n">fd</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="k">else</span>  <span class="c1">//accept失败
+</span>  <span class="p">{</span>
+      <span class="kt">int</span> <span class="n">err</span> <span class="o">=</span> <span class="n">errno</span><span class="p">;</span>
+      <span class="k">switch</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
+      <span class="p">{</span>
+         <span class="c1">//暂时没有出错回调
+</span>         <span class="c1">//&lt;&lt;UNP卷一&gt;&gt;建议忽略以下这种异常情况
+</span>         <span class="c1">//即：客户在服务端accept之前发送RST
+</span>      <span class="k">case</span> <span class="n">EWOULDBLOCK</span><span class="p">:</span>   <span class="c1">//Berkeley
+</span>      <span class="k">case</span> <span class="n">ECONNABORTED</span><span class="p">:</span>  <span class="c1">//POSIX
+</span>      <span class="k">case</span> <span class="n">EPROTO</span><span class="p">:</span>
+      <span class="k">default</span><span class="o">:</span><span class="k">break</span><span class="p">;</span>
+      <span class="p">}</span>
+  <span class="p">}</span>
+<span class="p">}</span>
+<span class="c1">//最后一步：把这个“连接”交给loop，通过上述的回调函数:callback_(fd,clinetAddr)
+</span><span class="kt">void</span> <span class="n">TcpServer</span><span class="o">::</span><span class="n">newConnetion</span><span class="p">(</span><span class="kt">int</span> <span class="n">fd</span><span class="p">,</span><span class="k">const</span> <span class="n">InetAddress</span><span class="o">&amp;</span> <span class="n">addr</span><span class="p">)</span>
+<span class="p">{</span>
+  <span class="c1">//用到了TcpConnection\TcpServer类，稍后介绍
+</span>  <span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">TcpConnection</span><span class="o">&gt;</span> <span class="n">newConn</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">TcpConnection</span><span class="o">&gt;</span><span class="p">(</span><span class="n">loop_</span><span class="p">,</span><span class="n">fd</span><span class="p">,</span><span class="n">addr</span><span class="p">);</span>
+  <span class="n">assert</span><span class="p">(</span><span class="n">connections_</span><span class="p">.</span><span class="n">find</span><span class="p">(</span><span class="n">fd</span><span class="p">)</span> <span class="o">==</span> <span class="n">connections_</span><span class="p">.</span><span class="n">end</span><span class="p">());</span>
+  <span class="n">connections_</span><span class="p">[</span><span class="n">fd</span><span class="p">]</span> <span class="o">=</span> <span class="n">newConn</span><span class="p">;</span>
+  <span class="k">if</span><span class="p">(</span><span class="n">messageCallback_</span><span class="p">)</span>
+  <span class="p">{</span>
+      <span class="n">newConn</span><span class="o">-&gt;</span><span class="n">setMessageCallback</span><span class="p">(</span><span class="n">messageCallback_</span><span class="p">);</span>
+  <span class="p">}</span>
+  <span class="n">newConn</span><span class="o">-&gt;</span><span class="n">setCloseCallback</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">TcpServer</span><span class="o">::</span><span class="n">removeConnection</span><span class="p">,</span><span class="k">this</span><span class="p">,</span><span class="n">_1</span><span class="p">,</span><span class="n">_2</span><span class="p">));</span>
+  <span class="n">newLoop</span><span class="o">-&gt;</span><span class="n">runInLoop</span><span class="p">(</span><span class="n">std</span><span class="o">::</span><span class="n">bind</span><span class="p">(</span><span class="o">&amp;</span><span class="n">TcpConnection</span><span class="o">::</span><span class="n">established</span><span class="p">,</span><span class="n">newConn</span><span class="p">));</span>
+  <span class="c1">//...
+</span><span class="p">}</span>
+</code></pre>
+    </div>
+    <p>这样以后，loop会对负责这个连接上的任何事件。</p>
+    <h3 id="tcpconnection类">TcpConnection类</h3>
+    <p>(未完待续…)</p>
+    <h3 id="以下为草稿">以下为草稿</h3>
+    <p>这是TCP Server单线程时候的样子：</p>
+    <div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="k">class</span> <span class="nc">TcpServer</span><span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+  <span class="n">TcpServer</span><span class="p">(</span><span class="n">InetAddress</span> <span class="n">listenAddr</span><span class="p">);</span>
+  <span class="kt">void</span> <span class="n">setMessageCallback</span><span class="p">(</span><span class="k">const</span> <span class="n">MessageCallback</span><span class="o">&amp;&amp;</span> <span class="n">cb</span><span class="p">);</span>
+  <span class="kt">void</span> <span class="n">removeConnection</span><span class="p">(</span><span class="kt">int</span> <span class="n">fd</span><span class="p">,</span><span class="n">EventLoop</span><span class="o">*</span> <span class="n">loop</span><span class="p">);</span> 
+  <span class="kt">void</span> <span class="n">stat</span><span class="p">();</span>
+<span class="k">private</span><span class="o">:</span>
+  <span class="kt">void</span> <span class="n">newConnetion</span><span class="p">(</span><span class="kt">int</span> <span class="n">fd</span><span class="p">,</span><span class="k">const</span> <span class="n">InetAddress</span><span class="o">&amp;</span> <span class="n">addr</span><span class="p">);</span>
+  <span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">EventLoop</span><span class="o">&gt;</span>   <span class="n">loop_</span><span class="p">;</span>
+  <span class="n">std</span><span class="o">::</span><span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">TcpAcceptor</span><span class="o">&gt;</span> <span class="n">acceptor_</span><span class="p">;</span>
+  <span class="n">ConnectedMap</span>                 <span class="n">connections_</span><span class="p">;</span>
 
-    <span class="n">MessageCallback</span>              <span class="n">messageCallback_</span><span class="p">;</span>
+  <span class="n">MessageCallback</span>              <span class="n">messageCallback_</span><span class="p">;</span>
 <span class="p">};</span>
 <span class="kt">void</span> <span class="n">TcpServer</span><span class="o">::</span><span class="n">newConnetion</span><span class="p">(</span><span class="kt">int</span> <span class="n">fd</span><span class="p">,</span><span class="k">const</span> <span class="n">InetAddress</span><span class="o">&amp;</span> <span class="n">addr</span><span class="p">)</span>
 <span class="p">{</span>
-    <span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">TcpConnection</span><span class="o">&gt;</span> <span class="n">newConn</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">TcpConnection</span><span class="o">&gt;</span><span class="p">(</span><span class="n">loop_</span><span class="p">,</span><span class="n">fd</span><span class="p">,</span><span class="n">addr</span><span class="p">);</span>
-    <span class="n">connections_</span><span class="p">[</span><span class="n">fd</span><span class="p">]</span> <span class="o">=</span> <span class="n">newConn</span><span class="p">;</span>
-    <span class="n">newConn</span><span class="o">-&gt;</span><span class="n">setMessageCallback</span><span class="p">(</span><span class="n">messageCallback_</span><span class="p">);</span>
+  <span class="n">shared_ptr</span><span class="o">&lt;</span><span class="n">TcpConnection</span><span class="o">&gt;</span> <span class="n">newConn</span> <span class="o">=</span> <span class="n">std</span><span class="o">::</span><span class="n">make_shared</span><span class="o">&lt;</span><span class="n">TcpConnection</span><span class="o">&gt;</span><span class="p">(</span><span class="n">loop_</span><span class="p">,</span><span class="n">fd</span><span class="p">,</span><span class="n">addr</span><span class="p">);</span>
+  <span class="n">connections_</span><span class="p">[</span><span class="n">fd</span><span class="p">]</span> <span class="o">=</span> <span class="n">newConn</span><span class="p">;</span>
+  <span class="n">newConn</span><span class="o">-&gt;</span><span class="n">setMessageCallback</span><span class="p">(</span><span class="n">messageCallback_</span><span class="p">);</span>
 <span class="p">}</span>
 </code></pre>
-</div>
-<p>三言两语说清楚太不容易了，一个简化的过程是这样的：当新连接到达时，acceptor会回调newConnection(),实例化一个TCP连接对象，并记录。TCP连接对象:TcpConnection。它会接管该具体的TCP连接，因为accept()会返回一个fd，我根据这个fd，创建一个channel，添加到eventloop中。这样，当这个tcp连接的读写事件到达时，就可以根据channel执行对应的回调了,比如tcp fd可读：</p>
-<div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="kt">void</span> <span class="n">TcpConnection</span><span class="o">::</span><span class="n">handleRead</span><span class="p">()</span>
+    </div>
+    <p>三言两语说清楚太不容易了，一个简化的过程是这样的：当新连接到达时，acceptor会回调newConnection(),实例化一个TCP连接对象，并记录。TCP连接对象:TcpConnection。它会接管该具体的TCP连接，因为accept()会返回一个fd，我根据这个fd，创建一个channel，添加到eventloop中。这样，当这个tcp连接的读写事件到达时，就可以根据channel执行对应的回调了,比如tcp fd可读：</p>
+    <div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="kt">void</span> <span class="n">TcpConnection</span><span class="o">::</span><span class="n">handleRead</span><span class="p">()</span>
 <span class="p">{</span>
-    <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">fd_</span><span class="p">);</span>
-    <span class="k">if</span><span class="p">(</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
-    <span class="p">{</span>
-        <span class="n">messageCallback_</span><span class="p">(</span><span class="n">shared_from_this</span><span class="p">(),</span><span class="n">inputBuffer_</span><span class="p">,</span><span class="n">socket_</span><span class="o">-&gt;</span><span class="n">fd</span><span class="p">());</span>
-    <span class="p">}</span>
-    <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="c1">//FIN 分节
-</span>    <span class="p">{</span>
-        <span class="n">handleClose</span><span class="p">();</span>
-    <span class="p">}</span>
-    <span class="k">else</span>
-    <span class="p">{</span>
-        <span class="n">handleError</span><span class="p">();</span>
-    <span class="p">}</span>
+  <span class="kt">int</span> <span class="n">n</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">fd_</span><span class="p">);</span>
+  <span class="k">if</span><span class="p">(</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+  <span class="p">{</span>
+      <span class="n">messageCallback_</span><span class="p">(</span><span class="n">shared_from_this</span><span class="p">(),</span><span class="n">inputBuffer_</span><span class="p">,</span><span class="n">socket_</span><span class="o">-&gt;</span><span class="n">fd</span><span class="p">());</span>
+  <span class="p">}</span>
+  <span class="k">else</span> <span class="k">if</span><span class="p">(</span><span class="n">n</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="c1">//FIN 分节
+</span>  <span class="p">{</span>
+      <span class="n">handleClose</span><span class="p">();</span>
+  <span class="p">}</span>
+  <span class="k">else</span>
+  <span class="p">{</span>
+      <span class="n">handleError</span><span class="p">();</span>
+  <span class="p">}</span>
 <span class="p">}</span>
 </code></pre>
-</div>
-<h4 id="tcp读写">tcp读写</h4>
-<ul>
+    </div>
+    <h4 id="tcp读写">tcp读写</h4>
+  </li>
   <li>读取就是上述的messageCallback();</li>
   <li>写就比较麻烦了，涉及到socket缓冲区的问题。只能再开一篇文章介绍:https://memetao.github.io/TcpBuffer/
     <h4 id="应用层buffer">应用层Buffer</h4>
