@@ -7,19 +7,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="author" content="songroger">
 
-  <title>Archive</title>
+  <title>面试总结</title>
 
-  <meta name="description" content="中国计量大学本科 通信工程 在读(2017) ">
+  <meta name="description" content="&lt;hr /&gt;&lt;h3 id=&quot;不会的问题&quot;&gt;不会的问题&lt;/h3&gt;&lt;p&gt;2018.3.8 浙江大华&lt;/p&gt;">
 
   <!-- Open graph data -->
   <meta property="og:site_name" content="Welcome my site">
-  <meta property="og:title" content="Archive">
-  <meta property="og:url" content="http://localhost:4000/archive/page2/">
+  <meta property="og:title" content="面试总结">
+  <meta property="og:url" content="http://localhost:4000/dahuaInterview/">
   <meta property="og:type" content="article">
-  <meta property="og:description" content="中国计量大学本科 通信工程 在读(2017) ">
+  <meta property="og:description" content="&lt;hr /&gt;&lt;h3 id=&quot;不会的问题&quot;&gt;不会的问题&lt;/h3&gt;&lt;p&gt;2018.3.8 浙江大华&lt;/p&gt;">
 
   <!-- Standard Stuff -->
-  <link rel="canonical" href="http://localhost:4000/archive/page2/"/>
+  <link rel="canonical" href="http://localhost:4000/dahuaInterview/"/>
   <link rel="alternate" type="application/rss+xml" title="Welcome my site" href="http://localhost:4000/feed.xml"/>
 
   <!-- Favicons -->
@@ -61,62 +61,106 @@
   <main class="col">
 
 
-<h2 class="article__title article__title--single">Archive</h2>
+<article class="article">
+  <h2 class="article__title article__title--single">面试总结</h2>
+  <time class="article__date" datetime="2018-03-08"> 15:13 Mar.08-2018</time>
+  
+  <hr />
+<h3 id="不会的问题">不会的问题</h3>
+<p>2018.3.8 浙江大华</p>
+
+<h4 id="1linux不同线程的线程栈是如何分布的">1、Linux不同线程的线程栈是如何分布的？</h4>
+<p>面试官问：是连续还是离散？ 因为我是真的不知道，只好回答说不懂。</p>
+
+<p>回来后，查阅了一些资料，很明显不是我这个段位选手能掌握的知识。只好留作以后学习了。</p>
+
+<p>但有一点东西，需要记一下，总结如下：</p>
 <ul>
-  
-    <div class="arch-item">
-      <li>
-        <a href="/TcpBuffer/" class="arch-title">TCP缓冲区与write系统调用</a>
-        <time>Jan.15, 2018</time>
-      </li>
-      
-    </div>
-  
-    <div class="arch-item">
-      <li>
-        <a href="/masterPlan/" class="arch-title">考研-从头到尾</a>
-        <time>Jul.29, 2017</time>
-      </li>
-      
-    </div>
-  
-    <div class="arch-item">
-      <li>
-        <a href="/functionClass/" class="arch-title">C++fucnion模板类与函数指针</a>
-        <time>Jun.07, 2017</time>
-      </li>
-      
-    </div>
-  
-    <div class="arch-item">
-      <li>
-        <a href="/callback/" class="arch-title">当回调函数是C++类成员函数</a>
-        <time>May.20, 2017</time>
-      </li>
-      
-    </div>
-  
-    <div class="arch-item">
-      <li>
-        <a href="/mytracks/" class="arch-title">我的这一次选择</a>
-        <time>May.07, 2017</time>
-      </li>
-      
-    </div>
-  
+  <li>线程栈大小：ulimit a</li>
+  <li>修改线程栈大小：ulimit  Hs 64 限制硬资源，线程栈大小为 64K。</li>
+  <li>进程栈大小不固定，线程栈大小固定</li>
 </ul>
 
-    <nav class="blocks blocks--space">
-      <div class="blocks__item">
-        <a href="/archive/">Previous</a>
-      </div>
-      <div class="blocks__item">
-        Page: 2 of 3
-      </div>
-      <div class="blocks__item">
-        <a href="/archive/page3">Next</a>
-      </div>
-    </nav>
+<h4 id="2stdset-和-stdmap-是如何实现的">2、std::set 和 std::map 是如何实现的？</h4>
+<ul>
+  <li>我：红黑树</li>
+  <li>面试官: 具体原理是？</li>
+  <li>我：不会。</li>
+  <li>面试官好像比较为难，问：那换个，vector<T>的内存管理?</T></li>
+  <li>我：这还是清楚的，balabala</li>
+</ul>
+
+<p>以前一直认为红黑树这些东西校招是不会出现的，不知道是岗位特殊还是要求太高，竟然问了。
+<strong>挖个坑，准备啃STL的相关章节了。</strong></p>
+
+<h4 id="3c继承体系的构造函数析构函数的调用顺序">3、C++继承体系的构造函数、析构函数的调用顺序？</h4>
+<ul>
+  <li>我：对于构造函数来说，基类先于派生类;对于析构函数，派生类先于基类。</li>
+  <li>面试官：嗯。那你说说看，为什么会这样？</li>
+  <li>我：我想想….(仿佛以前哪里见过，想不起来了)，只好说：不会。
+<strong>这样的调用顺序是为了保证基类或者成员类没有在他们创建之前被调用，或者在析构之后还可能被调用。</strong></li>
+</ul>
+
+<h4 id="4堆栈静态存储区区别这问题是因为我在笔试的时候答错了">4、堆栈、静态存储区区别？（这问题是因为我在笔试的时候答错了）</h4>
+<p>Linux 对进程地址空间有个标准布局，地址空间中由各个不同的内存段组成 (Memory Segment)，主要的内存段如下：</p>
+<ul>
+  <li>程序段 (Text Segment)：可执行文件代码的内存映射</li>
+  <li>数据段 (Data Segment)：可执行文件的已初始化全局变量的内存映射</li>
+  <li>BSS段 (BSS Segment)：未初始化的全局变量或者静态变量（用零页初始化）</li>
+  <li>堆区 (Heap) : 存储动态内存分配，匿名的内存映射</li>
+  <li>栈区 (Stack) : 进程用户空间栈，由编译器自动分配释放，存放函数的参数值、局部变量的值等</li>
+  <li>映射段(Memory Mapping Segment)：任何内存映射文件</li>
+</ul>
+
+<h4 id="5如果让你来实现memcpystrcpy你会怎么做">5、如果让你来实现memcpy,strcpy，你会怎么做？</h4>
+<ul>
+  <li>我：对于strcpy，我重点会关注’\0’</li>
+  <li>面试官：’\0’在ascii码上的数值是多少？</li>
+  <li>我：0</li>
+  <li>面试官：memcpy的实现需要注意什么么？</li>
+  <li>我：不懂。</li>
+  <li>面试官：需要注意内存重叠。</li>
+  <li>面试官：strncpy需要注意一下什么问题？
+回来看了一下memcpy:
+    <blockquote>
+      <p>NOTES
+     Failure to observe the requirement that the memory areas do not overlap has been  the  source  of  real  bugs.
+     (POSIX  and  the  C  standards  are explicit that employing memcpy() with overlapping areas produces undefined
+     behavior.)  Most notably, in glibc 2.13 a performance optimization of memcpy() on  some  platforms  (including
+     x86-64) included changing the order in which bytes were copied from src to dest.</p>
+    </blockquote>
+  </li>
+</ul>
+
+<p><strong>妈的！他不应该问”调用memcpy需要注意什么问题”么？</strong></p>
+
+<h3 id="模糊的问题">模糊的问题</h3>
+<h4 id="虚函数表">虚函数表</h4>
+<ul>
+  <li>面试官：虚函数是如何实现的？</li>
+  <li>我：如果类中定义了虚函数，那么这个类在实例化对象的时候，这个对象在内存中的最开头会有一个指针，指向虚表，在这个表中，每一个单元都存放了一个函数指针，指向每一个虚函数。</li>
+  <li>面试官：那派生类的虚表是什么样的？</li>
+  <li>我：如果派生类中的虚函数覆盖了基类的虚函数，那么在虚表中也会直接覆盖。</li>
+  <li>面试官：如果没有覆盖呢？</li>
+  <li>我：那就会在表中增加一项。</li>
+  <li>面试官：在前面增加还是后面增加？</li>
+  <li>我：(太特么细了，我猜得) 后面。</li>
+</ul>
+
+<p><strong>后来想，插在前面的话会造成重排，事实上的确是后面</strong></p>
+
+<h3 id="总结一下大华的面试">总结一下大华的面试</h3>
+
+<p>面试官开始就说了，他看我简历是服务端，但是他们部门是设备端。不知道是不是岗位原因，问的问题很多都牵扯到了内核上面。比如:select poll epoll的区别和效率问题。很多问题我回答不上来(上面这些)，也有一些是因为描述的不清楚，我一时没反应过来。面试官一直在C/C++上面扯问题，其实我特别想表现一下TCP的掌握程度，竟然不问我！唉！难受！</p>
+
+<p>总的来说，有点可惜，没有发挥出来全部能力。后来就开始聊职业规划，我就一个主题：我是面向工资的，什么赚钱就学什么，比如说JAVA。面试官表示很不解，C++这么好的语言你竟然不打算深入学习？！ 对不起，套用一句知乎名言：贫穷限制了我的理想。</p>
+
+<p>再后来就HR面了，HR鼻孔朝天，我有点难受，上来就问”你对加班怎么看的?” 我表示无法接收没有理由的加班，特别是11、12点的那种加班，9点之前的还可以接收。后面就是扯一下兴趣爱好的，我瞎说了一通。</p>
+
+
+  
+</article>
+
 
 
 
