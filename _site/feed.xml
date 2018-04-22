@@ -7,9 +7,87 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 26 Mar 2018 11:40:13 +0800</pubDate>
-    <lastBuildDate>Mon, 26 Mar 2018 11:40:13 +0800</lastBuildDate>
+    <pubDate>Sun, 22 Apr 2018 21:05:58 +0800</pubDate>
+    <lastBuildDate>Sun, 22 Apr 2018 21:05:58 +0800</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
+    
+      <item>
+        <title>webRtc预研结果</title>
+        <description>&lt;hr /&gt;
+
+&lt;h3 id=&quot;webrtc简介&quot;&gt;webRtc简介&lt;/h3&gt;
+&lt;p&gt;webRtc是google开源的chrome浏览器内置项目。&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;采用C++构建了底层API，为上层封装了JS API&lt;/li&gt;
+  &lt;li&gt;支持p2p音频、视频、数据流传输能力
+源码地址(需要翻墙)：https://chromium.googlesource.com/external/webrtc/&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;webrtc信息交互过程&quot;&gt;webRtc信息交互过程&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;无论是使用前端JS的WebRTC API接口，还是在WebRTC源码上构建自己的对聊框架，都需要遵循以下执行流程：&lt;/strong&gt;
+&lt;img src=&quot;../material/WEBRTC/frame.png&quot; alt=&quot;Process&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;最后建立的是一条点对点通道，用于传输数据。&lt;/p&gt;
+
+&lt;p&gt;在浏览器端，上述过程是&lt;strong&gt;必须&lt;/strong&gt;执行的。&lt;/p&gt;
+
+&lt;p&gt;注,上图中:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;1.signal Server:信令服务器，&lt;strong&gt;必须由使用方自行实现&lt;/strong&gt;。&lt;/li&gt;
+  &lt;li&gt;2.stun Server:内网穿透。&lt;/li&gt;
+  &lt;li&gt;3.SDP:双方的编码方式、采样频率等信息&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;3要集成到设备上需要做哪些事情&quot;&gt;3.要集成到设备上需要做哪些事情&lt;/h3&gt;
+
+&lt;h4 id=&quot;31如果直接使用webrtc的现有源码c&quot;&gt;3.1如果直接使用webRtc的现有源码(C++)&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;1.升级编译器，设备上目前是arm-linux-gcc4.4.0，需要升级到4.8.0以上版本以支持C++11。&lt;/li&gt;
+  &lt;li&gt;2.整个webRtc项目的编译采用的是google的gn工具。如果要使用make，需要我们自行编写，必须要对代码结构、功能模块有熟悉的认识。&lt;/li&gt;
+  &lt;li&gt;3.与对方协商，确定信令格式，以实现信令服务器。&lt;/li&gt;
+  &lt;li&gt;4.如果浏览器方和设备不在同一局域网内，需要设置stun服务器。&lt;/li&gt;
+  &lt;li&gt;5.暂时不确定webRtc编译后的所有.a文件大小，以及运行后所占内存大小。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h4 id=&quot;32不使用webrtc源码自行模拟webrtc的通信流程&quot;&gt;3.2不使用webRtc源码，自行模拟webRtc的通信流程&lt;/h4&gt;
+
+&lt;p&gt;&lt;strong&gt;要非常熟悉webRtc项目才行&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id=&quot;结论&quot;&gt;结论&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;1.技术上可行。&lt;/li&gt;
+  &lt;li&gt;2.工作量非常大(webRtc项目本身很复杂)。&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Sun, 22 Apr 2018 17:13:17 +0800</pubDate>
+        <link>http://localhost:4000/webRtcStudy/</link>
+        <guid isPermaLink="true">http://localhost:4000/webRtcStudy/</guid>
+        
+        
+        <category>algorithm</category>
+        
+      </item>
+    
+      <item>
+        <title>Arraysizemustbeconstant</title>
+        <description>
+</description>
+        <pubDate>Fri, 20 Apr 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/ArraySizeMustBeConstant/</link>
+        <guid isPermaLink="true">http://localhost:4000/ArraySizeMustBeConstant/</guid>
+        
+        
+      </item>
+    
+      <item>
+        <title>Gccandg++parameter</title>
+        <description>
+</description>
+        <pubDate>Thu, 29 Mar 2018 00:00:00 +0800</pubDate>
+        <link>http://localhost:4000/GccAndG++Parameter/</link>
+        <guid isPermaLink="true">http://localhost:4000/GccAndG++Parameter/</guid>
+        
+        
+      </item>
     
       <item>
         <title>tcp多线程服务器总结</title>
@@ -856,418 +934,6 @@ Linux 新增的timer_create()用来创建一个定时器,详见：http://man7.or
         
         
         <category>C++</category>
-        
-      </item>
-    
-      <item>
-        <title>当回调函数是C++类成员函数</title>
-        <description>&lt;hr /&gt;
-&lt;p&gt;今天在公司实习，领导为了让我熟悉公司底层服务端架构，给我两天时间写一个基于当前平台的多线程收发消息的Demo。我参考项目中的旧代码编写这个Demo，平台上有个接口是注册回调函数的，我参照接口函数参数类型一一编写，最后碰到一个编译错误，百思不得其解，后来是同事提醒这里需要加个static关键字，他说C++回调函数必须是static，我一脸茫然。他让我去看static关键的作用，我说我都知道呀，static嘛，balabala…..。他说对啊，所以这里要加static。我还是一脸茫然，为了不暴露我&lt;strong&gt;菜&lt;/strong&gt;的事实，只好点头说是。下班后深究之下，终于发现了问题根源,同事说的并不是全对。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;本次发现的问题: C++类成员函数不遵守默认函数调用约定(__cdecl),因为要传递this指针&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;看下面的例子:&lt;/p&gt;
-&lt;h3 id=&quot;普通的回调&quot;&gt;普通的回调:&lt;/h3&gt;
-&lt;p&gt;&lt;img src=&quot;../material/CALLBACK/normal_callback.png&quot; alt=&quot;普通回调函数&quot; /&gt;
-很正常，函数正常运行。&lt;/p&gt;
-&lt;h3 id=&quot;c成员函数作为回调函数&quot;&gt;C++成员函数作为回调函数&lt;/h3&gt;
-
-&lt;p&gt;现在我们来看，&lt;strong&gt;当回调的函数是某个对象的成员函数的时候&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../material/CALLBACK/class_memberfunction.png&quot; alt=&quot;C++回调&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;我们编写类成员函数类型，和接口要求的回调函数参数类型&lt;strong&gt;“完全一样”&lt;/strong&gt;,好，我们编译一下：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../material/CALLBACK/compile_error.png&quot; alt=&quot;C++回调编译结果&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;为什么会这样？函数指针不都只这么用的么，而且怎么还和static搭上了关系？根据编译器的提示，我上网找资料，终于发现了症结所在，算是今天最大的收获了！&lt;/p&gt;
-
-&lt;h3 id=&quot;找原因&quot;&gt;找原因&lt;/h3&gt;
-&lt;p&gt;要从C++对象模型说起，&lt;strong&gt;this指针&lt;/strong&gt;。我们知道,普通的C++类,其成员函数是类的所有对象共享的,而数据时每个对象所独有的.即:&lt;strong&gt;数据独有,方法共享&lt;/strong&gt;。因此在调用类的某个成员方法(非静态方法)时,我怎么知道是哪个对象调用的呢?此时就是通过this指针来区分的，通过this指针我可以区分是该类的哪个对象正在调用该成员方法。&lt;/p&gt;
-
-&lt;p&gt;这里不得不提一下这次的另一个收获：&lt;strong&gt;函数调用约定&lt;/strong&gt;，下面是其中三种:&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;1、__cdecl
-    __cdecl调用约定成为C调用约定，是&lt;strong&gt;C/C++语言缺省的调用约定&lt;/strong&gt;。参数按照从右至左的方式入栈，函数本身不清理栈，返回值在EAX中，允许可变参数函数存在，如：int printf(char* buffer,const char* format,…);&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;2、__stdcall 函数自身清理栈。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;3、__thiscall 这是C++语言特有的一种调用方式，用于类成员函数的调用约定。如果参数确定，this指针存放于ECX寄存器，函数自身清理堆栈；如果参数不确定，this指针在所有参数入栈后再入栈，调用者清理栈。__thiscall不是关键字，程序员不能使用。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;C++类成员函数调用时，实际传递了&lt;strong&gt;this&lt;/strong&gt;，如:&lt;/p&gt;
-
-&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    &lt;span class=&quot;n&quot;&gt;Class&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;A&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//在编译器看来，A::func最终会转化成 Type func(A *this);
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;这样看来，我们找到了编译器提示错误的原因，&lt;strong&gt;仅仅是函数参数类型不匹配而已!&lt;/strong&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;解决方式&quot;&gt;解决方式&lt;/h3&gt;
-&lt;h4 id=&quot;1用static修饰类成员函数并且改变调用接口&quot;&gt;1、用static修饰类成员函数,并且改变调用接口&lt;/h4&gt;
-
-&lt;p&gt;但是，问题又随之而来，我们的回调函数是类的成员函数的目的之一：希望通过这个函数来访问对象的资源。但是，&lt;strong&gt;我们函数又是static的，只能访问静态数据成员&lt;/strong&gt;，怎么办？看来显式传递this指针无法避免，即：修改接口，另外加一个参数,用以放置this，如:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../material/CALLBACK/static_solution.png&quot; alt=&quot;静态解决方式&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;这种解决方式勉强可用把，但不是很满意！&lt;/p&gt;
-
-&lt;h4 id=&quot;2肯定还有其他更好的方法暂时没想出来哈哈哈&quot;&gt;2、肯定还有其他更好的方法，暂时没想出来，哈哈哈！&lt;/h4&gt;
-
-&lt;p&gt;来更新一波，使用std::function&amp;lt;&amp;gt;类模板也可以实现这个功能！显示传递this指针即可。因为funciton和C语言的函数指针有点小区别，打算改日另开一篇文章专门记录一下std::function&amp;lt;&amp;gt;和函数指针的区别与联系            2017-6-7&lt;/p&gt;
-
-</description>
-        <pubDate>Sat, 20 May 2017 21:09:12 +0800</pubDate>
-        <link>http://localhost:4000/callback/</link>
-        <guid isPermaLink="true">http://localhost:4000/callback/</guid>
-        
-        
-        <category>C++</category>
-        
-      </item>
-    
-      <item>
-        <title>我的这一次选择</title>
-        <description>&lt;hr /&gt;
-&lt;p&gt;这几个月是我最焦虑的日子了，哈哈哈，身边的大多数同学应该也是这个状态，要在就业和继续学习之间做一个抉择。好残酷，必须让你做一个选择。受限于眼界，我是从大一就决定的不考研，虽然现在觉得考研真的很有必要,真的！如果你知道你自己想要什么、追求什么，工作和考研都差不多，两者相比考研更佳。很多人关心我，劝我考研，包括我妈妈。我一意孤行，还是选择了直接就业，当然了，暂时是这么想的，因为我就是这么一个“善变”的人，说不定我明天就去考研了。&lt;/p&gt;
-
-&lt;p&gt;我现在选择的工作和我大一所想的真是天差万别，但是我一点不后悔！我选择通信工程这个专业，我不是盲目的，跟好多同学相比，这一点我很感激自己。我选择这个专业的原因我已经想不起来，也无从考证了。我只记得，我没上大学之前对于&lt;strong&gt;遥控&lt;/strong&gt;这个概念印象很深！我小时候(小学)能接触的最高级的玩具就是遥控小车了，我还能想起来的是我为了买这个遥控小车花了将近一个月在山上摘茶叶，从茶叶萌芽到茶叶花谢。至于飞机与小船我都是看别人玩的,我们那里不卖这种高级货。我好奇心还是很强的，玩了每几天我就把它拆了，我想弄明白里面的故事。看着里面的电路板我当时就明白了，再拆100个也无济于事,这差距就像一只毛毛虫想要打败大灰熊,判若云泥。后来我还拆了一个东西，小霸王学习机。&lt;/p&gt;
-
-&lt;p&gt;一个人的兴趣会影响他很长一段时间。&lt;/p&gt;
-
-&lt;p&gt;所以大一的时候，实验室招新，我没有犹豫就参加了。在实验室的这两年，还真是学到了不少，至少给我建立了一个完整的知识体系,我非常感谢。知识真是可以完全改变一个的野心，到现在，那些玩具已经不在话下了,这个兴趣也就到此为止了！这是我后来离开这个领域的其中一个原因,当然还有一个蛮重要的原因就是，如果我想在这方面有所建树，我必须考研。&lt;/p&gt;
-
-&lt;p&gt;大学提倡的自由，给我的一个负面影响是，对于不感兴趣的东西，我坚持不了15分钟的全神贯注。我是有体会的，我高中的时候，即使不喜欢化学，我还是可以看一下午的化学题，但是现在，你如果让我看两个小时的工程图学，比今天早上的1000米体测还难受！&lt;/p&gt;
-
-&lt;p&gt;大三上学期是我的一个过渡期，我每天都在犹豫，犹豫了一整个学期，后来还是选择了写代码。电路、嵌入式是我的舒适区，离开舒适区的前一段时间是很痛苦的，因为什么都是陌生的，我看不到希望。所以我花很多精力来适应，我的效率是很低的，主要原因是脑子不聪明，所以我选择多花时间。比如大年三十晚上还在写代码、在看招聘网上的职位要求。&lt;/p&gt;
-
-&lt;p&gt;后来看了一个寒假的书之后，我就试着去找实习，前期投简历真是打击我自信心，反馈给我的信息都是:经验不足。也的确，我才学了二十多天，所以我连面试机会都拿不到。这个实习找了整整二个半月，这个期间有几个时间点我真是有点坚持不下去了，我多次给自己暗示，如果这次简历没反馈，我就去考研。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;谢谢我的室友在这期间一直鼓励我！&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;后来终于有了一次面试机会，是杭州边锋网络的游戏研发,因为方向的不同，我没去面试。但至少给了我一点安慰，我开始变得有竞争力了。&lt;/p&gt;
-
-&lt;p&gt;所以我又高高兴兴开始学习了！学习这件事，我是一点都不排斥的。相反，我挺喜欢的。当然啦，我是指我感兴趣的东西。自学真的是一件困难的事情，原因还是一样，因为你不知道方向是否正确，我每天还是很焦虑。&lt;/p&gt;
-
-&lt;p&gt;后来又有两次面试机会，一次是奥克斯集团、一次是宇视科技。前者HR欺骗我，我就不提了，后者的面试我通过了。我笔试部分做的很不错，面试也没出现什么失误，面试官说我很优秀，比好多应届生还好！那一刻，我真是热泪盈眶！面试官没有看不起我不是科班的身份，也没在意我经验不足，还给了我一些中肯的建议。所以后来的发给我的offer我直接就答应了！哦，对了，他们公司的HR声音真好听！&lt;/p&gt;
-
-&lt;p&gt;那天是我三个月来最开心的一天。&lt;/p&gt;
-
-&lt;p&gt;所以我后来回到学校，就请我室友吃了一次&lt;strong&gt;大份&lt;/strong&gt;的小龙虾，哈哈哈哈！&lt;/p&gt;
-
-&lt;p&gt;距离拿到offer已经过去了半个月，这半个月真是爽到不行，早就把之前的雄心壮志扔到下水道了，整天游手好闲！光是小龙虾就吃了三回！不得不说，吃了好几家，小龙虾还是兰溪的“红火龙虾馆”最好吃！&lt;/p&gt;
-
-&lt;p&gt;马上就要去公司上班了，目的也很简单，我就是去打打酱油，学习学习正规军是如何作战的！希望几个月后的秋招能找个好工作！&lt;/p&gt;
-
-&lt;h3 id=&quot;写在最后&quot;&gt;写在最后&lt;/h3&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;“那一天我二十一岁，在我一生的黄金时代，我有好多奢望。我想爱，想吃，还想在一瞬间变成天上半明半暗的云。后来我才知道，生活就是个缓慢受锤的过程，人一天天老下去，奢望也一天天消失，最后变得像挨了锤的牛一样。我觉得自己会永远生猛下去，什么也锤不了我。”&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;离大学本科毕业还有将近一年，时间是个一去不回的游戏，且行且珍惜！&lt;/p&gt;
-
-&lt;h4 id=&quot;黄沙百战穿金甲不破楼兰誓不还&quot;&gt;黄沙百战穿金甲，不破楼兰誓不还&lt;/h4&gt;
-
-&lt;p&gt;&lt;img src=&quot;../material/IDPhoto/idphoto.jpg&quot; alt=&quot;美照,哈哈哈&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;PS:我知道过几天我回头看这篇文章我肯定会不好意思，哈哈哈！再见！&lt;/strong&gt;&lt;/p&gt;
-
-</description>
-        <pubDate>Sun, 07 May 2017 13:17:00 +0800</pubDate>
-        <link>http://localhost:4000/mytracks/</link>
-        <guid isPermaLink="true">http://localhost:4000/mytracks/</guid>
-        
-        
-        <category>diary</category>
-        
-      </item>
-    
-      <item>
-        <title>维特比算法的实现</title>
-        <description>&lt;hr /&gt;
-&lt;p&gt;前几天做通信原理的实验，发现网上关于维特比算法的解释太理论化，我结合代码通俗话的解释一下。如果看了以下代码您还是不能理解维特比纠错算法的真实目的，请务必联系我！&lt;/p&gt;
-
-&lt;p&gt;首先，我问大家一个问题，如下：
-&lt;img src=&quot;../material/VTB/route_guess.png&quot; alt=&quot;路径猜测&quot; /&gt;
-  A，B，C代表三个地点，三条实线代表路径。假设张三现在要去A、B、C的其中一个地方，由于淘宝上买了一个劣质的指南针，方向出了偏差，虚线是他走过的路，我们不知道到底偏了多少。我们以上帝视觉&lt;strong&gt;猜测&lt;/strong&gt;张三的目的，显然：&lt;strong&gt;看上去张三的目的地好像是B&lt;/strong&gt;。如果我们信赖这个指南针(偏的并不离谱),那么我们的结论也许就是对的。&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;注意哦&lt;/strong&gt;,我们的结论是根据最近的地点距离猜得，并不是非常准确，也就是说张三的目的地是A也是有可能的，即:&lt;strong&gt;指南针偏的的太多了&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;这里的”偏的太多了”，在通信上可以认为信息在传输过程受到了非常大的干扰，导致接收到的信息已经面目全非，想要恢复原有信息的话已经不太可能。&lt;/p&gt;
-
-&lt;p&gt;这就是维特比算法的一部分,&lt;strong&gt;根据汉明距离来选择最有可能通往下一个节点的路径&lt;/strong&gt;。所以说，如果信息位错的太离谱了，它就不可靠了，这个不离谱是有一个&lt;strong&gt;度&lt;/strong&gt;的，具体是多少，您可以参考下面的代码做个实验。&lt;/p&gt;
-
-&lt;p&gt;对了！如果您不知道什么是&lt;strong&gt;汉明距离&lt;/strong&gt;，那么您可以直接关掉这个页面了。&lt;/p&gt;
-
-&lt;p&gt;好了，接下来我们来模拟一下整个信息传输过程,我默认您已经掌握了一定的原理，知道什么是M序列、卷积码等。&lt;/p&gt;
-
-&lt;h3 id=&quot;第一步产生m序列&quot;&gt;第一步：产生M序列&lt;/h3&gt;
-
-&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    &lt;span class=&quot;k&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mseq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;m_sequence&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fbconnection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;register&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fbconnection&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;N&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;^&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
-    &lt;span class=&quot;n&quot;&gt;mseq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;register&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;        &lt;span class=&quot;c1&quot;&gt;%m序列的第一个输出码元&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;N&lt;/span&gt; 
-        &lt;span class=&quot;n&quot;&gt;newregister&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;mod&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sum&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fbconnection&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;.*&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;register&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; 
-            &lt;span class=&quot;n&quot;&gt;newregister&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;register&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;j&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;register&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;newregister&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;mseq&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;register&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;    
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;其中fbconnection就是我们要发送的信息，它被认为是M序列的特征方程的阶次。&lt;/p&gt;
-
-&lt;p&gt;我们把它定义成函数，将这个文件命名为:createMsequence.m,在matlab中，输入：vector = createMsequence(…,…)就可以产生一个信息段对应的M序列。示列：&lt;/p&gt;
-
-&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    &lt;span class=&quot;n&quot;&gt;mes&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;];&lt;/span&gt;   &lt;span class=&quot;c1&quot;&gt;%我们要发送的信息,我这里假设是4位，当然不论多少位都是可以的&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;init&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;zeros&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)];&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;%寄存器初始值&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;mseq&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;createMsequence&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;mes&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;init&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;  &lt;span class=&quot;c1&quot;&gt;%调用之前我们写的代码&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h4 id=&quot;运行实例&quot;&gt;运行实例:&lt;/h4&gt;
-
-&lt;p&gt;&lt;img src=&quot;../material/VTB/Mseq.png&quot; alt=&quot;M序列的产生&quot; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;加密卷积&quot;&gt;加密、卷积&lt;/h3&gt;
-
-&lt;p&gt;我们先随机产生一个和M序列等长度的01码，我们把这个序列认为是密码子，也就是说接收方如果想要结算它接收到的信息，必须依靠这个密码子。&lt;/p&gt;
-
-&lt;h4 id=&quot;加密&quot;&gt;加密&lt;/h4&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;secret = randint(1,length(mseq));
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;加密函数就简单点，直接异或吧。&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mseq = bitxor(mseq,secret);
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;我们现在再来看一下差异。&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../material/VTB/secret.png&quot; alt=&quot;secret&quot; /&gt;&lt;/p&gt;
-
-&lt;h4 id=&quot;卷积&quot;&gt;卷积&lt;/h4&gt;
-
-&lt;p&gt;然后我们再对这个序列进行卷积,我采用的是最简单的3,1,3卷积:&lt;/p&gt;
-
-&lt;div class=&quot;language-matlab highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    &lt;span class=&quot;k&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;out&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;conv&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;len&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;length&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;b1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;b2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;b3&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;len&lt;/span&gt; 
-        &lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;xor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;c3&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;xor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;xor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;),&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;b3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;out&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;out&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;out&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;c3&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;b3&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b2&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;b2&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;b1&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;b1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;vector&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;这是3,1,3卷积编码的实现，具体的实现框图我相信您肯定知道的，不难的，不就是一个迭代么。&lt;/p&gt;
-
-&lt;h3 id=&quot;信道传输&quot;&gt;信道传输&lt;/h3&gt;
-
-&lt;p&gt;我们知道信号的传输过程受环境影响很大，有干扰的情况下很容易造成信息位错乱，其实就是抽样判决的时候导致的。&lt;/p&gt;
-
-&lt;p&gt;假设信号序列在传输过程中出错了，导致了某些位由原来的1-&amp;gt;0,0-&amp;gt;1，我们就令第3、4位吧。&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;convolution(3) = ~convolution(3);
-convolution(4) = ~convolution(4);
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;&lt;img src=&quot;../material/VTB/channeltransform.png&quot; alt=&quot;信道传输&quot; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;第四步接收差错纠正&quot;&gt;第四步：接收、差错纠正&lt;/h3&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;recevive = convolution;
-decode_out = decode(recevive);
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;嘿嘿，全文的重点来了，&lt;strong&gt;维特比解码算法&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;这里我就直接贴代码了，相信我，如果您专心取理解每一行代码，肯定是看得懂的！&lt;/p&gt;
-
-&lt;p&gt;维特比算法的原理呢，如果您看不懂，结合下面的代码来看会有事半功倍的效果！&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;%MemeTao 2017.4.16 
-%维特比算法 仅支持(3,1,3)卷积码 
-%PS:请在调用前保证序列长度 &amp;gt;= 3*3   为什么? 这不是常识么？！
-function [out] = receive(vector)
-len = length(vector);   %获取输入序列长度
-if(mod(len,3) &amp;gt; 0)
-    disp('fuck you!');  %序列长度肯定是3的倍数，因为313卷积码嘛!
-end 
-%下面我要开始初始化route了
-%如果您看不懂下面的路径初始化,
-%不用怀疑,绝对是没理解卷积码的逆向推导,请去看书
-%a b c d 是状态
-%aa ab bc ... 是路径
-a = [0 0];
-b = [0 1];
-c = [1 0];
-d = [1 1];
-
-aa = [0 0 0]; 
-ab = [1 1 1];
-
-bc = [0 0 1];
-bd = [1 1 0];
-
-ca = [0 1 1];
-cb = [1 0 0];
-
-dc = [0 1 0];
-dd = [1 0 1];
-%你还是看不懂？ 那怎么办？下面更看不懂咯！   ^_^   ^_^ 
-%按照理论,每一次仅存在8条路径，然后判决出4条幸存路径
-%管他呢
-route = cell(1,8); 
-route_survive = cell(1,4);
-status = cell(1,8);
-dis_cur = zeros(1,8);
-dis_survive = zeros(1,8);
-%--------------------------------8条路径+4条幸存-----------------------------------%
-route{1} = [aa,aa,aa]; status{1} = a; dis_cur(1) = hanmingDis(route{1},vector(1:9)); 
-route{2} = [ab,bc,ca]; status{2} = a; dis_cur(2) = hanmingDis(route{2},vector(1:9)); 
-route{3} = [aa,aa,ab]; status{3} = b; dis_cur(3) = hanmingDis(route{3},vector(1:9));
-route{4} = [ab,bc,cb]; status{4} = b; dis_cur(4) = hanmingDis(route{4},vector(1:9));
-route{5} = [aa,ab,bc]; status{5} = c; dis_cur(5) = hanmingDis(route{5},vector(1:9));
-route{6} = [ab,bd,dc]; status{6} = c; dis_cur(6) = hanmingDis(route{6},vector(1:9));
-route{7} = [aa,ab,bd]; status{7} = d; dis_cur(7) = hanmingDis(route{7},vector(1:9));
-route{8} = [ab,bd,dd]; status{8} = d; dis_cur(8) = hanmingDis(route{8},vector(1:9));
-
-for i = 1 : 4
-    if( dis_cur(2*i-1) &amp;lt;= dis_cur(2*i) )
-    	route_survive{i} = route{2*i-1};
-	    dis_survive(i) = dis_cur(2*i-1);
-    else
-	    route_survive{i} = route{2*i};
-	    dis_survive(i) = dis_cur(2*i);
-    end
-end
-
-for index = 10 : 3 : len
-    %重新产生八条路径
-    %case a    状态A,下同                  
-    route  {1}  = [route_survive{1},aa];   %增加一条a-a路径
-    dis_cur(1)  = dis_survive(1) + hanmingDis(aa,vector(index:index+2)); %更新汉明距离
-    route  {3} 	= [route_survive{1},ab];   %增加一条a-b路径
-    dis_cur(3)  = dis_survive(1) + hanmingDis(ab,vector(index:index+2)); %更新汉明距离
-    %case b:
-    route  {5}  = [route_survive{2},bc];   %增加一条b-c路径
-    dis_cur(5)  = dis_survive(2) + hanmingDis(bc,vector(index:index+2)); %更新汉明距离
-    route  {7} 	= [route_survive{2},bd];   %增加一条b-d路径
-    dis_cur(7)  = dis_survive(2) + hanmingDis(bd,vector(index:index+2));
-    %case c:
-    route  {2}  = [route_survive{3},ca];   %增加一条c-a路径
-    dis_cur(2)  = dis_survive(3) + hanmingDis(ca,vector(index:index+2)); %更新汉明距离
-    route  {4}  = [route_survive{3},cb];   %增加一条c-b路径
-    dis_cur(4)  = dis_survive(3) + hanmingDis(cb,vector(index:index+2)); %更新汉明距离
-    %case d:
-    route  {6}  = [route_survive{4},dc];   %增加一条d-c路径
-    dis_cur(6)  = dis_survive(4) + hanmingDis(dc,vector(index:index+2)); %更新汉明距离
-    route  {8}  = [route_survive{4},dd];   %增加一条d-d路径
-    dis_cur(8)  = dis_survive(4) + hanmingDis(dd,vector(index:index+2)); %更新汉明距离
-    %重新产生幸存序列
-    for i = 1 : 4
-    	if( dis_cur(2*i-1) &amp;lt;= dis_cur(2*i) )
-    		route_survive{i} = route{2*i-1};
-    		dis_survive(i) = dis_cur(2*i-1);
-    	else
-		    route_survive{i} = route{2*i};
-		    dis_survive(i) = dis_cur(2*i);
-    	end
-    end	
-end	
-%答案就在最后的幸存序列里面
-min = realmax();%最大整数
-for i = 1 : 4 
-	if( dis_survive(i) &amp;lt; min)
-	    min = dis_survive(i);
-	    tar = i;
-    end
-end
-convolution = route_survive{tar};   %现在找到噪声之前的卷积码了！
-%下面进行的是卷积码逆向推回M序列，即我们最终的答案
-mse = zeros(1,3);
-for index_con = 1 : 3 : length(convolution)
-    mse = convolution(index_con:index_con+2);
-    if( all( mse(:) == aa(:) ) || all( mse(:) == bc(:) ) || all( mse(:) == ca(:) ) || all( mse(:) == dc(:) ) )
-	    out(round(index_con/3)+1) = 0;
-    else 
-    	out(round(index_con/3)+1) = 1;
-    end
-end
-
-%简直佩服我自己！哈哈哈！
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;h4 id=&quot;关于汉明距离的计算&quot;&gt;关于汉明距离的计算&lt;/h4&gt;
-
-&lt;p&gt;我认为这个您是可以自己接触的，出于人道主义：&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;function hanmingDis = input(src,cur)
-len_src = length(src);
-len_cur = length(cur);
-if(len_src ~= len_cur)
-    disp('error input: len_cur not equal len_src');
-end
-dis = 0;
-for i = 1 : len_cur
-    if(cur(i) ~= src(i))
-        dis = dis + 1;
-    end
-end
-hanmingDis = dis;
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;好，我们来测试一下在出现差错的情况下，它是否还能还原信息序列：&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../material/VTB/decode.png&quot; alt=&quot;纠错&quot; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;总结与测试&quot;&gt;总结与测试&lt;/h3&gt;
-
-&lt;p&gt;截至到这里，我们已经完成的工作是： 产生M序列-&amp;gt;加密-&amp;gt;卷积编码-&amp;gt;模拟信道传输-&amp;gt;维特比纠错解码-&amp;gt;还原M序列-&amp;gt;还原最初的信息&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../material/VTB/end.png&quot; alt=&quot;end&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;如果您细心看了，会发现最后一步我没介绍，就留给您自己实现吧!&lt;/p&gt;
-
-&lt;p&gt;PS:如果您需要整份代码，可以在以下地址获取&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;&lt;a href=&quot;https://github.com/MemeTao/MemeTao.github.io/tree/master/material/VTB/code&quot;&gt;代码&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
-
-</description>
-        <pubDate>Wed, 12 Apr 2017 17:13:17 +0800</pubDate>
-        <link>http://localhost:4000/VBIT/</link>
-        <guid isPermaLink="true">http://localhost:4000/VBIT/</guid>
-        
-        
-        <category>algorithm</category>
         
       </item>
     

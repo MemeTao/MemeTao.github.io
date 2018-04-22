@@ -7,19 +7,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="author" content="songroger">
 
-  <title>Archive</title>
+  <title>linux操作记录</title>
 
-  <meta name="description" content="中国计量大学本科 通信工程 在读(2017) ">
+  <meta name="description" content="&lt;hr /&gt;">
 
   <!-- Open graph data -->
   <meta property="og:site_name" content="Welcome my site">
-  <meta property="og:title" content="Archive">
-  <meta property="og:url" content="http://localhost:4000/archive/page2/">
+  <meta property="og:title" content="linux操作记录">
+  <meta property="og:url" content="http://localhost:4000/linuxOperation/">
   <meta property="og:type" content="article">
-  <meta property="og:description" content="中国计量大学本科 通信工程 在读(2017) ">
+  <meta property="og:description" content="&lt;hr /&gt;">
 
   <!-- Standard Stuff -->
-  <link rel="canonical" href="http://localhost:4000/archive/page2/"/>
+  <link rel="canonical" href="http://localhost:4000/linuxOperation/"/>
   <link rel="alternate" type="application/rss+xml" title="Welcome my site" href="http://localhost:4000/feed.xml"/>
 
   <!-- Favicons -->
@@ -61,62 +61,53 @@
   <main class="col">
 
 
-<h2 class="article__title article__title--single">Archive</h2>
+<article class="article">
+  <h2 class="article__title article__title--single">linux操作记录</h2>
+  <time class="article__date" datetime="2017-04-12"> 17:13 Apr.12-2017</time>
+  
+  <hr />
+
+<h3 id="安装与卸载">安装与卸载</h3>
 <ul>
-  
-    <div class="arch-item">
-      <li>
-        <a href="/Poll/" class="arch-title">TCP四次挥手中，Poll返回了几次？</a>
-        <time>Feb.04, 2018</time>
+  <li>apt-get install xxx #安装xxx</li>
+  <li>apt-get remove xxx  #卸载xxx</li>
+  <li>apt-get update      #更新软件信息数据库</li>
+  <li>apt-get upgrade     #进行系统升级</li>
+  <li>apt-cache search    #搜索软件包
+    <h3 id="文件查找">文件查找</h3>
+  </li>
+  <li>
+    <ol>
+      <li>find / -name filename
+        <h3 id="替换操作">替换操作</h3>
+        <h4 id="语法为-addrs源字符串目的字符串option">语法为 :[addr]s/源字符串/目的字符串/[option]</h4>
+        <div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="p">[</span><span class="n">addr</span><span class="p">]</span> <span class="c1">//表示检索范围，省略时表示当前行。
+//如:"1，20":表示从第1行到20行；
+</span><span class="s">"%"</span><span class="o">:</span><span class="c1">//表示整个文件，同“1,$”；
+</span><span class="s">".,$"</span><span class="o">:</span><span class="c1">//从当前行到文件尾；
+</span><span class="nl">s:</span> <span class="c1">//表示替换操作
+</span><span class="p">[</span><span class="n">option</span><span class="p">]</span><span class="o">:</span><span class="c1">//表示操作类型
+//如: g 表示全局替换; 
+//c 表示进行确认
+//p 表示替代结果逐行显示（Ctrl + L恢复屏幕）；
+//省略option时仅对每行第一个匹配串进行替换；
+//如果在源字符串和目的字符串中出现特殊字符，需要用”\”转义
+</span></code></pre>
+        </div>
       </li>
-      
-    </div>
-  
-    <div class="arch-item">
-      <li>
-        <a href="/ThunderingHerdProblem/" class="arch-title">TCP:多线程同时accept到底有没有必要?</a>
-        <time>Jan.29, 2018</time>
-      </li>
-      
-    </div>
-  
-    <div class="arch-item">
-      <li>
-        <a href="/TcpBuffer/" class="arch-title">TCP缓冲区与write系统调用</a>
-        <time>Jan.15, 2018</time>
-      </li>
-      
-    </div>
-  
-    <div class="arch-item">
-      <li>
-        <a href="/masterPlan/" class="arch-title">考研-从头到尾</a>
-        <time>Jul.29, 2017</time>
-      </li>
-      
-    </div>
-  
-    <div class="arch-item">
-      <li>
-        <a href="/functionClass/" class="arch-title">C++fucnion模板类与函数指针</a>
-        <time>Jun.07, 2017</time>
-      </li>
-      
-    </div>
-  
+    </ol>
+  </li>
 </ul>
 
-    <nav class="blocks blocks--space">
-      <div class="blocks__item">
-        <a href="/archive/">Previous</a>
-      </div>
-      <div class="blocks__item">
-        Page: 2 of 3
-      </div>
-      <div class="blocks__item">
-        <a href="/archive/page3">Next</a>
-      </div>
-    </nav>
+<h3 id="常用shell">常用shell</h3>
+
+<ul>
+  <li>1.echo export PATH=$(pwd):$PATH</li>
+</ul>
+
+  
+</article>
+
 
 
 
