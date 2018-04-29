@@ -31,7 +31,9 @@ s: //表示替换操作
 //省略option时仅对每行第一个匹配串进行替换；
 //如果在源字符串和目的字符串中出现特殊字符，需要用”\”转义
 ```
-
+### 统计代码行数
+* 1.find ./ -name *.cpp | xargs wc -l
+* 2.find ./ -name *.cpp | xargs wc -l | sort -n
 ### 常用shell
 
 * 1.echo export PATH=$(pwd):$PATH
