@@ -36,4 +36,4 @@ s: //表示替换操作
 * 2.find ./ -name *.cpp | xargs wc -l | sort -n
 ### 常用shell
 
-* 1.echo export PATH=$(pwd):$PATH
+* 环境变量添加 1.echo export PATH=$(pwd):$PATH
