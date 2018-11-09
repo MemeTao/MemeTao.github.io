@@ -14,13 +14,13 @@
   <!-- Open graph data -->
   <meta property="og:site_name" content="Welcome my site">
   <meta property="og:title" content="TCP缓冲区与write系统调用">
-  <meta property="og:url" content="http://localhost:4000/TcpBuffer/">
+  <meta property="og:url" content="http://MemeTao.github.io//TcpBuffer/">
   <meta property="og:type" content="article">
   <meta property="og:description" content="&lt;hr /&gt;">
 
   <!-- Standard Stuff -->
-  <link rel="canonical" href="http://localhost:4000/TcpBuffer/"/>
-  <link rel="alternate" type="application/rss+xml" title="Welcome my site" href="http://localhost:4000/feed.xml"/>
+  <link rel="canonical" href="http://MemeTao.github.io//TcpBuffer/"/>
+  <link rel="alternate" type="application/rss+xml" title="Welcome my site" href="http://MemeTao.github.io//feed.xml"/>
 
   <!-- Favicons -->
   <link rel="shortcut icon" href="http://7xof48.com1.z0.glb.clouddn.com/favicon.png">
@@ -87,16 +87,15 @@
 </blockquote>
 
 <p>我随即查看我的电脑上的配置</p>
-<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="err">运行结果：</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">运行结果：</span>
 <span class="err">$</span> <span class="n">cat</span> <span class="o">/</span><span class="n">proc</span><span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">net</span><span class="o">/</span><span class="n">core</span><span class="o">/</span><span class="n">wmem_default</span> <span class="o">(</span><span class="err">套接字缓冲区大小</span><span class="o">-</span><span class="err">写</span><span class="o">)</span>
 <span class="mi">212992</span> 
 <span class="err">$</span> <span class="n">cat</span> <span class="o">/</span><span class="n">proc</span><span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">net</span><span class="o">/</span><span class="n">ipv4</span><span class="o">/</span><span class="n">tcp_wmem</span>   
 <span class="mi">4096</span>	<span class="mi">16384</span>	<span class="mi">4194304</span>          <span class="n">min</span><span class="o">/</span><span class="k">default</span><span class="o">/</span><span class="n">max</span> 
 
-</code></pre>
-</div>
+</code></pre></div></div>
 <p>为了确认这些数据，我在自己电脑上用以下程序做了实验:</p>
-<div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="c1">//#include some head file
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//#include some head file
 </span><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
 <span class="p">{</span>
     <span class="kt">int</span> <span class="n">optval</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
@@ -109,8 +108,7 @@
         <span class="n">std</span><span class="o">::</span><span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">"val:"</span><span class="o">&lt;&lt;</span><span class="n">optval</span><span class="o">&lt;&lt;</span><span class="n">std</span><span class="o">::</span><span class="n">endl</span><span class="p">;</span>
     <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
 <span class="p">}</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 <p>结果是16384。</p>
 
 <p>为什么我程序输出的却是/pro/sys/ipv4/tcp_wmen的默认值呢？我迷惑了，难道是Linux man 手册说错了?</p>
@@ -131,11 +129,10 @@
 </blockquote>
 
 <p>那么我的电脑上有没有这所谓的window scaling呢？</p>
-<div class="language-java highlighter-rouge"><pre class="highlight"><code><span class="err">运行结果：</span>
+<div class="language-java highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">运行结果：</span>
 <span class="o">~</span><span class="err">$</span> <span class="n">cat</span> <span class="o">/</span><span class="n">proc</span><span class="o">/</span><span class="n">sys</span><span class="o">/</span><span class="n">net</span><span class="o">/</span><span class="n">ipv4</span><span class="o">/</span><span class="n">tcp_window_scaling</span>
 <span class="mi">1</span>   
-</code></pre>
-</div>
+</code></pre></div></div>
 <p>有的。依稀记得好像有这么一句化：当前的以太网带宽发展很快，以前的双绞线10MB以太网现在已经发展到千兆以太网，所以16位的窗口值在一些场合已经不适用了。</p>
 
 <h5 id="用一个例子来理解一下上面所说的概念socket缓冲区大小">用一个例子来理解一下上面所说的概念:socket缓冲区大小</h5>

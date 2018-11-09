@@ -14,13 +14,13 @@
   <!-- Open graph data -->
   <meta property="og:site_name" content="Welcome my site">
   <meta property="og:title" content="TCP:多线程同时accept到底有没有必要?">
-  <meta property="og:url" content="http://localhost:4000/ThunderingHerdProblem/">
+  <meta property="og:url" content="http://MemeTao.github.io//ThunderingHerdProblem/">
   <meta property="og:type" content="article">
   <meta property="og:description" content="&lt;hr /&gt;">
 
   <!-- Standard Stuff -->
-  <link rel="canonical" href="http://localhost:4000/ThunderingHerdProblem/"/>
-  <link rel="alternate" type="application/rss+xml" title="Welcome my site" href="http://localhost:4000/feed.xml"/>
+  <link rel="canonical" href="http://MemeTao.github.io//ThunderingHerdProblem/"/>
+  <link rel="alternate" type="application/rss+xml" title="Welcome my site" href="http://MemeTao.github.io//feed.xml"/>
 
   <!-- Favicons -->
   <link rel="shortcut icon" href="http://7xof48.com1.z0.glb.clouddn.com/favicon.png">
@@ -82,9 +82,8 @@
     <h4 id="22当accept队列满了">2.2当accept队列满了</h4>
     <p>当accept队列满了之后，即使client继续向server发送ACK的包，也会不被响应，此时ListenOverflows+1，同时server通过/proc/sys/net/ipv4/tcp_abort_on_overflow来决定如何返回，0表示直接丢弃该ACK，1表示发送RST通知client；相应的，client则会分别返回read timeout 或者 connection reset by peer。</p>
     <h4 id="23如何查看是否存在队列溢出">2.3如何查看是否存在队列溢出</h4>
-    <div class="language-shell highlighter-rouge"><pre class="highlight"><code>netstat -s | grep <span class="s2">"listen|LISTEN"</span>
-</code></pre>
-    </div>
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>netstat <span class="nt">-s</span> | <span class="nb">grep</span> <span class="s2">"listen|LISTEN"</span>
+</code></pre></div>    </div>
     <p>由于我电脑不是服务器，没有溢出的情况，暂时不能举例。</p>
     <h4 id="24如果客户端第三个ack已达到但是服务端没有accept且客户端发送了信息这时发生什么">2.4如果客户端第三个ACK已达到，但是服务端没有accept，且客户端发送了信息，这时发生什么?</h4>
     <p>我没有做相应的实验，查资料得知，服务端不做任何响应，客户端超时重传，直至断开连接。</p>

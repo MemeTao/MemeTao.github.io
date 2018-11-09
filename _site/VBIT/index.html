@@ -14,13 +14,13 @@
   <!-- Open graph data -->
   <meta property="og:site_name" content="Welcome my site">
   <meta property="og:title" content="维特比算法的实现">
-  <meta property="og:url" content="http://localhost:4000/VBIT/">
+  <meta property="og:url" content="http://MemeTao.github.io//VBIT/">
   <meta property="og:type" content="article">
   <meta property="og:description" content="&lt;hr /&gt;&lt;p&gt;前几天做通信原理的实验，发现网上关于维特比算法的解释太理论化，我结合代码通俗话的解释一下。如果看了以下代码您还是不能理解维特比纠错算法的真实目的，请务必联系我！&lt;/p&gt;&lt;p&gt;首先，我问大家一个问题，如下：&lt;img src=&quot;../m...">
 
   <!-- Standard Stuff -->
-  <link rel="canonical" href="http://localhost:4000/VBIT/"/>
-  <link rel="alternate" type="application/rss+xml" title="Welcome my site" href="http://localhost:4000/feed.xml"/>
+  <link rel="canonical" href="http://MemeTao.github.io//VBIT/"/>
+  <link rel="alternate" type="application/rss+xml" title="Welcome my site" href="http://MemeTao.github.io//feed.xml"/>
 
   <!-- Favicons -->
   <link rel="shortcut icon" href="http://7xof48.com1.z0.glb.clouddn.com/favicon.png">
@@ -84,7 +84,7 @@
 
 <h3 id="第一步产生m序列">第一步：产生M序列</h3>
 
-<div class="language-matlab highlighter-rouge"><pre class="highlight"><code>    <span class="k">function</span> <span class="p">[</span><span class="n">mseq</span><span class="p">]</span> <span class="o">=</span> <span class="n">m_sequence</span><span class="p">(</span><span class="n">fbconnection</span><span class="p">,</span><span class="n">register</span><span class="p">)</span>
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">function</span> <span class="p">[</span><span class="n">mseq</span><span class="p">]</span> <span class="o">=</span> <span class="n">m_sequence</span><span class="p">(</span><span class="n">fbconnection</span><span class="p">,</span><span class="n">register</span><span class="p">)</span>
     <span class="n">n</span><span class="o">=</span><span class="nb">length</span><span class="p">(</span><span class="n">fbconnection</span><span class="p">);</span>
     <span class="n">N</span><span class="o">=</span><span class="mi">2</span><span class="o">^</span><span class="n">n</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span> 
     <span class="n">mseq</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">=</span><span class="n">register</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>        <span class="c1">%m序列的第一个输出码元</span>
@@ -96,18 +96,16 @@
         <span class="n">register</span><span class="o">=</span><span class="n">newregister</span><span class="p">;</span>
         <span class="n">mseq</span><span class="p">(</span><span class="nb">i</span><span class="p">)</span><span class="o">=</span><span class="n">register</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
     <span class="k">end</span>    
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>其中fbconnection就是我们要发送的信息，它被认为是M序列的特征方程的阶次。</p>
 
 <p>我们把它定义成函数，将这个文件命名为:createMsequence.m,在matlab中，输入：vector = createMsequence(…,…)就可以产生一个信息段对应的M序列。示列：</p>
 
-<div class="language-matlab highlighter-rouge"><pre class="highlight"><code>    <span class="n">mes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span><span class="p">];</span>   <span class="c1">%我们要发送的信息,我这里假设是4位，当然不论多少位都是可以的</span>
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="n">mes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span> <span class="mi">0</span> <span class="mi">0</span> <span class="mi">1</span><span class="p">];</span>   <span class="c1">%我们要发送的信息,我这里假设是4位，当然不论多少位都是可以的</span>
     <span class="n">init</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="nb">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="nb">length</span><span class="p">(</span><span class="n">mes</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)];</span> <span class="c1">%寄存器初始值</span>
     <span class="n">mseq</span> <span class="o">=</span> <span class="n">createMsequence</span><span class="p">(</span><span class="n">mes</span><span class="p">,</span><span class="n">init</span><span class="p">);</span>  <span class="c1">%调用之前我们写的代码</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h4 id="运行实例">运行实例:</h4>
 
@@ -118,15 +116,13 @@
 <p>我们先随机产生一个和M序列等长度的01码，我们把这个序列认为是密码子，也就是说接收方如果想要结算它接收到的信息，必须依靠这个密码子。</p>
 
 <h4 id="加密">加密</h4>
-<div class="highlighter-rouge"><pre class="highlight"><code>secret = randint(1,length(mseq));
-</code></pre>
-</div>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>secret = randint(1,length(mseq));
+</code></pre></div></div>
 
 <p>加密函数就简单点，直接异或吧。</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>mseq = bitxor(mseq,secret);
-</code></pre>
-</div>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mseq = bitxor(mseq,secret);
+</code></pre></div></div>
 
 <p>我们现在再来看一下差异。</p>
 
@@ -136,7 +132,7 @@
 
 <p>然后我们再对这个序列进行卷积,我采用的是最简单的3,1,3卷积:</p>
 
-<div class="language-matlab highlighter-rouge"><pre class="highlight"><code>    <span class="k">function</span> <span class="p">[</span><span class="n">out</span><span class="p">]</span> <span class="o">=</span> <span class="nb">conv</span><span class="p">(</span><span class="n">vector</span><span class="p">);</span>
+<div class="language-matlab highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">function</span> <span class="p">[</span><span class="n">out</span><span class="p">]</span> <span class="o">=</span> <span class="nb">conv</span><span class="p">(</span><span class="n">vector</span><span class="p">);</span>
     <span class="n">len</span> <span class="o">=</span> <span class="nb">length</span><span class="p">(</span><span class="n">vector</span><span class="p">);</span>
     <span class="n">b1</span> <span class="o">=</span> <span class="n">vector</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
     <span class="n">b2</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
@@ -154,8 +150,7 @@
             <span class="n">b1</span> <span class="o">=</span> <span class="n">vector</span><span class="p">(</span><span class="nb">i</span><span class="o">+</span><span class="mi">1</span><span class="p">);</span>
         <span class="k">end</span>
     <span class="k">end</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>这是3,1,3卷积编码的实现，具体的实现框图我相信您肯定知道的，不难的，不就是一个迭代么。</p>
 
@@ -165,19 +160,17 @@
 
 <p>假设信号序列在传输过程中出错了，导致了某些位由原来的1-&gt;0,0-&gt;1，我们就令第3、4位吧。</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>convolution(3) = ~convolution(3);
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>convolution(3) = ~convolution(3);
 convolution(4) = ~convolution(4);
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p><img src="../material/VTB/channeltransform.png" alt="信道传输" /></p>
 
 <h3 id="第四步接收差错纠正">第四步：接收、差错纠正</h3>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>recevive = convolution;
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>recevive = convolution;
 decode_out = decode(recevive);
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>嘿嘿，全文的重点来了，<strong>维特比解码算法</strong></p>
 
@@ -185,7 +178,7 @@ decode_out = decode(recevive);
 
 <p>维特比算法的原理呢，如果您看不懂，结合下面的代码来看会有事半功倍的效果！</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>%MemeTao 2017.4.16 
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>%MemeTao 2017.4.16 
 %维特比算法 仅支持(3,1,3)卷积码 
 %PS:请在调用前保证序列长度 &gt;= 3*3   为什么? 这不是常识么？！
 function [out] = receive(vector)
@@ -296,14 +289,13 @@ for index_con = 1 : 3 : length(convolution)
 end
 
 %简直佩服我自己！哈哈哈！
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h4 id="关于汉明距离的计算">关于汉明距离的计算</h4>
 
 <p>我认为这个您是可以自己接触的，出于人道主义：</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>function hanmingDis = input(src,cur)
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>function hanmingDis = input(src,cur)
 len_src = length(src);
 len_cur = length(cur);
 if(len_src ~= len_cur)
@@ -316,8 +308,7 @@ for i = 1 : len_cur
     end
 end
 hanmingDis = dis;
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>好，我们来测试一下在出现差错的情况下，它是否还能还原信息序列：</p>
 

@@ -7,19 +7,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="author" content="songroger">
 
-  <title>Archive</title>
+  <title>C++成员函数指针的大小</title>
 
-  <meta name="description" content="中国计量大学本科 通信工程 在读(2017) ">
+  <meta name="description" content="&lt;hr /&gt;">
 
   <!-- Open graph data -->
   <meta property="og:site_name" content="Welcome my site">
-  <meta property="og:title" content="Archive">
-  <meta property="og:url" content="http://MemeTao.github.io//archive/">
+  <meta property="og:title" content="C++成员函数指针的大小">
+  <meta property="og:url" content="http://MemeTao.github.io//theSizeOfMemeberFunctionPointer/">
   <meta property="og:type" content="article">
-  <meta property="og:description" content="中国计量大学本科 通信工程 在读(2017) ">
+  <meta property="og:description" content="&lt;hr /&gt;">
 
   <!-- Standard Stuff -->
-  <link rel="canonical" href="http://MemeTao.github.io//archive/"/>
+  <link rel="canonical" href="http://MemeTao.github.io//theSizeOfMemeberFunctionPointer/"/>
   <link rel="alternate" type="application/rss+xml" title="Welcome my site" href="http://MemeTao.github.io//feed.xml"/>
 
   <!-- Favicons -->
@@ -61,62 +61,86 @@
   <main class="col">
 
 
-<h2 class="article__title article__title--single">Archive</h2>
-<ul>
+<article class="article">
+  <h2 class="article__title article__title--single">C++成员函数指针的大小</h2>
+  <time class="article__date" datetime="2018-07-12"> 17:13 Jul.12-2018</time>
   
-    <div class="arch-item">
-      <li>
-        <a href="/string-coding/" class="arch-title">String Coding</a>
-        <time>Nov.09, 2018</time>
-      </li>
-      
-    </div>
-  
-    <div class="arch-item">
-      <li>
-        <a href="/theSizeOfMemeberFunctionPointer/" class="arch-title">C++成员函数指针的大小</a>
-        <time>Jul.12, 2018</time>
-      </li>
-      <div class="arch-desc">this指针的调整</div>
-    </div>
-  
-    <div class="arch-item">
-      <li>
-        <a href="/SocketConnect/" class="arch-title">Socket注意事项:非阻塞connect的返回值</a>
-        <time>Feb.10, 2018</time>
-      </li>
-      
-    </div>
-  
-    <div class="arch-item">
-      <li>
-        <a href="/Poll/" class="arch-title">TCP四次挥手中，Poll返回了几次？</a>
-        <time>Feb.04, 2018</time>
-      </li>
-      
-    </div>
-  
-    <div class="arch-item">
-      <li>
-        <a href="/ThunderingHerdProblem/" class="arch-title">TCP:多线程同时accept到底有没有必要?</a>
-        <time>Jan.29, 2018</time>
-      </li>
-      
-    </div>
-  
-</ul>
+  <hr />
 
-    <nav class="blocks blocks--space">
-      <div class="blocks__item">
-        
-      </div>
-      <div class="blocks__item">
-        Page: 1 of 2
-      </div>
-      <div class="blocks__item">
-        <a href="/archive/page2">Next</a>
-      </div>
-    </nav>
+<h3 id="c中的函数指针假定在64位机器上">c++中的函数指针(假定在64位机器上)</h3>
+
+<p>我们知道指针的大小恒定的,跟机器位数有关,32位机下,指针是4字节大小,64位机下指针是8字节大小.但是在C++中,有一个比较特殊的地方是C++的类成员函数
+指针,它的大小是普通指针的2倍.先看一个实例:</p>
+<pre><code class="language-C++">void foo(void)
+{
+}
+class A{
+public:
+    void foo(){}
+}
+
+int main()
+{
+    void (*pfun)(void);
+    pfun = foo;
+    void (A::*pMfun)(void);
+    pMfun = &amp;A::foo;
+    std::cout&lt;&lt;"normal function pointer size:"&lt;&lt;sizeof(pfun)&lt;&lt;std::endl;
+    std::cout&lt;&lt;"member function pointer size:"&lt;&lt;sizeof(pMfun)&lt;&lt;std::endl;
+    return 0;
+}
+</code></pre>
+<p>运行结果:</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>normal <span class="k">function </span>pointer size:8
+member <span class="k">function </span>pointer size:16
+</code></pre></div></div>
+<p>证明完毕.下面解释为什么会这样.</p>
+<h3 id="this指针的调整">this指针的调整</h3>
+
+<p>再看一个例子:</p>
+<pre><code class="language-C++">class A{
+public;
+    void foo()
+    {
+        //假设我们需要在这里去使用数组a
+        std::cout&lt;&lt;"addr of this:%x"&lt;&lt;this&lt;&lt;std::endl;
+    }
+private:
+    int a[4];
+};
+class B{
+public:
+    void bar()
+    { 
+        //假设我们需要在这里去使用数组b
+        std::cout&lt;&lt;"addr of this:%x"&lt;&lt;this&lt;&lt;std::endl;
+    }
+prviate:
+    int b[4];
+};
+class C: public A,B{
+
+};
+
+int main()
+{
+    C c; 
+    c.foo();
+    c.bar();
+    return 0;
+}
+</code></pre>
+<p>结果</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>addr of this:%x0x7ffd30f4ec00
+addr of this:%x0x7ffd30f4ec10
+</code></pre></div></div>
+<p>这时候可以看到,传递给foo和bar函数的this指针是不一样的?为什么会不一样呢? 考虑一下函数中的注释.
+所以调用类成员函数指针时,就需要将this指针进行调整,这个调整的信息在哪里?就在这个函数指针中,所以就需要另外的空间去存放这些信息,这也就是为什么类成员函数指针是16字节的原因,因为多出来的8字节,用于编译期的this指针调整.</p>
+
+
+  
+</article>
+
 
 
 

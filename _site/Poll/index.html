@@ -14,13 +14,13 @@
   <!-- Open graph data -->
   <meta property="og:site_name" content="Welcome my site">
   <meta property="og:title" content="TCP四次挥手中，Poll返回了几次？">
-  <meta property="og:url" content="http://localhost:4000/Poll/">
+  <meta property="og:url" content="http://MemeTao.github.io//Poll/">
   <meta property="og:type" content="article">
   <meta property="og:description" content="&lt;hr /&gt;">
 
   <!-- Standard Stuff -->
-  <link rel="canonical" href="http://localhost:4000/Poll/"/>
-  <link rel="alternate" type="application/rss+xml" title="Welcome my site" href="http://localhost:4000/feed.xml"/>
+  <link rel="canonical" href="http://MemeTao.github.io//Poll/"/>
+  <link rel="alternate" type="application/rss+xml" title="Welcome my site" href="http://MemeTao.github.io//feed.xml"/>
 
   <!-- Favicons -->
   <link rel="shortcut icon" href="http://7xof48.com1.z0.glb.clouddn.com/favicon.png">
@@ -71,7 +71,7 @@
 <p>我在给多线程TCP服务器写被动关闭逻辑时遇到了一个疑问，Poll返回的时机是什么时候？TCP四次挥手能够引起几次Poll返回？</p>
 <h3 id="如何引入的问题">如何引入的问题</h3>
 <p>一般的服务器编程逻辑，一般是由客户端发起的主动关闭，服务端实行被动关闭。按正常的流程是这样的:对端发送FIN，服务端发送ACK，如果没有多余数据，随即再发送FIN分节，对端继续发送ACK便进入熟知的TIME_WAIT状态，等待2MSL时间后进入CLOSE状态，本次TCP连接顺利断开。依照这个模型，我们只要在fd上注册一个回调函数，等poll返回时，用read系统调用即可判断是正常数据还是FIN分节，很容易得到如下回调函数伪代码:</p>
-<div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">handleRead</span><span class="p">()</span>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">void</span> <span class="nf">handleRead</span><span class="p">()</span>
 <span class="p">{</span>
     <span class="kt">ssize_t</span> <span class="n">n</span> <span class="o">=</span> <span class="n">read</span><span class="p">(</span><span class="n">fd</span><span class="p">);</span> 
     <span class="k">if</span><span class="p">(</span> <span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="c1">//对端发来信息
@@ -86,8 +86,7 @@
     <span class="k">else</span>
         <span class="n">Error</span><span class="p">();</span>
 <span class="p">}</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 <p>上述代码在实际的运行时，发生了错误，操作系统提示我一个关键词：<strong>double free</strong></p>
 
 <h3 id="寻找症结">寻找症结</h3>
@@ -95,11 +94,10 @@
 <p>根据提示:我猜测是某些资源释放了多次。在多次复现问题后，最终发现这个问题出现在TCP连接断开的时候。</p>
 
 <p>我用Linux下的NC工具模拟了客户端TCP连接，并用tcpdump试图分析出一点蛛丝马迹：</p>
-<div class="language-shell highlighter-rouge"><pre class="highlight"><code>    <span class="nv">$ </span>./TcpServer -l 65500     //在本地65500端口启动服务器
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="nv">$ </span>./TcpServer <span class="nt">-l</span> 65500     //在本地65500端口启动服务器
     <span class="nv">$ </span>nc 127.0.0.1 65500       //连接到服务器65500端口
     <span class="nv">$ </span>Ctrl-D                   //一段时间后，NC主动断开连接 
-</code></pre>
-</div>
+</code></pre></div></div>
 <p>以下是tcpdump本地抓包结果：
 <img src="../material/POLL/tcpdump.png" alt="TCPDUMP" />
 首先是TCP三次握手，随后等我键入Ctrl-D断开连接，TCP四次挥手也很正常(由于FIN分节携带了ACK，所以表现出来是3个报文),然后服务端依然奔溃，并提示double free!</p>
@@ -157,14 +155,13 @@
 
 <ul>
   <li>方案一：具体是在read()返回0，后随机注销掉该socket_fd的一切事件。伪代码描述如下:
-    <div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="k">if</span><span class="p">(</span><span class="n">read</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+    <div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span><span class="p">(</span><span class="n">read</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
 <span class="p">{</span>
   <span class="n">pollfd</span><span class="p">.</span><span class="n">events</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>   <span class="c1">//如果不懂,请查阅struct pollfd
 </span>  <span class="n">addTask</span><span class="p">(</span><span class="n">freeMemory</span><span class="p">);</span> <span class="c1">//让其他线程来处理该连接的资源
 </span>  <span class="n">close</span><span class="p">(</span><span class="n">fd</span><span class="p">);</span> 
 <span class="p">}</span>
-</code></pre>
-    </div>
+</code></pre></div>    </div>
   </li>
   <li>方案二:一个TCP连接的所以资源自始自终都由某一个线程管理，不要转移fd。</li>
 </ul>

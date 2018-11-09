@@ -14,13 +14,13 @@
   <!-- Open graph data -->
   <meta property="og:site_name" content="Welcome my site">
   <meta property="og:title" content="linux操作记录">
-  <meta property="og:url" content="http://localhost:4000/linuxOperation/">
+  <meta property="og:url" content="http://MemeTao.github.io//linuxOperation/">
   <meta property="og:type" content="article">
   <meta property="og:description" content="&lt;hr /&gt;">
 
   <!-- Standard Stuff -->
-  <link rel="canonical" href="http://localhost:4000/linuxOperation/"/>
-  <link rel="alternate" type="application/rss+xml" title="Welcome my site" href="http://localhost:4000/feed.xml"/>
+  <link rel="canonical" href="http://MemeTao.github.io//linuxOperation/"/>
+  <link rel="alternate" type="application/rss+xml" title="Welcome my site" href="http://MemeTao.github.io//feed.xml"/>
 
   <!-- Favicons -->
   <link rel="shortcut icon" href="http://7xof48.com1.z0.glb.clouddn.com/favicon.png">
@@ -81,7 +81,7 @@
       <li>find / -name filename
         <h3 id="替换操作">替换操作</h3>
         <h4 id="语法为-addrs源字符串目的字符串option">语法为 :[addr]s/源字符串/目的字符串/[option]</h4>
-        <div class="language-c++ highlighter-rouge"><pre class="highlight"><code><span class="p">[</span><span class="n">addr</span><span class="p">]</span> <span class="c1">//表示检索范围，省略时表示当前行。
+        <div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="n">addr</span><span class="p">]</span> <span class="c1">//表示检索范围，省略时表示当前行。
 //如:"1，20":表示从第1行到20行；
 </span><span class="s">"%"</span><span class="o">:</span><span class="c1">//表示整个文件，同“1,$”；
 </span><span class="s">".,$"</span><span class="o">:</span><span class="c1">//从当前行到文件尾；
@@ -92,17 +92,25 @@
 //p 表示替代结果逐行显示（Ctrl + L恢复屏幕）；
 //省略option时仅对每行第一个匹配串进行替换；
 //如果在源字符串和目的字符串中出现特殊字符，需要用”\”转义
-</span></code></pre>
-        </div>
+</span></code></pre></div>        </div>
+        <h3 id="统计代码行数">统计代码行数</h3>
       </li>
     </ol>
   </li>
-</ul>
-
-<h3 id="常用shell">常用shell</h3>
-
-<ul>
-  <li>1.echo export PATH=$(pwd):$PATH</li>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td>1.find ./ -name *.cpp</td>
+          <td>xargs wc -l</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li>2.find ./ -name *.cpp | xargs wc -l | sort -n
+    <h3 id="常用shell">常用shell</h3>
+  </li>
+  <li>环境变量添加 1.echo export PATH=$(pwd):$PATH</li>
 </ul>
 
   

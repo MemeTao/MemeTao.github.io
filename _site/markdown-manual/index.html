@@ -14,13 +14,13 @@
   <!-- Open graph data -->
   <meta property="og:site_name" content="Welcome my site">
   <meta property="og:title" content="Markdown">
-  <meta property="og:url" content="http://localhost:4000/markdown-manual/">
+  <meta property="og:url" content="http://MemeTao.github.io//markdown-manual/">
   <meta property="og:type" content="article">
   <meta property="og:description" content="&lt;hr /&gt;&lt;p&gt;Markdown manual&lt;/p&gt;">
 
   <!-- Standard Stuff -->
-  <link rel="canonical" href="http://localhost:4000/markdown-manual/"/>
-  <link rel="alternate" type="application/rss+xml" title="Welcome my site" href="http://localhost:4000/feed.xml"/>
+  <link rel="canonical" href="http://MemeTao.github.io//markdown-manual/"/>
+  <link rel="alternate" type="application/rss+xml" title="Welcome my site" href="http://MemeTao.github.io//feed.xml"/>
 
   <!-- Favicons -->
   <link rel="shortcut icon" href="http://7xof48.com1.z0.glb.clouddn.com/favicon.png">
@@ -82,15 +82,14 @@
 
 <p>示例：</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>这是一个一级标题
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>这是一个一级标题
 ============================
 
 这是一个二级标题
 --------------------------------------------------
 
 ### 这是一个三级标题
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>你也可以选择在行首加井号表示不同级别的标题 (H1-H6)，例如：# H1, ## H2, ### H3，#### H4。</p>
 
@@ -150,9 +149,8 @@
 
 <p>示例：</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>这是一个代码块，此行左侧有四个不可见的空格。
-</code></pre>
-</div>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>这是一个代码块，此行左侧有四个不可见的空格。
+</code></pre></div></div>
 
 <h3 id="9--插入图像">9.  插入图像</h3>
 
@@ -194,13 +192,12 @@
 
 <p>非代码示例：</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>$ sudo apt-get install vim-gnome
-</code></pre>
-</div>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ sudo apt-get install vim-gnome
+</code></pre></div></div>
 
 <p>Python 示例：</p>
 
-<div class="language-python highlighter-rouge"><pre class="highlight"><code><span class="nd">@requires_authorization</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">@requires_authorization</span>
 <span class="k">def</span> <span class="nf">somefunc</span><span class="p">(</span><span class="n">param1</span><span class="o">=</span><span class="s">''</span><span class="p">,</span> <span class="n">param2</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
     <span class="s">'''A docstring'''</span>
     <span class="k">if</span> <span class="n">param1</span> <span class="o">&gt;</span> <span class="n">param2</span><span class="p">:</span> <span class="c"># interesting</span>
@@ -212,12 +209,11 @@
 
 <span class="o">&gt;&gt;&gt;</span> <span class="n">message</span> <span class="o">=</span> <span class="s">'''interpreter
 ... prompt'''</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>JavaScript 示例：</p>
 
-<div class="language-javascript highlighter-rouge"><pre class="highlight"><code><span class="cm">/**
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">/**
 * nth element in the fibonacci series.
 * @param n &gt;= 0
 * @return the nth element, &gt;= 0.
@@ -234,8 +230,7 @@
 <span class="p">}</span>
 
 <span class="nb">document</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="nx">fib</span><span class="p">(</span><span class="mi">10</span><span class="p">));</span>
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <h3 id="5-定义型列表">5. 定义型列表</h3>
 
@@ -245,9 +240,8 @@
   <dt>代码块 2</dt>
   <dd>这是代码块的定义（左侧有一个可见的冒号和四个不可见的空格）
 
-    <div class="highlighter-rouge"><pre class="highlight"><code>代码块（左侧有八个不可见的空格）
-</code></pre>
-    </div>
+    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>代码块（左侧有八个不可见的空格）
+</code></pre></div>    </div>
   </dd>
 </dl>
 
@@ -255,7 +249,7 @@
 
 <p>本站支持在 Markdown 语法中嵌套 Html 标签，譬如，你可以用 Html 写一个纵跨两行的表格：</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>&lt;table&gt;
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;table&gt;
     &lt;tr&gt;
         &lt;th rowspan="2"&gt;值班人员&lt;/th&gt;
         &lt;th&gt;星期一&lt;/th&gt;
@@ -268,8 +262,7 @@
         &lt;td&gt;王平&lt;/td&gt;
     &lt;/tr&gt;
 &lt;/table&gt;
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <table>
     <tr>
@@ -289,7 +282,7 @@
 
 <p>使用带有 [ ] 或 [x] （未完成或已完成）项的列表语法撰写一个待办事宜列表，并且支持子列表嵌套以及混用Markdown语法，例如：</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>- [ ] **Cmd Markdown 开发**
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- [ ] **Cmd Markdown 开发**
     - [ ] 改进 Cmd 渲染算法，使用局部渲染技术提高渲染效率
     - [ ] 支持以 PDF 格式导出文稿
     - [x] 新增Todo列表功能 [语法参考](https://github.com/)
@@ -300,8 +293,7 @@
     - [ ] 准备邮轮上需要携带的物品
     - [ ] 浏览日本免税店的物品
     - [x] 购买蓝宝石公主号七月一日的船票
-</code></pre>
-</div>
+</code></pre></div></div>
 
 <p>对应显示如下待办事宜 Todo 列表：</p>
 
@@ -331,10 +323,10 @@
 <div class="footnotes">
   <ol>
     <li id="fn:footnote">
-      <p>这是一个 <em>注脚</em> 的 <strong>文本</strong>。&nbsp;<a href="#fnref:footnote" class="reversefootnote">&#8617;</a></p>
+      <p>这是一个 <em>注脚</em> 的 <strong>文本</strong>。 <a href="#fnref:footnote" class="reversefootnote">&#8617;</a></p>
     </li>
     <li id="fn:footnote2">
-      <p>这是另一个 <em>注脚</em> 的 <strong>文本</strong>。&nbsp;<a href="#fnref:footnote2" class="reversefootnote">&#8617;</a></p>
+      <p>这是另一个 <em>注脚</em> 的 <strong>文本</strong>。 <a href="#fnref:footnote2" class="reversefootnote">&#8617;</a></p>
     </li>
   </ol>
 </div>
