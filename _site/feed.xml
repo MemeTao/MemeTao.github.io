@@ -7,18 +7,172 @@
 </description>
     <link>http://MemeTao.github.io//</link>
     <atom:link href="http://MemeTao.github.io//feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 09 Nov 2018 14:52:22 +0800</pubDate>
-    <lastBuildDate>Fri, 09 Nov 2018 14:52:22 +0800</lastBuildDate>
+    <pubDate>Sat, 10 Nov 2018 12:27:51 +0800</pubDate>
+    <lastBuildDate>Sat, 10 Nov 2018 12:27:51 +0800</lastBuildDate>
     <generator>Jekyll v3.1.6</generator>
     
       <item>
-        <title>String Coding</title>
-        <description>
+        <title>字符串编码</title>
+        <description>&lt;hr /&gt;
+
+&lt;h3 id=&quot;前言&quot;&gt;前言&lt;/h3&gt;
+&lt;p&gt;一直以来，字符串编码总是我摸不着头脑。对待字符串编码问题的策略也是简单粗暴，直接规避：一律使用utf-8。但是，猿在码界漂，哪能不挨刀。今天就总结一下字符串编码问题。&lt;/p&gt;
+&lt;h3 id=&quot;编码类型介绍&quot;&gt;编码类型介绍&lt;/h3&gt;
+&lt;h4 id=&quot;ascii&quot;&gt;ascii&lt;/h4&gt;
+&lt;p&gt;编码格式花样很多。由于计算机是老美发明的，因此，最早只有127个字符被编码到计算机中，着127个字符被称为ascii编码集。由于ascii字符集只有127个字符，故只要一个字节就可以表示。&lt;/p&gt;
+
+&lt;h4 id=&quot;else&quot;&gt;else&lt;/h4&gt;
+&lt;p&gt;但是，世界上那么多国家、那么多语言，全世界人民都想体验一把先进文化，于是八仙过海，各显神通，日本把日文编码到Shift-jis中，韩国把韩文编码到Euc-kr中。我们国家陆续有gb2312、gbk、gb18030，后者都是对前者的扩展。拿我们汉字举例，汉字有成千上万个，所以一个字节表示不了那么多的汉字，所以就需要多个字节(2个或3个)来表示。&lt;/p&gt;
+&lt;h4 id=&quot;unicode&quot;&gt;unicode&lt;/h4&gt;
+&lt;p&gt;大家要是没有一套统一的编码格式的话，还怎么促进文化的交流、各国码农感情的培养。于是，unicode应运而生，unicode把所有语言都统一到一套编码中，这样大家就可以顺畅的交流了。为了表示那么多的语言，unicode也只能采用多字节表示法，就是一个字符用多个字节的数据表示。&lt;/p&gt;
+
+&lt;p&gt;于是，新的问题又出现了。对于大部分西方国家，他们使用的英语，一个字节就可以表示一个字符。如果使用unicode，那岂不是很浪费空间。于是又有人想出来了一种更佳妙的方式：对unicode继续编码。（可以理解成对unicode压缩编码）&lt;/p&gt;
+
+&lt;p&gt;也就说，utf-8,utf-16,utf-32是在unicode基础上，对unicode再次编码。&lt;/p&gt;
+
+&lt;p&gt;以UTF-8来说：UTF-8编码把一个Unicode字符根据不同的数字大小编码成1-6个字节，常用的英文字母被编码成1个字节，汉字通常是3个字节，只有很生僻的字符才会被编码成4-6个字节。如果你要传输的文本包含大量英文字符，用UTF-8编码就能节省空间：&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;字符&lt;/th&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;ascii&lt;/th&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;unicode&lt;/th&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;utf-8&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;A&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;01000001&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;00000000 01000001&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;01000001&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;中&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;?&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;01001110 00101101  11100100 10111000&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;10101101&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;这么多编码格式，大家的一个共同点就是：完全对ascii码兼容。也就是说ascii中的’a’，和gb2312中的’a’是同样的表示方法(假设是0x63)。&lt;/p&gt;
+
+&lt;h3 id=&quot;实际环境&quot;&gt;实际环境&lt;/h3&gt;
+&lt;h4 id=&quot;linux&quot;&gt;Linux&lt;/h4&gt;
+&lt;p&gt;如果您是在linux上开发，通常是碰不到这些问题的。(没错，我就是舔狗)&lt;/p&gt;
+
+&lt;p&gt;在Linux上，系统默认就是utf-8格式。这是什么意思？&lt;/p&gt;
+
+&lt;p&gt;举例来说，当你 “touch main.cpp” 这个文件就是采用的utf-8来编码里面的所有数据。
+当你&lt;/p&gt;
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pstr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;中文ABC&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;%s&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pstr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;这个pstr中的内容就会以utf-8格式存储。
+当你:&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;g++ main.cpp &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; a.out
+&amp;amp; ./a.out
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;编译器会忠于你的文件编码格式，按此编码格式处理该源文件。pstr中的内容会被取出来放在内存中，并以utf-8格式输出在终端环境上。终端能不能正常显示，就看你的终端能不能支持utf-8。&lt;/p&gt;
+
+&lt;p&gt;任何的字符串乱码问题，就是上面这三种中的某一个或多个编码格式不一样导致。&lt;/p&gt;
+&lt;h4 id=&quot;windows&quot;&gt;Windows&lt;/h4&gt;
+&lt;p&gt;在windows上，呵呵呵了。中文windows默认采用gb2312格式。&lt;/p&gt;
+
+&lt;p&gt;举例来说。当你”新建一个文件”，这个文件通常是gb2312格式，如果这个文件只在本地使用，这时候通常是没问题的。&lt;/p&gt;
+
+&lt;p&gt;但是当你因为某些原因需要使用在windows上使用”unicode”，问题就来了。
+还是以上面main.cpp为例：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;1.如果main.cpp为gb2312，用vs编译，pstr为gb2312格式，终端可以显示。&lt;/li&gt;
+  &lt;li&gt;2.如果main.cpp为纯unicode，用vs编译，pstr在内存里为gb2312格式，终端可以显示。&lt;/li&gt;
+  &lt;li&gt;3.如果main.cpp为utf-8(无bom)，用vs编译，pstr在内存里为utf-8格式，但是终端显示不了中文。&lt;/li&gt;
+  &lt;li&gt;4.如果main.cpp为utf-8(bom)，用vs编译，pstr在内存里为gb2312格式，终端可以显示。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;看到了吧，vs的”睿智”。这个问题如果搭配上”wchar_t”，更加让人恼火。&lt;/p&gt;
+
+&lt;p&gt;上面的测试可以采用如下程序：&lt;/p&gt;
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pstr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;size_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;size_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;%x,&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pstr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]);&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;str&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;abc中文ABC&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pstr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const_cast&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c_str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pstr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wstring&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wstr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;L&quot;abc中文ABC&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;wchar_t&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pwstr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const_cast&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;wchar_t&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wstr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c_str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pwstr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;将结果和各个编码表进行对照，既可得出结论。&lt;/p&gt;
+
+&lt;p&gt;在unicode方面，对windows的批评滔滔不绝，”utf-8 everywhere”认为微软在字符串处理上误入歧途，因为他们比别的厂商更早做了决定。微软虽然有理由说，windows先于unicode问世。但是这么多年过去了，windows的API还是不完全支持unicode。&lt;/p&gt;
+
+&lt;p&gt;windows不遵守基本法，也不是一天两天了，嘻嘻。&lt;/p&gt;
+
+&lt;p&gt;关于如何在windows处理utf-8，以及对windwos的更多批评，可以从这篇文章起步: &lt;a href=&quot;http://utf8everywhere.org/zh-cn#faq.almostfw&quot;&gt;utf8 everywhere&lt;/a&gt; “&lt;/p&gt;
+&lt;h3 id=&quot;char与wchar_tstring与wstring&quot;&gt;char与wchar_t，string与wstring&lt;/h3&gt;
+&lt;p&gt;如果您不幸遇到了string和wstring方便的困扰，恭喜您。&lt;/p&gt;
+
+&lt;p&gt;首先，std::string 和 std::wstring都继承与std::basic_string。
+只不过std::string的模板参数是char，std::wstring的模板参数是wchar_t。
+在linux上，wchar_t占用4个字节，windows上则是占用2个字节。他们之间的差别，&lt;strong&gt;仅此而已。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;你如果使用wstring存放字符串，Linux是没有啥问题的，采用utf-32编码wstring。&lt;/p&gt;
+
+&lt;p&gt;但是如果是windows上，嘻嘻，问题又来了。假设在main.cpp中存放了一个std::wstring = “abc中文”,那么：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;1.a.cpp如果是gb2312格式，wstring在内存中是unicode格式。&lt;/li&gt;
+  &lt;li&gt;2.a.cpp如果是unicode格式，wstring在内存中是unicode格式。&lt;/li&gt;
+  &lt;li&gt;3.a.cpp如果是utf-8格式，wstring在内存中是ucs-2be格式。&lt;/li&gt;
+  &lt;li&gt;4.a.cpp如果是utf-8-bom格式，wstring在内存中是unicode格式。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;您肯定还有一个疑惑，&lt;strong&gt;关于wstring和string之间的互相转换&lt;/strong&gt;。
+那么，您需要确保你非常了解待转换的数据的格式，或者待转换数据仅来自本地。&lt;/p&gt;
+
+&lt;p&gt;在windows上，windows有一个奇技淫巧：&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;WideCharToMultiByte系列API，通过参数设定你就可以获得你所希望的结果。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;详见windows api说明，如何正确使用，请看： &lt;a href=&quot;https://stackoverflow.com/questions/215963/how-do-you-properly-use-widechartomultibyte&quot;&gt;stackoverflow&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;当然，c++标准库也可以做到：std::locale、std::codecvt结合使用。&lt;/p&gt;
+
+&lt;h3 id=&quot;帮组文档&quot;&gt;帮组文档&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://utf8everywhere.org/zh-cn#faq.almostfw&quot;&gt;utf8 everywhere&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://blog.csdn.net/benkaoya/article/details/59522148&quot;&gt;潜谈C/C++编程中的字符编码转换&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://my.oschina.net/ybusad/blog/363139&quot;&gt;C++字符编码问题探究和中文乱码的产生&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;获得帮助&quot;&gt;获得帮助&lt;/h3&gt;
+&lt;p&gt;meemetao@gmail.com&lt;/p&gt;
 </description>
-        <pubDate>Fri, 09 Nov 2018 00:00:00 +0800</pubDate>
+        <pubDate>Thu, 08 Nov 2018 17:13:17 +0800</pubDate>
         <link>http://MemeTao.github.io//string-coding/</link>
         <guid isPermaLink="true">http://MemeTao.github.io//string-coding/</guid>
         
+        
+        <category>c++</category>
         
       </item>
     
@@ -519,7 +673,7 @@ addr of this:%x0x7ffd30f4ec10
         <guid isPermaLink="true">http://MemeTao.github.io//linuxOperation/</guid>
         
         
-        <category>algorithm</category>
+        <category>linux</category>
         
       </item>
     
