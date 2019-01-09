@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="author" content="songroger">
+
+  <title>TCP:多线程同时accept到底有没有必要?</title>
+
+  <meta name="description" content="&lt;hr /&gt;">
+
+  <!-- Open graph data -->
+  <meta property="og:site_name" content="Welcome my site">
+  <meta property="og:title" content="TCP:多线程同时accept到底有没有必要?">
+  <meta property="og:url" content="http://MemeTao.github.io//ThunderingHerdProblem/">
+  <meta property="og:type" content="article">
+  <meta property="og:description" content="&lt;hr /&gt;">
+
+  <!-- Standard Stuff -->
+  <link rel="canonical" href="http://MemeTao.github.io//ThunderingHerdProblem/"/>
+  <link rel="alternate" type="application/rss+xml" title="Welcome my site" href="http://MemeTao.github.io//feed.xml"/>
+
+  <!-- Favicons -->
+  <link rel="shortcut icon" href="http://7xof48.com1.z0.glb.clouddn.com/favicon.png">
+  <meta name="msapplication-TileColor" content="#ffffff">
+  <meta name="msapplication-config" content="/assets/browserconfig.xml">
+  <meta name="theme-color" content="#ffffff">
+
+  <!-- Styles -->
+  
+    <style type="text/css">
+      ::selection{background:#1565c0;color:#fff;text-shadow:none}html{font-size:109.375%;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;font-smoothing:antialiased;text-size-adjust:100%;box-sizing:border-box}@media screen and (min-width:700px){html{font-size:125%}}@media screen and (min-width:1440px){html{font-size:140.625%}}*,:after,:before{margin:0;padding:0;box-sizing:inherit}body{color:#444;font-family:Georgia,Source Sans Pro,sans-serif;font-size:.9rem;line-height:1.6rem}img{display:block;max-width:100%;height:auto;border:0}a:active,a:hover,a:visited{color:#444;text-decoration:none}strong{font-weight:700}em{font-style:italic}a{background:transparent;color:#1565c0;text-decoration:none;cursor:pointer;word-wrap:break-word}a:active,a:focus,a:hover{outline:0;text-decoration:none}h1,h2,h3,h4,h5,h6,p{margin-bottom:.2rem}h1,h2,h3,h4,h5,h6{color:#000;font-weight:700;vertical-align:middle}h1:not(:first-child),h2:not(:first-child),h3:not(:first-child),h4:not(:first-child),h5:not(:first-child),h6:not(:first-child){margin-top:2.4rem}h1{font-size:2rem;line-height:3.2rem}h2{font-size:1.5rem;line-height:2.4rem}h3{font-size:1.17rem}h4{font-size:1rem}h5{font-size:.707rem}h6{font-size:.5rem}ol,ul{margin:0 0 1.6rem 1.6rem}ol ol,ol ul,ul ol,ul ul{margin:0 1.6rem}hr{display:block;height:1.6rem;border:0;box-shadow:inset 0 1px 0 #eee}blockquote{margin-bottom:1.6rem;padding:1.6rem;border-left:4px solid #e6e6e6;background:#f7f7f7}blockquote p{margin:0}.col{max-width:calc(700px + 1.6rem);margin:0 auto;padding:0 .8rem}@media screen and (min-width:1440px){.col{max-width:calc(800px + 1.6rem)}}.header{display:flex;flex-wrap:wrap;justify-content:space-around;margin-bottom:2rem;box-shadow:0 1px 0 0 #eee}@media screen and (min-width:734px){.header{font-size:.75rem}}.header__logo{margin-bottom:0;font-size:1rem;font-weight:400;line-height:1.6rem}.header__logo img{display:initial;width:30px;height:30px;vertical-align:middle;border-radius:15px;opacity:1}.header__logo img:hover{opacity:.5;transition:all .5s ease-in}.header__logo a{color:#999;text-transform:uppercase}@media screen and (min-width:734px){.header__logo{font-size:.75rem}}.header__nav{display:flex;flex-wrap:wrap}.header__nav a{color:#444}.header__nav a:hover{color:#999;transition:all .5s ease-in}.header__link{padding:.8rem;color:#444;text-decoration:none;border-bottom:2px solid transparent;padding-bottom:1px}.header__link:hover{transition:all .5s ease-in;border-color:hsla(34,5%,70%,.7)}.header__link--logo{padding:.8rem;display:block}.header__link--logo:focus,.header__link--logo:hover{color:#444;transition:all .5s ease-in}.footer{margin-top:.5rem;padding:1.6rem 0;box-shadow:inset 0 1px 0 #eee}.footer .col{font-size:13px;text-align:center}.subscribe{color:#999;transition:all .25s ease-in}.subscribe:hover{color:#444;text-decoration:none}.blocks{display:flex;align-items:center;margin-bottom:.1rem}.blocks--space{justify-content:space-between}.block__item--mr{margin-right:.8rem}.blocks__item a{text-decoration:none;color:#999;border:3px solid rgba(0,0,0,.1);border-radius:20px;padding:1px 15px;font-family:Georgia,Microsoft YaHei,sans-serif}.blocks__item a:hover{color:#444;border-color:#999;transition:all .5s ease-in}.blocks__item .btn{box-shadow:inset 0 0 0 0 #1565c0}.article{margin-bottom:3rem;animation:itemshow .9s linear}.article__title{margin-bottom:.8rem}.article__title--single,.article__title a{font-family:Georgia,Microsoft YaHei,sans-serif}.article__title a{color:#444;transition:all .25s ease-in}.article__title a:hover{color:#999;text-decoration:none}.article__date{display:block;margin-bottom:.8rem;font-size:.7501rem}.cover{margin-bottom:.5rem}.cover img{width:100%}.article__more{color:#999;text-decoration:none}.article__more:hover{transition:all .5s ease-in;color:#444;text-decoration:none}.post-tags{text-align:right;text-decoration:none;font:italic 700 12px/30px Georgia,serif}.post-tags a{color:#999}.post-tags a:hover{color:#444;text-decoration:none}@-webkit-keyframes 'itemshow'{0%{top:-60px;opacity:0}33%{top:-40px;opacity:.2}66%{top:-20px;opacity:.6}to{top:0;opacity:1}}@keyframes 'itemshow'{0%{top:-60px;opacity:0}33%{top:-40px;opacity:.2}66%{top:-20px;opacity:.6}to{top:0;opacity:1}}.arch-item{margin-bottom:10px;animation:itemshow .9s linear}.arch-title{color:#444;font-size:20px;font-family:Georgia,Hiragino Sans GB,Microsoft YaHei,sans-serif;font-weight:700;padding-right:10px}.arch-title:hover{color:#999;transition:all .25s ease-in}time{font-size:15px;font-family:Optima,Helvetica Neue,sans-serif}.arch-desc,time{color:#999}code,pre{background:#f7f7f7;font-family:Source Code Pro,monospace;font-size:.847rem;overflow-x:auto;vertical-align:top}.highlight{margin-bottom:1.6rem;padding:.8rem;background:#f7f7f7;box-shadow:inset 0 0 0 1px #eee}.highlight .c{color:#998}.highlight .err{background-color:#e3d2d2;color:#a61717}.highlight .k,.highlight .o{font-weight:400}.highlight .cm{color:#998}.highlight .cp{color:#999;font-weight:400}.highlight .c1{color:#998}.highlight .cs{color:#999;font-weight:400}.highlight .gd{background-color:#fdd;color:#000}.highlight .gd .x{background-color:#faa;color:#000}.highlight .gr{color:#a00}.highlight .gh{color:#999}.highlight .gi{background-color:#dfd;color:#000}.highlight .gi .x{background-color:#afa;color:#000}.highlight .go{color:#888}.highlight .gp{color:#555}.highlight .gs{font-weight:400}.highlight .gu{color:#aaa}.highlight .gt{color:#a00}.highlight .kc,.highlight .kd,.highlight .kp,.highlight .kr,.highlight .kt{font-weight:400}.highlight .kt{color:#458}.highlight .m{color:#099}.highlight .s{color:#d14}.highlight .na{color:teal}.highlight .nb{color:#0086b3}.highlight .nc{color:#458;font-weight:400}.highlight .no{color:teal}.highlight .ni{color:purple}.highlight .ne,.highlight .nf{color:#900;font-weight:400}.highlight .nn{color:#555}.highlight .nt{color:navy}.highlight .nv{color:teal}.highlight .ow{font-weight:400}.highlight .w{color:#bbb}.highlight .mf,.highlight .mh,.highlight .mi,.highlight .mo{color:#099}.highlight .s2,.highlight .sb,.highlight .sc,.highlight .sd,.highlight .se,.highlight .sh,.highlight .si,.highlight .sx{color:#d14}.highlight .sr{color:#009926}.highlight .s1{color:#d14}.highlight .ss{color:#990073}.highlight .bp{color:#999}.highlight .vc,.highlight .vg,.highlight .vi{color:teal}.highlight .il{color:#099}
+
+    </style>
+  
+
+
+</head>
+
+<body>
+
+  <header class="header">
+
+    
+      <h1 class="header__logo">
+          <a href="/" class="header__link--logo">Home</a>
+      </h1>
+    
+
+    <nav class="header__nav" role="navigation">      
+      <a href="/archive/" class="header__link">Archive</a>
+      <!--我的Github-->
+      <a href="http://github.com/MemeTao" class="header__link" target="_blank">github</a> 
+      <!--about栏-->
+      <a href="/about/" class="header__link">About me</a>
+    </nav>
+  </header>
+
+  <main class="col">
+
+
+<article class="article">
+  <h2 class="article__title article__title--single">TCP:多线程同时accept到底有没有必要?</h2>
+  <time class="article__date" datetime="2018-01-29"> 15:13 Jan.29-2018</time>
+  
+  <hr />
+
+<h3 id="一问题">一、问题</h3>
+<p>最近在写一个TCP多线程服务器，模型是这样的：1个线程接受TCP新连接，从线程池中挑出一个EventLoop线程给这个TCP连接，以后这个TCP连接的所有操作都将由这个EventLoop线程负责。我疑惑的点是：<strong>仅由一个线程accept新连接，够么？能够处理多少并发量？</strong></p>
+
+<h3 id="二分析问题">二、分析问题</h3>
+<p>已经知道的知识是，TCP有个半连接队列和已连接队列(等待应用层accept)，如下：
+<img src="../material/ThunderingHerd/TCP connection.png" alt="TcpConnectionProcess" />
+(图片来源:https://segmentfault.com/a/1190000008224853)</p>
+<ul>
+  <li>SYNC队列:长度为 max(64, /proc/sys/net/ipv4/tcp_max_syn_backlog)，在我的机器上，后者的值是:128</li>
+  <li>ACCEPT队列:长度为 min(backlog, somaxconn)，/proc/sys/net/core/somaxconn的值为128，表示最多有129的ESTABLISHED的连接等待accept()，而backlog的值则应该是由int listen(int sockfd, int backlog)中的第二个参数指定，listen里面的backlog可以有我们的应用程序去定义的。
+    <h4 id="21当sync队列满了">2.1当sync队列满了</h4>
+    <p>当这个队列满了，不开启syncookies的时候，Server会丢弃新来的SYN包，而Client端在多次重发SYN包得不到响应而返回（connection time out）错误。但是，当Server端开启了syncookies=1，那么SYN半连接队列就没有逻辑上的最大值了，并且/proc/sys/net/ipv4/tcp_max_syn_backlog设置的值也会被忽略。</p>
+    <h4 id="22当accept队列满了">2.2当accept队列满了</h4>
+    <p>当accept队列满了之后，即使client继续向server发送ACK的包，也会不被响应，此时ListenOverflows+1，同时server通过/proc/sys/net/ipv4/tcp_abort_on_overflow来决定如何返回，0表示直接丢弃该ACK，1表示发送RST通知client；相应的，client则会分别返回read timeout 或者 connection reset by peer。</p>
+    <h4 id="23如何查看是否存在队列溢出">2.3如何查看是否存在队列溢出</h4>
+    <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>netstat <span class="nt">-s</span> | <span class="nb">grep</span> <span class="s2">"listen|LISTEN"</span>
+</code></pre></div>    </div>
+    <p>由于我电脑不是服务器，没有溢出的情况，暂时不能举例。</p>
+    <h4 id="24如果客户端第三个ack已达到但是服务端没有accept且客户端发送了信息这时发生什么">2.4如果客户端第三个ACK已达到，但是服务端没有accept，且客户端发送了信息，这时发生什么?</h4>
+    <p>我没有做相应的实验，查资料得知，服务端不做任何响应，客户端超时重传，直至断开连接。</p>
+  </li>
+</ul>
+
+<h3 id="三单线程accept的极限参数">三、单线程accept的极限参数</h3>
+<p>现在我们可以得到的结论是，高并发下，上述的队列参数的确会限制TCP并发连接数。可是具体参数是多少呢？我暂时不得而知，但我不久便会做个相应的实验(认真脸)!</p>
+
+<p>今天做了测试，模型是这样的: <strong>一个线程专门poll监听描述符号，有新连接就accept，然后将新fd交给其它线程，继续poll+accept</strong></p>
+
+<h4 id="测试记录">测试记录</h4>
+<ul>
+  <li><strong>电脑参数</strong>：双核+i5+4G 普通家用电脑</li>
+  <li><strong>发起连接数</strong>:50个进程，每个进程发起200个TCP连接，总共10K个连接，目标是 127.0.0.1:65500，发起连接后不管有无成功等待10S后，退出进程。</li>
+  <li><strong>服务端</strong>:监听65500端口，来一个接收一个。</li>
+  <li><strong>现象</strong>:服务端syn和accept队列被挤满，”netstat -s ]  grep listen”发现大量overflowed, ，1S内接收的TCP连接，最大时达到1200。</li>
+  <li><strong>问题</strong>:有时服务端会残留少量已连接TCP ，netstat ] grep localhost*.65500 可看到该问题 。可是客户端都已经关闭了，按理说每个连接都发送FIN分节。更加有意思的是，若在发起几波TCP连接，这些残留TCP会自动被服务端注销。</li>
+</ul>
+
+<h4 id="对测试结果的总结与思考">对测试结果的总结与思考</h4>
+<ul>
+  <li>关于残留TCP连接，我怀疑是Localhost的原因，由于数据量真的有点大了，我没有很好的办法追踪这个问题，只能暂时留个坑了。好在，结果是正确的，影响很小。</li>
+  <li>将poll换成epoll，如果仅仅是对于提高“接收TCP新连接”性能来说可能帮助并不大，因为要监听的端口号仅1个。</li>
+  <li>测试结果和电脑硬件有一定关系，但是数量级肯定是K级别，由于本地瞬间出现了大量的临时进程(50个发起10000TCP连接的进程），大量占用了CPU时间，所以实际上的结果肯定是偏小的。</li>
+  <li>因为是localhost，不经过数据链路层、网络层，有一定影响，但不大(猜测）</li>
+  <li>由于连接的断开也是该线程负责，但是每个客户端都预留了10S维持该连接，所以，poll+accept 循环间隔已经很短了。所以，测试的结果和可信。</li>
+  <li>如果以后有机会，换台高配主机，远程发起连接，再测试一回(认真脸)
+    <h3 id="四有没有必要">四、有没有必要？</h3>
+    <p>好了，现在继续。有了单线程accept的数据，我做大胆的分析：<strong>如果是为了提高TCP新连接并发数，多线程accept是可以的。</strong>
+假设我们的目标是使得单机承受100W个并发连接，并假设服务端成功的接收了上述的100W客户。</p>
+    <h4 id="41我们先计算几个参数">4.1我们先计算几个参数</h4>
+  </li>
+  <li>服务端1s内给所有客户发送一个hello,world!报文占用的带宽:</li>
+  <li>上述连接占用的内存</li>
+</ul>
+
+<h4 id="42内核是否能承受">4.2内核是否能承受？</h4>
+
+<h3 id="五结论">五、结论</h3>
+<p>未完待续~<del>2018-1-29
+我暂时还是无法得出结论，但是主流网络库都是1个线程进行accept。我还会继续在这个问题上学习，网络上关于这个问题的讨论，真知灼见貌似寥寥无几。未完待续</del>~2018-2-10</p>
+
+  
+</article>
+
+
+
+
+<footer class="footer">
+	<div class="col">
+		© 2017 MemeTao | <a href="/feed.xml" class="subscribe">RSS</a>
+	</div>
+</footer>
+
+<script type="text/javascript">
+  //友盟统计
+  var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");
+  document.write(unescape("%3Cspan style='display:none;' id='cnzz_stat_icon_1260641879'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s95.cnzz.com/z_stat.php%3Fid%3D1260641879' type='text/javascript'%3E%3C/script%3E"));
+</script>
+</body>
+</html>
