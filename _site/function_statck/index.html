@@ -7,19 +7,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="author" content="songroger">
 
-  <title>操作系统加载全过程</title>
+  <title>c函数调用栈</title>
 
   <meta name="description" content="&lt;hr /&gt;">
 
   <!-- Open graph data -->
   <meta property="og:site_name" content="Welcome my site">
-  <meta property="og:title" content="操作系统加载全过程">
-  <meta property="og:url" content="http://MemeTao.github.io//os_study/">
+  <meta property="og:title" content="c函数调用栈">
+  <meta property="og:url" content="http://MemeTao.github.io//function_statck/">
   <meta property="og:type" content="article">
   <meta property="og:description" content="&lt;hr /&gt;">
 
   <!-- Standard Stuff -->
-  <link rel="canonical" href="http://MemeTao.github.io//os_study/"/>
+  <link rel="canonical" href="http://MemeTao.github.io//function_statck/"/>
   <link rel="alternate" type="application/rss+xml" title="Welcome my site" href="http://MemeTao.github.io//feed.xml"/>
 
   <!-- Favicons -->
@@ -62,51 +62,10 @@
 
 
 <article class="article">
-  <h2 class="article__title article__title--single">操作系统加载全过程</h2>
-  <time class="article__date" datetime="2019-01-11"> 17:13 Jan.11-2019</time>
+  <h2 class="article__title article__title--single">c函数调用栈</h2>
+  <time class="article__date" datetime="2019-02-09"> 14:13 Feb.09-2019</time>
   
   <hr />
-
-<p>这将是一个漫长的过程，终将解答我心中的疑惑….</p>
-<h3 id="step-0汇编">step 0:汇编</h3>
-
-<h3 id="step-1-存储设备的第512字节">step 1: 存储设备的第512字节</h3>
-<p>Boot sector(引导扇区)是所有存储介质上的第一个扇区，大小为512字节。主要分为三个部分，分别是:</p>
-<ul>
-  <li>
-    <ol>
-      <li>MBR(master boot record,主引导记录) 445字节</li>
-    </ol>
-  </li>
-  <li>
-    <ol>
-      <li>DPT(disk partition table,磁盘分区表) 64字节</li>
-    </ol>
-  </li>
-  <li>
-    <ol>
-      <li>BRID(boot record ID 引导记录标示) 2字节
-        <h4 id="mbr">MBR</h4>
-        <p>主引导记录的作用是安装基本的引导加载程序(boot loader),在Linux中是grub。grub的主要功能是：</p>
-      </li>
-    </ol>
-  </li>
-  <li>
-    <ol>
-      <li>提供菜单：用户可以选择不同的开机选项，这是多重引导的虫咬功能。</li>
-    </ol>
-  </li>
-  <li>
-    <ol>
-      <li>载入内核文件: 直接指向可开机的程序区段来开始操作系统</li>
-    </ol>
-  </li>
-  <li>
-    <ol>
-      <li>转交其它Loader: 将引导加载功能交给其它loader处理</li>
-    </ol>
-  </li>
-</ul>
 
 
   

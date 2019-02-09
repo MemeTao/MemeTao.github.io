@@ -7,9 +7,60 @@
 </description>
     <link>http://MemeTao.github.io//</link>
     <atom:link href="http://MemeTao.github.io//feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 14 Jan 2019 19:01:13 +0800</pubDate>
-    <lastBuildDate>Mon, 14 Jan 2019 19:01:13 +0800</lastBuildDate>
+    <pubDate>Sat, 09 Feb 2019 16:51:27 +0800</pubDate>
+    <lastBuildDate>Sat, 09 Feb 2019 16:51:27 +0800</lastBuildDate>
     <generator>Jekyll v3.1.6</generator>
+    
+      <item>
+        <title>X86进入保护模式前的准备</title>
+        <description>&lt;hr /&gt;
+
+</description>
+        <pubDate>Sat, 09 Feb 2019 16:13:17 +0800</pubDate>
+        <link>http://MemeTao.github.io//x86_protection_mode/</link>
+        <guid isPermaLink="true">http://MemeTao.github.io//x86_protection_mode/</guid>
+        
+        
+        <category>Linux</category>
+        
+      </item>
+    
+      <item>
+        <title>c函数调用栈</title>
+        <description>&lt;hr /&gt;
+
+</description>
+        <pubDate>Sat, 09 Feb 2019 14:13:17 +0800</pubDate>
+        <link>http://MemeTao.github.io//function_statck/</link>
+        <guid isPermaLink="true">http://MemeTao.github.io//function_statck/</guid>
+        
+        
+        <category>Linux</category>
+        
+      </item>
+    
+      <item>
+        <title>一种在网络中时间同步的方式(精度100us)</title>
+        <description>&lt;hr /&gt;
+
+&lt;h3 id=&quot;介绍&quot;&gt;介绍&lt;/h3&gt;
+&lt;p&gt;本文介绍在&lt;strong&gt;非异常恶劣&lt;/strong&gt;的网络中，如何同步两台机器的本地时间，我们的目标是&lt;strong&gt;尽量(大概率上)&lt;/strong&gt;将时间同步的误差控制在0.1ms。&lt;/p&gt;
+
+&lt;p&gt;众所周知，网络中存在time服务器，利用ntp协议可以将网络中主机的本地时间同步到1s的误差范围。对于正常应用，这个精度应该是够的。但是总存在一些
+特殊应用，它对时间的精度要求更高。在这种情况下，time服务已经不满足我们的需要了。&lt;/p&gt;
+
+&lt;h3 id=&quot;基本方式&quot;&gt;基本方式&lt;/h3&gt;
+&lt;p&gt;在ping模式下，机器A发送一个包，并记录发包时间t1，机器B收到Icmp包后发送ack包，机器A收到ack包后记录收包时间t2，t2减t1就被认为是rtt。&lt;/p&gt;
+
+</description>
+        <pubDate>Tue, 22 Jan 2019 11:13:17 +0800</pubDate>
+        <link>http://MemeTao.github.io//timesynchronize/</link>
+        <guid isPermaLink="true">http://MemeTao.github.io//timesynchronize/</guid>
+        
+        
+        <category>algorithm</category>
+        
+      </item>
     
       <item>
         <title>2019一月学习计划</title>
@@ -32,12 +83,92 @@
       </item>
     
       <item>
+        <title>AT&amp;T汇编</title>
+        <description>&lt;h3 id=&quot;1-intel-x86_64寄存器介绍&quot;&gt;1. intel x86_64寄存器介绍&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;通用寄存器&lt;/strong&gt;:&lt;/p&gt;
+
+&lt;p&gt;共有16个通用寄存器，如下图所示:
+&lt;img src=&quot;../material/X86_64ASSEMBLY/general_register.png&quot; alt=&quot;generalRegister&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Segment Register&lt;/strong&gt;:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;ol&gt;
+      &lt;li&gt;CS:存放程序在内存中的基地址&lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;ol&gt;
+      &lt;li&gt;DS:数据段地址(.data?)&lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;«Linux 0.11完全注释»P90有关于这个的介绍&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;指令指针寄存器(EIP)&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;ol&gt;
+      &lt;li&gt;远跳转:在分段模式下，当跳转到另一个段中的指令时&lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;ol&gt;
+      &lt;li&gt;短跳转:当跳转偏移量小于128字节时&lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;ol&gt;
+      &lt;li&gt;近跳转:除12外的所有其它跳转
+&lt;strong&gt;堆栈指针寄存器(ESP)&lt;/strong&gt;&lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+  &lt;li&gt;0.指向栈顶&lt;/li&gt;
+  &lt;li&gt;1.函数调用:通常和EBP一起配合使用&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;2-函数&quot;&gt;2. 函数&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;声明函数&lt;/strong&gt;:&lt;/p&gt;
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;function&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;pushl&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ebp&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;movl&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;esp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ebp&lt;/span&gt;
+    &lt;span class=&quot;cp&quot;&gt;#code from here
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;movl&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ebp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;esp&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;popl&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;%&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ebp&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;ret&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;堆栈情况:
+&lt;img src=&quot;../material/X86_64ASSEMBLY/stack_overview.png&quot; alt=&quot;stackOverview&quot; /&gt;&lt;/p&gt;
+&lt;h3 id=&quot;2链接器&quot;&gt;2.链接器&lt;/h3&gt;
+&lt;p&gt;一段程序包含.text .data .bss 段链接器会将所有的目标文件的这些段合并在一块。
+&lt;img src=&quot;../material/X86_64ASSEMBLY/link_object.png&quot; alt=&quot;ldOverview&quot; /&gt;&lt;/p&gt;
+&lt;h3 id=&quot;3-内存寻址&quot;&gt;3. 内存寻址&lt;/h3&gt;
+&lt;p&gt;虚拟地址：[16][32] 16位段选择符、32位偏移地址&lt;/p&gt;
+
+&lt;p&gt;所有段可以有14^2个，段内偏移可以达到4G&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../material/X86_64ASSEMBLY/memeory_addressing.png&quot; alt=&quot;memory_addressing&quot; /&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Mon, 14 Jan 2019 17:13:17 +0800</pubDate>
+        <link>http://MemeTao.github.io//att_assembly_manaul/</link>
+        <guid isPermaLink="true">http://MemeTao.github.io//att_assembly_manaul/</guid>
+        
+        
+        <category>Linux</category>
+        
+      </item>
+    
+      <item>
         <title>操作系统加载全过程</title>
         <description>&lt;hr /&gt;
 
 &lt;p&gt;这将是一个漫长的过程，终将解答我心中的疑惑….&lt;/p&gt;
+&lt;h3 id=&quot;step-0汇编&quot;&gt;step 0:汇编&lt;/h3&gt;
 
-&lt;h3 id=&quot;step-1-存储设备的第521字节&quot;&gt;step 1: 存储设备的第521字节&lt;/h3&gt;
+&lt;h3 id=&quot;step-1-存储设备的第512字节&quot;&gt;step 1: 存储设备的第512字节&lt;/h3&gt;
 &lt;p&gt;Boot sector(引导扇区)是所有存储介质上的第一个扇区，大小为512字节。主要分为三个部分，分别是:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;
@@ -74,6 +205,7 @@
     &lt;/ol&gt;
   &lt;/li&gt;
 &lt;/ul&gt;
+
 </description>
         <pubDate>Fri, 11 Jan 2019 17:13:17 +0800</pubDate>
         <link>http://MemeTao.github.io//os_study/</link>
@@ -418,382 +550,6 @@ addr of this:%x0x7ffd30f4ec10
         <category>network</category>
         
         <category>program</category>
-        
-      </item>
-    
-      <item>
-        <title>TCP四次挥手中，Poll返回了几次？</title>
-        <description>&lt;hr /&gt;
-
-&lt;h3 id=&quot;问题&quot;&gt;问题&lt;/h3&gt;
-&lt;p&gt;我在给多线程TCP服务器写被动关闭逻辑时遇到了一个疑问，Poll返回的时机是什么时候？TCP四次挥手能够引起几次Poll返回？&lt;/p&gt;
-&lt;h3 id=&quot;如何引入的问题&quot;&gt;如何引入的问题&lt;/h3&gt;
-&lt;p&gt;一般的服务器编程逻辑，一般是由客户端发起的主动关闭，服务端实行被动关闭。按正常的流程是这样的:对端发送FIN，服务端发送ACK，如果没有多余数据，随即再发送FIN分节，对端继续发送ACK便进入熟知的TIME_WAIT状态，等待2MSL时间后进入CLOSE状态，本次TCP连接顺利断开。依照这个模型，我们只要在fd上注册一个回调函数，等poll返回时，用read系统调用即可判断是正常数据还是FIN分节，很容易得到如下回调函数伪代码:&lt;/p&gt;
-&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;handleRead&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;ssize_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; 
-    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//对端发来信息
-&lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;c1&quot;&gt;//正常处理信息
-&lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//说明对端发送了FIN分节
-&lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;addTask&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;freeMemory&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//让其它空闲线程来处理这个连接的资源
-&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;          &lt;span class=&quot;c1&quot;&gt;//发送FIN
-&lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;Error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;上述代码在实际的运行时，发生了错误，操作系统提示我一个关键词：&lt;strong&gt;double free&lt;/strong&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;寻找症结&quot;&gt;寻找症结&lt;/h3&gt;
-
-&lt;p&gt;根据提示:我猜测是某些资源释放了多次。在多次复现问题后，最终发现这个问题出现在TCP连接断开的时候。&lt;/p&gt;
-
-&lt;p&gt;我用Linux下的NC工具模拟了客户端TCP连接，并用tcpdump试图分析出一点蛛丝马迹：&lt;/p&gt;
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;./TcpServer &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt; 65500     //在本地65500端口启动服务器
-    &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;nc 127.0.0.1 65500       //连接到服务器65500端口
-    &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;Ctrl-D                   //一段时间后，NC主动断开连接 
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;以下是tcpdump本地抓包结果：
-&lt;img src=&quot;../material/POLL/tcpdump.png&quot; alt=&quot;TCPDUMP&quot; /&gt;
-首先是TCP三次握手，随后等我键入Ctrl-D断开连接，TCP四次挥手也很正常(由于FIN分节携带了ACK，所以表现出来是3个报文),然后服务端依然奔溃，并提示double free!&lt;/p&gt;
-
-&lt;p&gt;用netstat命令显示的TCP状态变化:&lt;/p&gt;
-
-&lt;table&gt;
-  &lt;thead&gt;
-    &lt;tr&gt;
-      &lt;th&gt;protocol&lt;/th&gt;
-      &lt;th&gt;port1&lt;/th&gt;
-      &lt;th&gt;port2&lt;/th&gt;
-      &lt;th&gt;status&lt;/th&gt;
-    &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td&gt;tcp&lt;/td&gt;
-      &lt;td&gt;—65500—&lt;/td&gt;
-      &lt;td&gt;—59580—&lt;/td&gt;
-      &lt;td&gt;—–ESTABLISHED&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;tcp&lt;/td&gt;
-      &lt;td&gt;—59580—&lt;/td&gt;
-      &lt;td&gt;—65500—&lt;/td&gt;
-      &lt;td&gt;—–TIME_WAIT&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;p&gt;说明连接是正常建立，正常断开的，一切都很正常!看来是一场硬仗，得调试代码了，由于当前还没有加入日志模块，用gdb又好像有点小题大作，先用printf大法试一下再说，最终发现&lt;strong&gt;在TCP四次挥手中，read() = 0 返回了两次！&lt;/strong&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;引起poll返回的事件&quot;&gt;引起poll返回的事件&lt;/h3&gt;
-
-&lt;p&gt;根据我的代码结构，回调之前是poll，随即开始查资料，在《APUE》中发现，以下条件是引起poll返回的特定revent:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;有数据可读，专业的说法是：套接字接收缓冲区中的数据字节数大于等于套接字接收缓冲区低潮限度的当前值。可以使用套接字选项SO_RCVLOWAT来设置低潮限度，对于TCP和UDP套接字，其值缺省为1&lt;/li&gt;
-  &lt;li&gt;连接的读这一半关闭，也就是说接收了FIN的TCP连接。对这样的套接字的套接字将不阻塞且返回0（即文件结束符）&lt;/li&gt;
-  &lt;li&gt;套接字是一个监听套接字且已完成的连接数为非0，即连接建立后可读&lt;/li&gt;
-  &lt;li&gt;有一个套接字错误待处理。对这样的套接字的读操作将不阻塞且返回一个错误（-1），errno则设置成明确的错误条件。这些待处理的错误也可以通过指定套接口选项SO_ERROR调用getsockopt来取得并清除。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;«UNP»还有如下补充:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;所有TCP和UDP正规数据都被认为是普通数据&lt;/li&gt;
-  &lt;li&gt;TCP的待外数据被认为是优先级带数据&lt;/li&gt;
-  &lt;li&gt;当TCP连接的读半部关闭时(譬如收到一个对端的FIN)，也被认为是普通数据，随后的读操作将返回0&lt;/li&gt;
-  &lt;li&gt;…&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;strong&gt;那客户端进入TIME_WAIT状态时发送的最后一次ACK是不是一次普通数据呢?&lt;/strong&gt;在这个情况下，没有其它什么事件能够引起poll返回了，很明显了，罪魁祸首就是&lt;strong&gt;TCP四次挥手的第四次ACK！&lt;/strong&gt;&lt;/p&gt;
-&lt;h3 id=&quot;问题的关键以及解决方案&quot;&gt;问题的关键以及解决方案&lt;/h3&gt;
-&lt;p&gt;之所以会出现这样的问题，是由于我的代码执行顺序的问题，由于是多线程，一个线程close(fd)使得tcp发送FIN分节，理论上，再此之前我们就应该注销掉这个连接的资源了。而我的代码试图将资源释放这个问题推迟一些以便于处理当下更紧急的其它任务，所以在poll所关注的事件列表中还有这个连接所关注的事件，所以引起了这个问题。清楚了原因之后，立马找到了解决方案：我只要注销掉poll中的该事件对应的fd即可，依然可以使得资源释放稍后执行。&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;方案一：具体是在read()返回0，后随机注销掉该socket_fd的一切事件。伪代码描述如下:
-    &lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;n&quot;&gt;pollfd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;events&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;   &lt;span class=&quot;c1&quot;&gt;//如果不懂,请查阅struct pollfd
-&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;addTask&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;freeMemory&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//让其他线程来处理该连接的资源
-&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; 
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;方案二:一个TCP连接的所以资源自始自终都由某一个线程管理，不要转移fd。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;我修改了代码，两种方案都可以达到预期目标，考虑代码结构的问题，我采用了方案二。&lt;/p&gt;
-&lt;h3 id=&quot;总结&quot;&gt;总结&lt;/h3&gt;
-&lt;p&gt;解决了上述问题后，我反思自己:当初看APUE和UNP的时候对上述问题之所以没有留下深刻的印象，原因恐怕是没有实际情况作为参照。想起一句名句:&lt;strong&gt;纸上得来终觉浅，绝知此事需躬行&lt;/strong&gt;&lt;/p&gt;
-</description>
-        <pubDate>Sun, 04 Feb 2018 15:13:17 +0800</pubDate>
-        <link>http://MemeTao.github.io//Poll/</link>
-        <guid isPermaLink="true">http://MemeTao.github.io//Poll/</guid>
-        
-        
-        <category>network</category>
-        
-        <category>program</category>
-        
-      </item>
-    
-      <item>
-        <title>TCP:多线程同时accept到底有没有必要?</title>
-        <description>&lt;hr /&gt;
-
-&lt;h3 id=&quot;一问题&quot;&gt;一、问题&lt;/h3&gt;
-&lt;p&gt;最近在写一个TCP多线程服务器，模型是这样的：1个线程接受TCP新连接，从线程池中挑出一个EventLoop线程给这个TCP连接，以后这个TCP连接的所有操作都将由这个EventLoop线程负责。我疑惑的点是：&lt;strong&gt;仅由一个线程accept新连接，够么？能够处理多少并发量？&lt;/strong&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;二分析问题&quot;&gt;二、分析问题&lt;/h3&gt;
-&lt;p&gt;已经知道的知识是，TCP有个半连接队列和已连接队列(等待应用层accept)，如下：
-&lt;img src=&quot;../material/ThunderingHerd/TCP connection.png&quot; alt=&quot;TcpConnectionProcess&quot; /&gt;
-(图片来源:https://segmentfault.com/a/1190000008224853)&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;SYNC队列:长度为 max(64, /proc/sys/net/ipv4/tcp_max_syn_backlog)，在我的机器上，后者的值是:128&lt;/li&gt;
-  &lt;li&gt;ACCEPT队列:长度为 min(backlog, somaxconn)，/proc/sys/net/core/somaxconn的值为128，表示最多有129的ESTABLISHED的连接等待accept()，而backlog的值则应该是由int listen(int sockfd, int backlog)中的第二个参数指定，listen里面的backlog可以有我们的应用程序去定义的。
-    &lt;h4 id=&quot;21当sync队列满了&quot;&gt;2.1当sync队列满了&lt;/h4&gt;
-    &lt;p&gt;当这个队列满了，不开启syncookies的时候，Server会丢弃新来的SYN包，而Client端在多次重发SYN包得不到响应而返回（connection time out）错误。但是，当Server端开启了syncookies=1，那么SYN半连接队列就没有逻辑上的最大值了，并且/proc/sys/net/ipv4/tcp_max_syn_backlog设置的值也会被忽略。&lt;/p&gt;
-    &lt;h4 id=&quot;22当accept队列满了&quot;&gt;2.2当accept队列满了&lt;/h4&gt;
-    &lt;p&gt;当accept队列满了之后，即使client继续向server发送ACK的包，也会不被响应，此时ListenOverflows+1，同时server通过/proc/sys/net/ipv4/tcp_abort_on_overflow来决定如何返回，0表示直接丢弃该ACK，1表示发送RST通知client；相应的，client则会分别返回read timeout 或者 connection reset by peer。&lt;/p&gt;
-    &lt;h4 id=&quot;23如何查看是否存在队列溢出&quot;&gt;2.3如何查看是否存在队列溢出&lt;/h4&gt;
-    &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;netstat &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; | &lt;span class=&quot;nb&quot;&gt;grep&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;listen|LISTEN&quot;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-    &lt;p&gt;由于我电脑不是服务器，没有溢出的情况，暂时不能举例。&lt;/p&gt;
-    &lt;h4 id=&quot;24如果客户端第三个ack已达到但是服务端没有accept且客户端发送了信息这时发生什么&quot;&gt;2.4如果客户端第三个ACK已达到，但是服务端没有accept，且客户端发送了信息，这时发生什么?&lt;/h4&gt;
-    &lt;p&gt;我没有做相应的实验，查资料得知，服务端不做任何响应，客户端超时重传，直至断开连接。&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;三单线程accept的极限参数&quot;&gt;三、单线程accept的极限参数&lt;/h3&gt;
-&lt;p&gt;现在我们可以得到的结论是，高并发下，上述的队列参数的确会限制TCP并发连接数。可是具体参数是多少呢？我暂时不得而知，但我不久便会做个相应的实验(认真脸)!&lt;/p&gt;
-
-&lt;p&gt;今天做了测试，模型是这样的: &lt;strong&gt;一个线程专门poll监听描述符号，有新连接就accept，然后将新fd交给其它线程，继续poll+accept&lt;/strong&gt;&lt;/p&gt;
-
-&lt;h4 id=&quot;测试记录&quot;&gt;测试记录&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;电脑参数&lt;/strong&gt;：双核+i5+4G 普通家用电脑&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;发起连接数&lt;/strong&gt;:50个进程，每个进程发起200个TCP连接，总共10K个连接，目标是 127.0.0.1:65500，发起连接后不管有无成功等待10S后，退出进程。&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;服务端&lt;/strong&gt;:监听65500端口，来一个接收一个。&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;现象&lt;/strong&gt;:服务端syn和accept队列被挤满，”netstat -s ]  grep listen”发现大量overflowed, ，1S内接收的TCP连接，最大时达到1200。&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;问题&lt;/strong&gt;:有时服务端会残留少量已连接TCP ，netstat ] grep localhost*.65500 可看到该问题 。可是客户端都已经关闭了，按理说每个连接都发送FIN分节。更加有意思的是，若在发起几波TCP连接，这些残留TCP会自动被服务端注销。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;对测试结果的总结与思考&quot;&gt;对测试结果的总结与思考&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;关于残留TCP连接，我怀疑是Localhost的原因，由于数据量真的有点大了，我没有很好的办法追踪这个问题，只能暂时留个坑了。好在，结果是正确的，影响很小。&lt;/li&gt;
-  &lt;li&gt;将poll换成epoll，如果仅仅是对于提高“接收TCP新连接”性能来说可能帮助并不大，因为要监听的端口号仅1个。&lt;/li&gt;
-  &lt;li&gt;测试结果和电脑硬件有一定关系，但是数量级肯定是K级别，由于本地瞬间出现了大量的临时进程(50个发起10000TCP连接的进程），大量占用了CPU时间，所以实际上的结果肯定是偏小的。&lt;/li&gt;
-  &lt;li&gt;因为是localhost，不经过数据链路层、网络层，有一定影响，但不大(猜测）&lt;/li&gt;
-  &lt;li&gt;由于连接的断开也是该线程负责，但是每个客户端都预留了10S维持该连接，所以，poll+accept 循环间隔已经很短了。所以，测试的结果和可信。&lt;/li&gt;
-  &lt;li&gt;如果以后有机会，换台高配主机，远程发起连接，再测试一回(认真脸)
-    &lt;h3 id=&quot;四有没有必要&quot;&gt;四、有没有必要？&lt;/h3&gt;
-    &lt;p&gt;好了，现在继续。有了单线程accept的数据，我做大胆的分析：&lt;strong&gt;如果是为了提高TCP新连接并发数，多线程accept是可以的。&lt;/strong&gt;
-假设我们的目标是使得单机承受100W个并发连接，并假设服务端成功的接收了上述的100W客户。&lt;/p&gt;
-    &lt;h4 id=&quot;41我们先计算几个参数&quot;&gt;4.1我们先计算几个参数&lt;/h4&gt;
-  &lt;/li&gt;
-  &lt;li&gt;服务端1s内给所有客户发送一个hello,world!报文占用的带宽:&lt;/li&gt;
-  &lt;li&gt;上述连接占用的内存&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h4 id=&quot;42内核是否能承受&quot;&gt;4.2内核是否能承受？&lt;/h4&gt;
-
-&lt;h3 id=&quot;五结论&quot;&gt;五、结论&lt;/h3&gt;
-&lt;p&gt;未完待续~&lt;del&gt;2018-1-29
-我暂时还是无法得出结论，但是主流网络库都是1个线程进行accept。我还会继续在这个问题上学习，网络上关于这个问题的讨论，真知灼见貌似寥寥无几。未完待续&lt;/del&gt;~2018-2-10&lt;/p&gt;
-</description>
-        <pubDate>Mon, 29 Jan 2018 15:13:17 +0800</pubDate>
-        <link>http://MemeTao.github.io//ThunderingHerdProblem/</link>
-        <guid isPermaLink="true">http://MemeTao.github.io//ThunderingHerdProblem/</guid>
-        
-        
-        <category>network</category>
-        
-        <category>program</category>
-        
-      </item>
-    
-      <item>
-        <title>TCP缓冲区与write系统调用</title>
-        <description>&lt;hr /&gt;
-
-&lt;h3 id=&quot;背景&quot;&gt;背景：&lt;/h3&gt;
-&lt;p&gt;在非阻塞多线程TCP网络编程中，设想一个场景:&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;程序A想通过TCP连接发送100KB的数据,我们通过系统调用write()来写入数据。因为我不希望程序长时间阻塞在write()，我希望操作系统迅速将我的100KB数据放入TCP缓冲区，然后write()系统调用返回，内核自动将我们的100KB数据通过TCP发送出去。这里不经有个疑问:TCP缓冲区可以放下我的100KB数据么？&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;以上的&lt;em&gt;TCP缓冲区&lt;/em&gt;我故意描述的比较有歧义，网上很多关于TCP缓冲区大小的资料都有一定的误导。首先查阅Linux man手册：&lt;/p&gt;
-&lt;blockquote&gt;
-  &lt;p&gt;SO_SNDBUF—————-
-          Sets or gets the maximum socket send buffer in bytes.  The
-          kernel doubles this value (to allow space for bookkeeping
-          overhead) when it is set using setsockopt(2), and this doubled
-          value is returned by getsockopt(2).  The default value is set
-          by the /proc/sys/net/core/wmem_default file and the maximum
-          allowed value is set by the /proc/sys/net/core/wmem_max file.
-          The minimum (doubled) value for this option is 2048.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;我随即查看我的电脑上的配置&lt;/p&gt;
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;err&quot;&gt;运行结果：&lt;/span&gt;
-&lt;span class=&quot;err&quot;&gt;$&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;proc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;net&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;core&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wmem_default&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;套接字缓冲区大小&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;写&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;212992&lt;/span&gt; 
-&lt;span class=&quot;err&quot;&gt;$&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;proc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;net&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ipv4&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tcp_wmem&lt;/span&gt;   
-&lt;span class=&quot;mi&quot;&gt;4096&lt;/span&gt;	&lt;span class=&quot;mi&quot;&gt;16384&lt;/span&gt;	&lt;span class=&quot;mi&quot;&gt;4194304&lt;/span&gt;          &lt;span class=&quot;n&quot;&gt;min&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;default&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;max&lt;/span&gt; 
-
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;为了确认这些数据，我在自己电脑上用以下程序做了实验:&lt;/p&gt;
-&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c1&quot;&gt;//#include some head file
-&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;optval&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;socklen_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;optlen&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;optval&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;AF_INET&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SOCK_STREAM&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;IPPROTO_TCP&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;err&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;getsockopt&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SOL_SOCKET&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SO_SNDBUF&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;optval&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;optlen&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;err&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;error&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;endl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;cout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;val:&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;optval&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;endl&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;结果是16384。&lt;/p&gt;
-
-&lt;p&gt;为什么我程序输出的却是/pro/sys/ipv4/tcp_wmen的默认值呢？我迷惑了，难道是Linux man 手册说错了?&lt;/p&gt;
-
-&lt;p&gt;这是网上相当多博客最大的误解，有人将其看作是TCP缓冲区大小，有人将其看作是TCP发送窗口大小。&lt;/p&gt;
-
-&lt;p&gt;后来我在IBM的文档中找到了这么一行:&lt;/p&gt;
-&lt;blockquote&gt;
-  &lt;p&gt;/proc/sys/net/ipv4/tcp_wmem	 4096 16384 131072	
-—–为自动调优定义每个 socket 使用的内存。第一个值是为 socket 的发送缓冲区分配的最少字节数。第二个值是默认值（该值会被 wmem_default 覆盖），缓冲区在系统负载不重的情况下可以增长到这个值。第三个值是发送缓冲区空间的最大字节数（该值会被 wmem_max 覆盖）。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;我彻底明白了，每当我们新建一个socket，Linux内核认为大多数时候我们并不会用到如此之大的socket缓冲区，为了内存方面的考虑，所以用16384 = 16KB作为优化值。当我们的数据大于16KB时，是会自动往上增加的，一直到/pro/sys/net/wmem_default,也就是212992 = 208KB。
-看到这里，有人会有疑问，也是我在网上搜索资料时遇到的误解:&lt;strong&gt;滑动窗口最大才2^16 = 65536 = 64KB，你这208KB怎么还比64KB大了？&lt;/strong&gt;
-为此我又重新翻阅了一下«TCP/IP VO.1»&lt;/p&gt;
-&lt;blockquote&gt;
-  &lt;p&gt;就 window scaling 来说，TCP 最初可以支持最大为 64KB 的窗口（使用 16 位的值来定义窗口的大小）。采用 window scaling（RFC 1323）扩展之后，您就可以使用 32 位的值来表示窗口的大小了。GNU/Linux 中提供的 TCP/IP 栈可以支持这个选项（以及其他一些选项）。提示：Linux 内核还包括了自动对这些 socket 缓冲区进行优化的能力（请参阅下面 表 1 中的 tcp_rmem 和 tcp_wmem），不过这些选项会对整个栈造成影响。如果您只需要为一个连接或一类连接调节窗口的大小，那么这种机制也许不能满足您的需要了。&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;那么我的电脑上有没有这所谓的window scaling呢？&lt;/p&gt;
-&lt;div class=&quot;language-java highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;err&quot;&gt;运行结果：&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;~&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;$&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;proc&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;sys&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;net&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ipv4&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;tcp_window_scaling&lt;/span&gt;
-&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;   
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;有的。依稀记得好像有这么一句化：当前的以太网带宽发展很快，以前的双绞线10MB以太网现在已经发展到千兆以太网，所以16位的窗口值在一些场合已经不适用了。&lt;/p&gt;
-
-&lt;h5 id=&quot;用一个例子来理解一下上面所说的概念socket缓冲区大小&quot;&gt;用一个例子来理解一下上面所说的概念:socket缓冲区大小&lt;/h5&gt;
-&lt;p&gt;举个小例子：&lt;/p&gt;
-&lt;blockquote&gt;
-  &lt;p&gt;当我们建立一个socket的时候，内核自动给我分配的是16KB的缓存区,假设程序有100KB数据，我们调用write(fd,data)将数据写入的是套接字缓冲区，由于100KB &amp;gt; 16KB ，缓冲区自动增大，由于100 &amp;lt; 208 故，操作系统将数据从用户态拷到内核缓存区后，write系统调用就返回了，然后TCP从该缓冲区中取数据，TCP得搬运好多次，但是这都是内核的事情，我们管不着。如果数据是209KB，很显然，write()调用势必要阻塞了，阻塞到什么时候?我的理解是,阻塞到TCP将多余的1KB发送出去，并收到回复。(例子可能不是很恰当,如果有不明确的自己google吧)&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;这下我放心了，100KB是可以放下的。但是我不免有点后怕，我并不确定我的程序到底会有多大的数据,如果下次我们数据是250KB怎么办？我并不想程序阻塞在这里，我得尽快抽身去忙活其它紧急的事情，那该怎么办呢？往下看。&lt;/p&gt;
-
-&lt;h3 id=&quot;如何解决write调用阻塞的问题&quot;&gt;如何解决write调用阻塞的问题？&lt;/h3&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;1.&lt;strong&gt;将accept返回的已连接TCP套接字设置成non-blocking&lt;/strong&gt; —— 比方我要写100KB，假设内核只接收了64KB,这时候,write写了64KB之后会返回,程序不会阻塞在这里，而是继续运行。那么又会引入另一个问题,&lt;strong&gt;剩余的36KB数据怎么办？&lt;/strong&gt;&lt;/li&gt;
-  &lt;li&gt;2.&lt;strong&gt;在程序中引入应用层缓冲区&lt;/strong&gt;——对于应用程序来说,我只管产生数据,并调用sendMessage()函数,你最终要分几次发送我不管,但是你不能阻塞我。具体做法是,封装sendMessage()函数:
-    &lt;blockquote&gt;
-      &lt;p&gt;判断write函数的返回值,将剩余的数据丢给Buffer,注册POLLOUT事件,等到对应的fd可读时，再将数据写入。这时候还有&lt;em&gt;第二点好处&lt;/em&gt;,当buffer有多余数据时，我们可以判断出socket缓冲区已经满了，我们不要调用write(),而是应该将数据添加到buffer中统一写入，这样做好处是什么：&lt;strong&gt;省了一次系统调用,岂不是美滋滋!&lt;/strong&gt;&lt;/p&gt;
-    &lt;/blockquote&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h3 id=&quot;如何确定要多大的socket缓冲区是不是越大越好&quot;&gt;如何确定要多大的socket缓冲区，是不是越大越好？&lt;/h3&gt;
-
-&lt;p&gt;IBM是这么说的,&lt;em&gt;&lt;a href=&quot;https://www.ibm.com/support/knowledgecenter/en/SSQPD3_2.6.0/com.ibm.wllm.doc/UDPSocketBuffers.html&quot;&gt;click heare link to IBM!&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;On the Linux platform Tx ring buffer overruns can occur when transmission rates approach 1Gbps and the default send socket buffer is greater than 65536. It is therefore recommended to set the net.core.wmem_default kernel parameter to 65536 bytes on all Linux systems.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;也就说在千兆以太网上，为了避免产生TX环形缓冲区溢出，我们最好将core/net/wmem_default设置成小于65536,也即64KB的一个值。但是这可是占内存的，如果我们给每一个socket都设置64KB，不考虑虚拟内存,假设机器内存是4GB，4GB / 64 KB = 16K，也即理论上在4G机器上，我们最多连接16K个TCP连接，这当然是不能接收的。所以这个问题要用毛泽东思想来解决：具体问题具体分析！&lt;/p&gt;
-
-&lt;h3 id=&quot;如何确定应用层buffer的大小&quot;&gt;如何确定应用层Buffer的大小？&lt;/h3&gt;
-
-&lt;p&gt;同样，这也是占内存的,我们不能过大也不能过少，这看起来好像也无解。&lt;/p&gt;
-
-&lt;p&gt;这里推荐一个&lt;strong&gt;&lt;a href=&quot;https://github.com/chenshuo/muduo&quot;&gt;Muduo网络库&lt;/a&gt;&lt;/strong&gt;的做法:动态增长。具体做法是，给每个Buffer初始分配1024B字节，并在栈上分配一个65536字节的数组。&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;读取：使用readv,buffer作为第一个地址，数组作为第二个地址，这样超过1024的数据全都读到了数组上，等读取结束在将buffer扩增，将数组内的数据追加到buffer。&lt;/li&gt;
-  &lt;li&gt;写入：比较简单，判断一下长度即可。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;这样做利用了临时栈上空间，避免每个连接的初始Buffer过大造成内存浪费，也避免反复调用read()的系统开销。&lt;/p&gt;
-</description>
-        <pubDate>Mon, 15 Jan 2018 15:13:17 +0800</pubDate>
-        <link>http://MemeTao.github.io//TcpBuffer/</link>
-        <guid isPermaLink="true">http://MemeTao.github.io//TcpBuffer/</guid>
-        
-        
-        <category>network</category>
-        
-        <category>program</category>
-        
-      </item>
-    
-      <item>
-        <title>linux操作记录</title>
-        <description>&lt;hr /&gt;
-
-&lt;h3 id=&quot;安装与卸载&quot;&gt;安装与卸载&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;apt-get install xxx #安装xxx&lt;/li&gt;
-  &lt;li&gt;apt-get remove xxx  #卸载xxx&lt;/li&gt;
-  &lt;li&gt;apt-get update      #更新软件信息数据库&lt;/li&gt;
-  &lt;li&gt;apt-get upgrade     #进行系统升级&lt;/li&gt;
-  &lt;li&gt;apt-cache search    #搜索软件包
-    &lt;h3 id=&quot;文件查找&quot;&gt;文件查找&lt;/h3&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;ol&gt;
-      &lt;li&gt;find / -name filename
-        &lt;h3 id=&quot;替换操作&quot;&gt;替换操作&lt;/h3&gt;
-        &lt;h4 id=&quot;语法为-addrs源字符串目的字符串option&quot;&gt;语法为 :[addr]s/源字符串/目的字符串/[option]&lt;/h4&gt;
-        &lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;addr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//表示检索范围，省略时表示当前行。
-//如:&quot;1，20&quot;:表示从第1行到20行；
-&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;%&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//表示整个文件，同“1,$”；
-&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;.,$&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//从当前行到文件尾；
-&lt;/span&gt;&lt;span class=&quot;nl&quot;&gt;s:&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//表示替换操作
-&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;option&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//表示操作类型
-//如: g 表示全局替换; 
-//c 表示进行确认
-//p 表示替代结果逐行显示（Ctrl + L恢复屏幕）；
-//省略option时仅对每行第一个匹配串进行替换；
-//如果在源字符串和目的字符串中出现特殊字符，需要用”\”转义
-&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;        &lt;/div&gt;
-        &lt;h3 id=&quot;统计代码行数&quot;&gt;统计代码行数&lt;/h3&gt;
-      &lt;/li&gt;
-    &lt;/ol&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;table&gt;
-      &lt;tbody&gt;
-        &lt;tr&gt;
-          &lt;td&gt;1.find ./ -name *.cpp&lt;/td&gt;
-          &lt;td&gt;xargs wc -l&lt;/td&gt;
-        &lt;/tr&gt;
-      &lt;/tbody&gt;
-    &lt;/table&gt;
-  &lt;/li&gt;
-  &lt;li&gt;2.find ./ -name *.cpp | xargs wc -l | sort -n
-    &lt;h3 id=&quot;常用shell&quot;&gt;常用shell&lt;/h3&gt;
-  &lt;/li&gt;
-  &lt;li&gt;环境变量添加 1.echo export PATH=$(pwd):$PATH&lt;/li&gt;
-&lt;/ul&gt;
-</description>
-        <pubDate>Wed, 12 Apr 2017 17:13:17 +0800</pubDate>
-        <link>http://MemeTao.github.io//linuxOperation/</link>
-        <guid isPermaLink="true">http://MemeTao.github.io//linuxOperation/</guid>
-        
-        
-        <category>linux</category>
         
       </item>
     
