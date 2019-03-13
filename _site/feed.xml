@@ -7,9 +7,42 @@
 </description>
     <link>http://MemeTao.github.io//</link>
     <atom:link href="http://MemeTao.github.io//feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sat, 09 Feb 2019 16:51:27 +0800</pubDate>
-    <lastBuildDate>Sat, 09 Feb 2019 16:51:27 +0800</lastBuildDate>
+    <pubDate>Wed, 13 Mar 2019 16:55:52 +0800</pubDate>
+    <lastBuildDate>Wed, 13 Mar 2019 16:55:52 +0800</lastBuildDate>
     <generator>Jekyll v3.1.6</generator>
+    
+      <item>
+        <title>总结c++中的cast</title>
+        <description>&lt;hr /&gt;
+
+&lt;h3 id=&quot;前言&quot;&gt;前言&lt;/h3&gt;
+&lt;p&gt;此文算是一个notes，总结一下C++中的各类cast用法和原理。&lt;/p&gt;
+
+&lt;h3 id=&quot;static_cast&quot;&gt;static_cast&lt;/h3&gt;
+
+&lt;h3 id=&quot;const_cast&quot;&gt;const_cast&lt;/h3&gt;
+
+&lt;h3 id=&quot;dynamic_cast&quot;&gt;dynamic_cast&lt;/h3&gt;
+
+&lt;h3 id=&quot;reinterpret_cast&quot;&gt;reinterpret_cast&lt;/h3&gt;
+
+&lt;h3 id=&quot;static_pointer_cast&quot;&gt;static_pointer_cast&lt;/h3&gt;
+
+&lt;h3 id=&quot;dynamic_pointer_cast&quot;&gt;dynamic_pointer_cast&lt;/h3&gt;
+
+&lt;h3 id=&quot;const_pointer_cast&quot;&gt;const_pointer_cast&lt;/h3&gt;
+
+&lt;h3 id=&quot;reinterpret_cast-1&quot;&gt;reinterpret_cast&lt;/h3&gt;
+
+</description>
+        <pubDate>Mon, 11 Mar 2019 12:13:17 +0800</pubDate>
+        <link>http://MemeTao.github.io//cppcastall/</link>
+        <guid isPermaLink="true">http://MemeTao.github.io//cppcastall/</guid>
+        
+        
+        <category>c++</category>
+        
+      </item>
     
       <item>
         <title>X86进入保护模式前的准备</title>
@@ -63,13 +96,34 @@
       </item>
     
       <item>
-        <title>2019一月学习计划</title>
-        <description>&lt;hr /&gt;
+        <title>x86保护模式2-保护模式及其编程</title>
+        <description>&lt;p&gt;###0.前记
+本文主要来自«Linux0.11 源码完全注释»，是此书第4章的笔记。
+###1. 功能寄存器&lt;/p&gt;
 
-&lt;h3 id=&quot;1-计算机体系结构&quot;&gt;1. 计算机体系结构&lt;/h3&gt;
-&lt;p&gt;晚上7.00-晚上8.30&lt;/p&gt;
-&lt;h3 id=&quot;2-操作系统学习&quot;&gt;2. 操作系统学习&lt;/h3&gt;
-&lt;p&gt;晚上9.00-晚上10.30&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;1. GDTR&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;存放全局描述符表的32位线性基地址和16位表长度&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;2. IDTR&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;存放中断描述符表IDT的32位线性基地址和16位表长度&lt;/p&gt;
+</description>
+        <pubDate>Mon, 14 Jan 2019 17:13:17 +0800</pubDate>
+        <link>http://MemeTao.github.io//x86_protection_mode/</link>
+        <guid isPermaLink="true">http://MemeTao.github.io//x86_protection_mode/</guid>
+        
+        
+        <category>Linux</category>
+        
+      </item>
+    
+      <item>
+        <title>2019学习计划</title>
+        <description>&lt;hr /&gt;
+&lt;h3 id=&quot;1linux-011源码4个月51前学完&quot;&gt;1.Linux 0.11源码(4个月,5.1前学完)&lt;/h3&gt;
+&lt;p&gt;涉及A&amp;amp;TT汇编基础知识、内核早期源码、x86基础知识&lt;/p&gt;
+
 </description>
         <pubDate>Mon, 14 Jan 2019 17:13:17 +0800</pubDate>
         <link>http://MemeTao.github.io//studyplay_january/</link>
@@ -83,8 +137,8 @@
       </item>
     
       <item>
-        <title>AT&amp;T汇编</title>
-        <description>&lt;h3 id=&quot;1-intel-x86_64寄存器介绍&quot;&gt;1. intel x86_64寄存器介绍&lt;/h3&gt;
+        <title>x86保护模式1-AT&amp;T汇编摘记</title>
+        <description>&lt;h3 id=&quot;0-intel-x86_64寄存器介绍&quot;&gt;0. intel x86_64寄存器介绍&lt;/h3&gt;
 &lt;p&gt;&lt;strong&gt;通用寄存器&lt;/strong&gt;:&lt;/p&gt;
 
 &lt;p&gt;共有16个通用寄存器，如下图所示:
@@ -125,9 +179,87 @@
     &lt;/ol&gt;
   &lt;/li&gt;
   &lt;li&gt;0.指向栈顶&lt;/li&gt;
-  &lt;li&gt;1.函数调用:通常和EBP一起配合使用&lt;/li&gt;
+  &lt;li&gt;1.函数调用:通常和EBP一起配合使用
+    &lt;h3 id=&quot;1段&quot;&gt;1.段&lt;/h3&gt;
+    &lt;p&gt;&lt;strong&gt;数据段(.data),以及.bss段&lt;/strong&gt;&lt;/p&gt;
+    &lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;//code1
+int main()
+{
+  return 0;
+}
+//code2
+int a;
+int main()
+{
+  return 0;
+}
+//code3
+int a = 0;
+int main()
+{
+  return 0;
+}
+int a = 1;
+int main()
+{
+  return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;p&gt;code1\2\3的text data bss大小一样，code4的data段比123多4字节，bss段比123少4字节。&lt;/p&gt;
+  &lt;/li&gt;
 &lt;/ul&gt;
 
+&lt;p&gt;这说明：
+&lt;em&gt;被显式初始化、且初值不为0的全局变量存放于.data段，为初始化的全局变量或者初始化为0的全局变量存放与.bss段。&lt;/em&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;//code11
+int main()
+{
+    return 0;
+}
+//code12
+static int i;
+int main()
+{
+    return 0;
+}
+//code13 
+static int i = 0;
+int main()
+{
+    return 0;
+}
+//code 14
+static int i = 1;
+int main()
+{
+    return 0;
+}
+//code 15
+int main()
+{
+    static int i ;
+    return 0;
+}
+//code 16
+int main()
+{
+    static int i = 0;
+    return 0;
+}
+//code 17
+int main()
+{
+    static int i = 1;
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;对与static修饰的变量，从&lt;strong&gt;存放位置&lt;/strong&gt;看，和全局变量没有任何区别:不管在局部静态变量还是全局静态变量，都按照全局变量处理。
+&lt;strong&gt;text 代码段&lt;/strong&gt;
+没啥好说的。&lt;/p&gt;
+
+&lt;p&gt;段寄存器CS和DS用于包含代码段和数据段的地址，CS + EIP（段中偏移）就可以获取指令码的地址。
+这里不做详细的介绍，«Linux0.11»中介绍了段管理的具体细节。&lt;/p&gt;
 &lt;h3 id=&quot;2-函数&quot;&gt;2. 函数&lt;/h3&gt;
 &lt;p&gt;&lt;strong&gt;声明函数&lt;/strong&gt;:&lt;/p&gt;
 &lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;function&lt;/span&gt;
@@ -140,16 +272,20 @@
     &lt;span class=&quot;n&quot;&gt;ret&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 &lt;p&gt;堆栈情况:
-&lt;img src=&quot;../material/X86_64ASSEMBLY/stack_overview.png&quot; alt=&quot;stackOverview&quot; /&gt;&lt;/p&gt;
+&lt;img src=&quot;../material/X86_64ASSEMBLY/stack_overview.png&quot; alt=&quot;stackOverview&quot; /&gt;
+解释：&lt;/p&gt;
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;bar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;当执行到bar(1,2)时，现将2,1参数压人堆栈然后将”return”语句的地址压入堆栈，但是为了避免在bar中出现push,pop等操作把返回地址给弄丢了，使用另外一个寄存器:ebp来存放’esp’的地址，当然还需要保存旧的ebp地址。所以函数的首部和尾部就长成了上述这样。(«汇编预言程序设计» P245)&lt;/p&gt;
+
+&lt;p&gt;还剩最后一个问题，如果函数把任何数据都压入堆栈，ESP寄存器仍然指向局部变量被存放之前的位置，并且将覆盖这些变量。为了解决这个问题，需要在函数开始的位置预留一定数量的栈空间。&lt;/p&gt;
 &lt;h3 id=&quot;2链接器&quot;&gt;2.链接器&lt;/h3&gt;
 &lt;p&gt;一段程序包含.text .data .bss 段链接器会将所有的目标文件的这些段合并在一块。
 &lt;img src=&quot;../material/X86_64ASSEMBLY/link_object.png&quot; alt=&quot;ldOverview&quot; /&gt;&lt;/p&gt;
-&lt;h3 id=&quot;3-内存寻址&quot;&gt;3. 内存寻址&lt;/h3&gt;
-&lt;p&gt;虚拟地址：[16][32] 16位段选择符、32位偏移地址&lt;/p&gt;
-
-&lt;p&gt;所有段可以有14^2个，段内偏移可以达到4G&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../material/X86_64ASSEMBLY/memeory_addressing.png&quot; alt=&quot;memory_addressing&quot; /&gt;&lt;/p&gt;
 
 </description>
         <pubDate>Mon, 14 Jan 2019 17:13:17 +0800</pubDate>
@@ -425,131 +561,6 @@ Old long-lived branch release: &lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;nv
         
         
         <category>c++</category>
-        
-      </item>
-    
-      <item>
-        <title>C++成员函数指针的大小</title>
-        <description>&lt;hr /&gt;
-
-&lt;h3 id=&quot;c中的函数指针假定在64位机器上&quot;&gt;c++中的函数指针(假定在64位机器上)&lt;/h3&gt;
-
-&lt;p&gt;我们知道指针的大小恒定的,跟机器位数有关,32位机下,指针是4字节大小,64位机下指针是8字节大小.但是在C++中,有一个比较特殊的地方是C++的类成员函数
-指针,它的大小是普通指针的2倍.先看一个实例:&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;void foo(void)
-{
-}
-class A{
-public:
-    void foo(){}
-}
-
-int main()
-{
-    void (*pfun)(void);
-    pfun = foo;
-    void (A::*pMfun)(void);
-    pMfun = &amp;amp;A::foo;
-    std::cout&amp;lt;&amp;lt;&quot;normal function pointer size:&quot;&amp;lt;&amp;lt;sizeof(pfun)&amp;lt;&amp;lt;std::endl;
-    std::cout&amp;lt;&amp;lt;&quot;member function pointer size:&quot;&amp;lt;&amp;lt;sizeof(pMfun)&amp;lt;&amp;lt;std::endl;
-    return 0;
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;运行结果:&lt;/p&gt;
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;normal &lt;span class=&quot;k&quot;&gt;function &lt;/span&gt;pointer size:8
-member &lt;span class=&quot;k&quot;&gt;function &lt;/span&gt;pointer size:16
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;证明完毕.下面解释为什么会这样.&lt;/p&gt;
-&lt;h3 id=&quot;this指针的调整&quot;&gt;this指针的调整&lt;/h3&gt;
-
-&lt;p&gt;再看一个例子:&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;class A{
-public;
-    void foo()
-    {
-        //假设我们需要在这里去使用数组a
-        std::cout&amp;lt;&amp;lt;&quot;addr of this:%x&quot;&amp;lt;&amp;lt;this&amp;lt;&amp;lt;std::endl;
-    }
-private:
-    int a[4];
-};
-class B{
-public:
-    void bar()
-    { 
-        //假设我们需要在这里去使用数组b
-        std::cout&amp;lt;&amp;lt;&quot;addr of this:%x&quot;&amp;lt;&amp;lt;this&amp;lt;&amp;lt;std::endl;
-    }
-prviate:
-    int b[4];
-};
-class C: public A,B{
-
-};
-
-int main()
-{
-    C c; 
-    c.foo();
-    c.bar();
-    return 0;
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;结果&lt;/p&gt;
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;addr of this:%x0x7ffd30f4ec00
-addr of this:%x0x7ffd30f4ec10
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;这时候可以看到,传递给foo和bar函数的this指针是不一样的?为什么会不一样呢? 考虑一下函数中的注释.
-所以调用类成员函数指针时,就需要将this指针进行调整,这个调整的信息在哪里?就在这个函数指针中,所以就需要另外的空间去存放这些信息,这也就是为什么类成员函数指针是16字节的原因,因为多出来的8字节,用于编译期的this指针调整.&lt;/p&gt;
-
-</description>
-        <pubDate>Thu, 12 Jul 2018 17:13:17 +0800</pubDate>
-        <link>http://MemeTao.github.io//theSizeOfMemeberFunctionPointer/</link>
-        <guid isPermaLink="true">http://MemeTao.github.io//theSizeOfMemeberFunctionPointer/</guid>
-        
-        
-        <category>c++</category>
-        
-      </item>
-    
-      <item>
-        <title>Socket注意事项:非阻塞connect的返回值</title>
-        <description>&lt;hr /&gt;
-
-&lt;h3 id=&quot;问题引入&quot;&gt;问题引入：&lt;/h3&gt;
-&lt;p&gt;为了测试1S内TCP服务器单线程能accept多少并发TCP连接，由于正常的TCP建立可能需要几十毫秒，所以客户端发起的连接应该是这样子的:&lt;/p&gt;
-&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;AF_INET&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SOCK_STREAM&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SOCK_NONBLOCK&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//非阻塞connect
-&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;serverAddr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sockaddr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;代码运行后，我发现connect()返回值一直是false，但是使用tcpdump抓包发现tcp三次握手正常，也就是说仅仅是connect函数的返回值不符合预期。&lt;/p&gt;
-
-&lt;h3 id=&quot;解决问题&quot;&gt;解决问题&lt;/h3&gt;
-&lt;p&gt;我再一次翻开«UNP»，在书上发现：&lt;strong&gt;当在一个非阻塞的TCP套接字上调用connect时，将立即返回一个EINPROGRESS错误，不过已经发起的TCP三路握手继续进行&lt;/strong&gt;，
-这样问题就清晰了，修改代码如下：&lt;/p&gt;
-&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;AF_INET&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SOCK_STREAM&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SOCK_NONBLOCK&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//非阻塞connect
-&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;serverAddr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sockaddr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;errno&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;EINPROGRESS&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;注:errno是线程安全的，每个线程都保留一份errno。&lt;/p&gt;
-&lt;h3 id=&quot;总结&quot;&gt;总结&lt;/h3&gt;
-&lt;p&gt;&lt;strong&gt;纸上得来终觉浅，绝知此事需躬行&lt;/strong&gt;&lt;/p&gt;
-
-</description>
-        <pubDate>Sat, 10 Feb 2018 15:13:17 +0800</pubDate>
-        <link>http://MemeTao.github.io//SocketConnect/</link>
-        <guid isPermaLink="true">http://MemeTao.github.io//SocketConnect/</guid>
-        
-        
-        <category>network</category>
-        
-        <category>program</category>
         
       </item>
     

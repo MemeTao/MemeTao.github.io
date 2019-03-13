@@ -7,19 +7,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="author" content="songroger">
 
-  <title>Welcome my site</title>
+  <title>总结c++中的cast</title>
 
-  <meta name="description" content="中国计量大学本科 通信工程 在读(2017) ">
+  <meta name="description" content="&lt;hr /&gt;">
 
   <!-- Open graph data -->
   <meta property="og:site_name" content="Welcome my site">
-  <meta property="og:title" content="Welcome my site">
-  <meta property="og:url" content="http://MemeTao.github.io//">
-  <meta property="og:type" content="website">
-  <meta property="og:description" content="中国计量大学本科 通信工程 在读(2017) ">
+  <meta property="og:title" content="总结c++中的cast">
+  <meta property="og:url" content="http://MemeTao.github.io//cppcastall/">
+  <meta property="og:type" content="article">
+  <meta property="og:description" content="&lt;hr /&gt;">
 
   <!-- Standard Stuff -->
-  <link rel="canonical" href="http://MemeTao.github.io//"/>
+  <link rel="canonical" href="http://MemeTao.github.io//cppcastall/"/>
   <link rel="alternate" type="application/rss+xml" title="Welcome my site" href="http://MemeTao.github.io//feed.xml"/>
 
   <!-- Favicons -->
@@ -61,142 +61,36 @@
   <main class="col">
 
 
+<article class="article">
+  <h2 class="article__title article__title--single">总结c++中的cast</h2>
+  <time class="article__date" datetime="2019-03-11"> 12:13 Mar.11-2019</time>
   
-    <!-- article -->
-    <article class="article">
-      <h3 class="article__title">
-        <a href="/cppcastall/">总结c++中的cast</a>
-      </h3>
-      <time class="article__date" datetime="2019-03-11">Mar 11, 2019</time>
-      <!--<p class="article__excerpt"><hr />
+  <hr />
 
-</p>
-      <a href="/cppcastall/" class="article__more">Read more »</a> -->
-    </article>
-  
-    <!-- article -->
-    <article class="article">
-      <h3 class="article__title">
-        <a href="/x86_protection_mode/">X86进入保护模式前的准备</a>
-      </h3>
-      <time class="article__date" datetime="2019-02-09">Feb 9, 2019</time>
-      <!--<p class="article__excerpt"><hr />
-</p>
-      <a href="/x86_protection_mode/" class="article__more">Read more »</a> -->
-    </article>
-  
-    <!-- article -->
-    <article class="article">
-      <h3 class="article__title">
-        <a href="/function_statck/">c函数调用栈</a>
-      </h3>
-      <time class="article__date" datetime="2019-02-09">Feb 9, 2019</time>
-      <!--<p class="article__excerpt"><hr />
+<h3 id="前言">前言</h3>
+<p>此文算是一个notes，总结一下C++中的各类cast用法和原理。</p>
 
-</p>
-      <a href="/function_statck/" class="article__more">Read more »</a> -->
-    </article>
-  
-    <!-- article -->
-    <article class="article">
-      <h3 class="article__title">
-        <a href="/timesynchronize/">一种在网络中时间同步的方式(精度100us)</a>
-      </h3>
-      <time class="article__date" datetime="2019-01-22">Jan 22, 2019</time>
-      <!--<p class="article__excerpt"><hr />
+<h3 id="static_cast">static_cast</h3>
 
-</p>
-      <a href="/timesynchronize/" class="article__more">Read more »</a> -->
-    </article>
-  
-    <!-- article -->
-    <article class="article">
-      <h3 class="article__title">
-        <a href="/x86_protection_mode/">x86保护模式2-保护模式及其编程</a>
-      </h3>
-      <time class="article__date" datetime="2019-01-14">Jan 14, 2019</time>
-      <!--<p class="article__excerpt"><p>###0.前记
-本文主要来自«Linux0.11 源码完全注释»，是此书第4章的笔记。
-###1. 功能寄存器</p>
+<h3 id="const_cast">const_cast</h3>
 
-</p>
-      <a href="/x86_protection_mode/" class="article__more">Read more »</a> -->
-    </article>
-  
-    <!-- article -->
-    <article class="article">
-      <h3 class="article__title">
-        <a href="/studyplay_january/">2019学习计划</a>
-      </h3>
-      <time class="article__date" datetime="2019-01-14">Jan 14, 2019</time>
-      <!--<p class="article__excerpt"><hr />
-<h3 id="1linux-011源码4个月51前学完">1.Linux 0.11源码(4个月,5.1前学完)</h3>
-<p>涉及A&amp;TT汇编基础知识、内核早期源码、x86基础知识</p>
-</p>
-      <a href="/studyplay_january/" class="article__more">Read more »</a> -->
-    </article>
-  
-    <!-- article -->
-    <article class="article">
-      <h3 class="article__title">
-        <a href="/att_assembly_manaul/">x86保护模式1-AT&T汇编摘记</a>
-      </h3>
-      <time class="article__date" datetime="2019-01-14">Jan 14, 2019</time>
-      <!--<p class="article__excerpt"><h3 id="0-intel-x86_64寄存器介绍">0. intel x86_64寄存器介绍</h3>
-<p><strong>通用寄存器</strong>:</p>
+<h3 id="dynamic_cast">dynamic_cast</h3>
 
-</p>
-      <a href="/att_assembly_manaul/" class="article__more">Read more »</a> -->
-    </article>
-  
-    <!-- article -->
-    <article class="article">
-      <h3 class="article__title">
-        <a href="/os_study/">操作系统加载全过程</a>
-      </h3>
-      <time class="article__date" datetime="2019-01-11">Jan 11, 2019</time>
-      <!--<p class="article__excerpt"><hr />
+<h3 id="reinterpret_cast">reinterpret_cast</h3>
 
-</p>
-      <a href="/os_study/" class="article__more">Read more »</a> -->
-    </article>
-  
-    <!-- article -->
-    <article class="article">
-      <h3 class="article__title">
-        <a href="/InstallNvidiaDriver/">ubuntu18.04上安装英伟达驱动</a>
-      </h3>
-      <time class="article__date" datetime="2019-01-09">Jan 9, 2019</time>
-      <!--<p class="article__excerpt"><hr />
+<h3 id="static_pointer_cast">static_pointer_cast</h3>
 
-</p>
-      <a href="/InstallNvidiaDriver/" class="article__more">Read more »</a> -->
-    </article>
-  
-    <!-- article -->
-    <article class="article">
-      <h3 class="article__title">
-        <a href="/string-coding/">字符串编码</a>
-      </h3>
-      <time class="article__date" datetime="2018-11-08">Nov 8, 2018</time>
-      <!--<p class="article__excerpt"><hr />
+<h3 id="dynamic_pointer_cast">dynamic_pointer_cast</h3>
 
-</p>
-      <a href="/string-coding/" class="article__more">Read more »</a> -->
-    </article>
-  
+<h3 id="const_pointer_cast">const_pointer_cast</h3>
 
-    <!-- <nav class="blocks blocks--space">
-      <div class="blocks__item">
-        
-      </div>
-      <div class="blocks__item">
-        Page:  of 
-      </div>
-      <div class="blocks__item">
-        
-      </div>
-    </nav> -->
+<h3 id="reinterpret_cast-1">reinterpret_cast</h3>
+
+
+  
+</article>
+
+
 
 
 <footer class="footer">
