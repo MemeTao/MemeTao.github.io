@@ -7,19 +7,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="author" content="songroger">
 
-  <title>Archive</title>
+  <title>mcg设计文档</title>
 
-  <meta name="description" content="中国计量大学本科 通信工程 在读(2017) ">
+  <meta name="description" content="&lt;hr /&gt;">
 
   <!-- Open graph data -->
   <meta property="og:site_name" content="Welcome my site">
-  <meta property="og:title" content="Archive">
-  <meta property="og:url" content="http://MemeTao.github.io//archive/page2/">
+  <meta property="og:title" content="mcg设计文档">
+  <meta property="og:url" content="http://MemeTao.github.io//design/">
   <meta property="og:type" content="article">
-  <meta property="og:description" content="中国计量大学本科 通信工程 在读(2017) ">
+  <meta property="og:description" content="&lt;hr /&gt;">
 
   <!-- Standard Stuff -->
-  <link rel="canonical" href="http://MemeTao.github.io//archive/page2/"/>
+  <link rel="canonical" href="http://MemeTao.github.io//design/"/>
   <link rel="alternate" type="application/rss+xml" title="Welcome my site" href="http://MemeTao.github.io//feed.xml"/>
 
   <!-- Favicons -->
@@ -61,62 +61,91 @@
   <main class="col">
 
 
-<h2 class="article__title article__title--single">Archive</h2>
+<article class="article">
+  <h2 class="article__title article__title--single">mcg设计文档</h2>
+  <time class="article__date" datetime="2019-04-05"> 13:13 Apr.05-2019</time>
+  
+  <hr />
+
+<p>HEAD | SUMMARY
+—–|——–
+Author:| All mcg members
+Status:| Draft
+Date:| 5–2019
+Post-History:| None</p>
+<h2 id="流程">流程</h2>
+<h3 id="请求首页">请求首页</h3>
+<p>前端发起get请求，获取首页，path = “/index.html”。</p>
+
+<p>首页信息包含3块内容，”校选修、院选修、体育选修”，页面内容、格式自行设计。</p>
+
+<h3 id="前端请求课程信息">前端请求课程信息</h3>
+<h4 id="客户端点击">客户端点击</h4>
+
+<p>前端点击”校选修、院选修、体育选修”中的任何一个时，立即向服务端发起请求，获取<strong>全量</strong>课程目录，自行决定如何展示。目录信息获取到之后，立刻发起第2个请求，获取课程的剩余人数，这里采用分页请求的方式，前端自行决定一次请求查询多少页的课程剩余人数。客户端发起的请求中，应包含要查询的课程名列表。</p>
+
+<h4 id="服务端回应">服务端回应</h4>
+<p>客户端查询课程目录时，全量返回。</p>
+
+<p>客户端查询剩余人数时，根据客户端要查询的课程名列表，进行”数据库操作”。</p>
+
+<p>”数据库操作”是这样的一个流程(下同)：判断是否”空闲”</p>
 <ul>
-  
-    <div class="arch-item">
-      <li>
-        <a href="/InstallNvidiaDriver/" class="arch-title">ubuntu18.04上安装英伟达驱动</a>
-        <time>Jan.09, 2019</time>
-      </li>
-      <div class="arch-desc">fuck nvidia</div>
-    </div>
-  
-    <div class="arch-item">
-      <li>
-        <a href="/string-coding/" class="arch-title">字符串编码</a>
-        <time>Nov.08, 2018</time>
-      </li>
-      
-    </div>
-  
-    <div class="arch-item">
-      <li>
-        <a href="/theSizeOfMemeberFunctionPointer/" class="arch-title">C++成员函数指针的大小</a>
-        <time>Jul.12, 2018</time>
-      </li>
-      
-    </div>
-  
-    <div class="arch-item">
-      <li>
-        <a href="/SocketConnect/" class="arch-title">Socket注意事项:非阻塞connect的返回值</a>
-        <time>Feb.10, 2018</time>
-      </li>
-      
-    </div>
-  
-    <div class="arch-item">
-      <li>
-        <a href="/Poll/" class="arch-title">TCP四次挥手中，Poll返回了几次？</a>
-        <time>Feb.04, 2018</time>
-      </li>
-      
-    </div>
-  
+  <li>如果是，直接返回结果。</li>
+  <li>如果繁忙，产生一个排队id(<strong>必须保证全局唯一</strong>),并构建合适的数据结构，插入队列。</li>
 </ul>
 
-    <nav class="blocks blocks--space">
-      <div class="blocks__item">
-        <a href="/archive/">Previous</a>
-      </div>
-      <div class="blocks__item">
-        Page: 2 of 4
-      </div>
-      <div class="blocks__item">
-        <a href="/archive/page3">Next</a>
-      </div>
-    </nav>
+<h4 id="客户端决策">客户端决策</h4>
+<ul>
+  <li>如果服务端返回一个排队id，则进行”等待操作”，定时轮询，轮询请求中需要携带这个排队id。</li>
+  <li>如果服务端返回了结果，则展示。</li>
+</ul>
+
+<h3 id="前端提交选课结果">前端提交选课结果</h3>
+<h4 id="客户端点击-1">客户端点击</h4>
+<p>客户端记录用户选择的课程名(可能是多个，自行决定是否做单次提交数量限制)，判断此次提交的课程是否存在时间冲突。如果冲突，放弃提交即可（demo阶段不做任何人性化的操作)。</p>
+
+<p>前端向服务端提交此次用户选择的课程名称，等待服务端返回结果。</p>
+
+<h4 id="服务端回应-1">服务端回应</h4>
+<ul>
+  <li>服务端获取这个学生的课表。遍历提交的选课列表，判断课程时间与课表时间是否冲突，从提交的选课列表中去除冲突课程。</li>
+  <li>遍历不冲突课程列表，<strong>对每一个课程</strong>进行”数据库操作”</li>
+</ul>
+
+<p><em>注：这里只要允许选课部分成功，部分失败即可，具体怎么操作再定</em></p>
+
+<h4 id="客户端决策-1">客户端决策</h4>
+<ul>
+  <li>如果服务端返回排队id列表，则进行等待，定时轮询，轮询请求中需要带上<strong>这些</strong>排队id.</li>
+  <li>如果服务端返回了结果，则展示。</li>
+</ul>
+
+<h3 id="前端取消已选课程">前端取消已选课程</h3>
+<p>流程上一模一样，暂不考虑。</p>
+
+<h2 id="前端处理">前端处理</h2>
+<h2 id="http请求参数">http请求参数</h2>
+<p>茹鑫补充。</p>
+<h2 id="轮询策略等">轮询策略等</h2>
+
+<h2 id="nginx配置">Nginx配置</h2>
+
+<h2 id="服务端处理">服务端处理</h2>
+
+<h3 id="服务端如何处理http请求">服务端如何处理http请求</h3>
+
+<h3 id="数据库操作-细节描述">”数据库操作” 细节描述</h3>
+<p>涂涂在这里补充。</p>
+
+<h2 id="数据库">数据库</h2>
+<h3 id="数据库表结构">数据库表结构</h3>
+<p>乐乐补充。</p>
+
+
+  
+</article>
+
 
 
 

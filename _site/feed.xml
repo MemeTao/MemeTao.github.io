@@ -7,8 +7,8 @@
 </description>
     <link>http://MemeTao.github.io//</link>
     <atom:link href="http://MemeTao.github.io//feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 13 Mar 2019 16:55:52 +0800</pubDate>
-    <lastBuildDate>Wed, 13 Mar 2019 16:55:52 +0800</lastBuildDate>
+    <pubDate>Tue, 16 Apr 2019 15:29:26 +0800</pubDate>
+    <lastBuildDate>Tue, 16 Apr 2019 15:29:26 +0800</lastBuildDate>
     <generator>Jekyll v3.1.6</generator>
     
       <item>
@@ -45,42 +45,13 @@
       </item>
     
       <item>
-        <title>X86进入保护模式前的准备</title>
-        <description>&lt;hr /&gt;
-
-</description>
-        <pubDate>Sat, 09 Feb 2019 16:13:17 +0800</pubDate>
-        <link>http://MemeTao.github.io//x86_protection_mode/</link>
-        <guid isPermaLink="true">http://MemeTao.github.io//x86_protection_mode/</guid>
-        
-        
-        <category>Linux</category>
-        
-      </item>
-    
-      <item>
-        <title>c函数调用栈</title>
-        <description>&lt;hr /&gt;
-
-</description>
-        <pubDate>Sat, 09 Feb 2019 14:13:17 +0800</pubDate>
-        <link>http://MemeTao.github.io//function_statck/</link>
-        <guid isPermaLink="true">http://MemeTao.github.io//function_statck/</guid>
-        
-        
-        <category>Linux</category>
-        
-      </item>
-    
-      <item>
-        <title>一种在网络中时间同步的方式(精度100us)</title>
+        <title>局域网下时间同步(精度100us)</title>
         <description>&lt;hr /&gt;
 
 &lt;h3 id=&quot;介绍&quot;&gt;介绍&lt;/h3&gt;
 &lt;p&gt;本文介绍在&lt;strong&gt;非异常恶劣&lt;/strong&gt;的网络中，如何同步两台机器的本地时间，我们的目标是&lt;strong&gt;尽量(大概率上)&lt;/strong&gt;将时间同步的误差控制在0.1ms。&lt;/p&gt;
 
-&lt;p&gt;众所周知，网络中存在time服务器，利用ntp协议可以将网络中主机的本地时间同步到1s的误差范围。对于正常应用，这个精度应该是够的。但是总存在一些
-特殊应用，它对时间的精度要求更高。在这种情况下，time服务已经不满足我们的需要了。&lt;/p&gt;
+&lt;p&gt;众所周知，网络中存在time服务器，利用ntp协议可以将网络中主机的本地时间同步到1s的误差范围。对于正常应用，这个精度应该是够的。但是总存在一些特殊应用，它对时间的精度要求更高。在这种情况下，time服务已经不满足我们的需要了。&lt;/p&gt;
 
 &lt;h3 id=&quot;基本方式&quot;&gt;基本方式&lt;/h3&gt;
 &lt;p&gt;在ping模式下，机器A发送一个包，并记录发包时间t1，机器B收到Icmp包后发送ack包，机器A收到ack包后记录收包时间t2，t2减t1就被认为是rtt。&lt;/p&gt;
@@ -92,29 +63,6 @@
         
         
         <category>algorithm</category>
-        
-      </item>
-    
-      <item>
-        <title>x86保护模式2-保护模式及其编程</title>
-        <description>&lt;p&gt;###0.前记
-本文主要来自«Linux0.11 源码完全注释»，是此书第4章的笔记。
-###1. 功能寄存器&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;1. GDTR&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;存放全局描述符表的32位线性基地址和16位表长度&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;2. IDTR&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;存放中断描述符表IDT的32位线性基地址和16位表长度&lt;/p&gt;
-</description>
-        <pubDate>Mon, 14 Jan 2019 17:13:17 +0800</pubDate>
-        <link>http://MemeTao.github.io//x86_protection_mode/</link>
-        <guid isPermaLink="true">http://MemeTao.github.io//x86_protection_mode/</guid>
-        
-        
-        <category>Linux</category>
         
       </item>
     
@@ -137,8 +85,8 @@
       </item>
     
       <item>
-        <title>x86保护模式1-AT&amp;T汇编摘记</title>
-        <description>&lt;h3 id=&quot;0-intel-x86_64寄存器介绍&quot;&gt;0. intel x86_64寄存器介绍&lt;/h3&gt;
+        <title>AT&amp;T汇编摘记</title>
+        <description>&lt;h3 id=&quot;0-寄存器&quot;&gt;0. 寄存器&lt;/h3&gt;
 &lt;p&gt;&lt;strong&gt;通用寄存器&lt;/strong&gt;:&lt;/p&gt;
 
 &lt;p&gt;共有16个通用寄存器，如下图所示:
@@ -174,40 +122,40 @@
   &lt;/li&gt;
   &lt;li&gt;
     &lt;ol&gt;
-      &lt;li&gt;近跳转:除12外的所有其它跳转
+      &lt;li&gt;近跳转:除1,2外的所有其它跳转
 &lt;strong&gt;堆栈指针寄存器(ESP)&lt;/strong&gt;&lt;/li&gt;
     &lt;/ol&gt;
   &lt;/li&gt;
   &lt;li&gt;0.指向栈顶&lt;/li&gt;
-  &lt;li&gt;1.函数调用:通常和EBP一起配合使用
-    &lt;h3 id=&quot;1段&quot;&gt;1.段&lt;/h3&gt;
-    &lt;p&gt;&lt;strong&gt;数据段(.data),以及.bss段&lt;/strong&gt;&lt;/p&gt;
-    &lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;//code1
+  &lt;li&gt;1.函数调用:通常和EBP一起配合使用&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;1-数据段&quot;&gt;1. 数据段&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;数据段(.data),以及.bss段&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;//code1
 int main()
 {
-  return 0;
+    return 0;
 }
 //code2
 int a;
 int main()
 {
-  return 0;
+    return 0;
 }
 //code3
 int a = 0;
 int main()
 {
-  return 0;
+    return 0;
 }
 int a = 1;
 int main()
 {
-  return 0;
+    return 0;
 }
 &lt;/code&gt;&lt;/pre&gt;
-    &lt;p&gt;code1\2\3的text data bss大小一样，code4的data段比123多4字节，bss段比123少4字节。&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+&lt;p&gt;code1\2\3的text data bss大小一样，code4的data段比123多4字节，bss段比123少4字节。&lt;/p&gt;
 
 &lt;p&gt;这说明：
 &lt;em&gt;被显式初始化、且初值不为0的全局变量存放于.data段，为初始化的全局变量或者初始化为0的全局变量存放与.bss段。&lt;/em&gt;&lt;/p&gt;
@@ -260,6 +208,7 @@ int main()
 
 &lt;p&gt;段寄存器CS和DS用于包含代码段和数据段的地址，CS + EIP（段中偏移）就可以获取指令码的地址。
 这里不做详细的介绍，«Linux0.11»中介绍了段管理的具体细节。&lt;/p&gt;
+
 &lt;h3 id=&quot;2-函数&quot;&gt;2. 函数&lt;/h3&gt;
 &lt;p&gt;&lt;strong&gt;声明函数&lt;/strong&gt;:&lt;/p&gt;
 &lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;type&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;err&quot;&gt;@&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;function&lt;/span&gt;
@@ -283,7 +232,8 @@ int main()
 &lt;p&gt;当执行到bar(1,2)时，现将2,1参数压人堆栈然后将”return”语句的地址压入堆栈，但是为了避免在bar中出现push,pop等操作把返回地址给弄丢了，使用另外一个寄存器:ebp来存放’esp’的地址，当然还需要保存旧的ebp地址。所以函数的首部和尾部就长成了上述这样。(«汇编预言程序设计» P245)&lt;/p&gt;
 
 &lt;p&gt;还剩最后一个问题，如果函数把任何数据都压入堆栈，ESP寄存器仍然指向局部变量被存放之前的位置，并且将覆盖这些变量。为了解决这个问题，需要在函数开始的位置预留一定数量的栈空间。&lt;/p&gt;
-&lt;h3 id=&quot;2链接器&quot;&gt;2.链接器&lt;/h3&gt;
+
+&lt;h3 id=&quot;3链接&quot;&gt;3.链接&lt;/h3&gt;
 &lt;p&gt;一段程序包含.text .data .bss 段链接器会将所有的目标文件的这些段合并在一块。
 &lt;img src=&quot;../material/X86_64ASSEMBLY/link_object.png&quot; alt=&quot;ldOverview&quot; /&gt;&lt;/p&gt;
 
@@ -298,50 +248,138 @@ int main()
       </item>
     
       <item>
-        <title>操作系统加载全过程</title>
+        <title>Linux 0.11运行机制</title>
         <description>&lt;hr /&gt;
 
 &lt;p&gt;这将是一个漫长的过程，终将解答我心中的疑惑….&lt;/p&gt;
-&lt;h3 id=&quot;step-0汇编&quot;&gt;step 0:汇编&lt;/h3&gt;
+&lt;h3 id=&quot;step-0-启动阶段&quot;&gt;step 0: 启动阶段&lt;/h3&gt;
+&lt;h4 id=&quot;磁盘引导&quot;&gt;磁盘引导&lt;/h4&gt;
+&lt;p&gt;PC加电后，BIOS将引导扇区加载到内存0x7C00处(为什么是这个地址?是个业内约定)。&lt;/p&gt;
 
-&lt;h3 id=&quot;step-1-存储设备的第512字节&quot;&gt;step 1: 存储设备的第512字节&lt;/h3&gt;
-&lt;p&gt;Boot sector(引导扇区)是所有存储介质上的第一个扇区，大小为512字节。主要分为三个部分，分别是:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;ol&gt;
-      &lt;li&gt;MBR(master boot record,主引导记录) 445字节&lt;/li&gt;
-    &lt;/ol&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;ol&gt;
-      &lt;li&gt;DPT(disk partition table,磁盘分区表) 64字节&lt;/li&gt;
-    &lt;/ol&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;ol&gt;
-      &lt;li&gt;BRID(boot record ID 引导记录标示) 2字节
-        &lt;h4 id=&quot;mbr&quot;&gt;MBR&lt;/h4&gt;
-        &lt;p&gt;主引导记录的作用是安装基本的引导加载程序(boot loader),在Linux中是grub。grub的主要功能是：&lt;/p&gt;
-      &lt;/li&gt;
-    &lt;/ol&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;ol&gt;
-      &lt;li&gt;提供菜单：用户可以选择不同的开机选项，这是多重引导的虫咬功能。&lt;/li&gt;
-    &lt;/ol&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;ol&gt;
-      &lt;li&gt;载入内核文件: 直接指向可开机的程序区段来开始操作系统&lt;/li&gt;
-    &lt;/ol&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;ol&gt;
-      &lt;li&gt;转交其它Loader: 将引导加载功能交给其它loader处理&lt;/li&gt;
-    &lt;/ol&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;引导扇区:
 
+Boot sector(引导扇区)是所有存储介质上的第一个扇区，大小为512字节。主要分为三个部分，分别是:
+* 1. MBR(master boot record,主引导记录) 445字节
+* 2. DPT(disk partition table,磁盘分区表) 64字节
+* 3. BRID(boot record ID 引导记录标示) 2字节
+#### MBR 
+主引导记录的作用是安装基本的引导加载程序(boot loader),在Linux中是grub。grub的主要功能是：
+* 1. 提供菜单：用户可以选择不同的开机选项，这是多重引导的虫咬功能。
+* 2. 载入内核文件: 直接指向可开机的程序区段来开始操作系统
+* 3. 转交其它Loader: 将引导加载功能交给其它loader处理
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;bootsect.s 是第一个被CPU执行的程序，这个程序先把自己从移动到0x90000处，接在吧磁盘中的setup.s弄到内存里来（具体的位置是0x920000)，然后把system模块移动到0x10000处，跳转到setup程序，setup.s程序又将system模块移动到内存起始地址。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bootsect.s,setup.s 为什么要移来移去的？
+
+我们的目标是要将操作系统放到内存里去，最好的位置就是内存起始地址(0x0000)，但是在刚开始的时候，BIOS在那个内存起始处保存了中断向量和终端服务程序，所以在仍然需要用到BIOS功能之前我们不能直接将系统移动到那个地方去。
+
+为什么是0x900000?
+
+那时候system模块挺小的，0x0000000 ---- 0x900000 足够放置system模块代码。 
+
+为什么是0x10000？
+
+BIOS相关的的东西在 0x000000 --- 0x10000中。
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;gdtldtrdt表&quot;&gt;gdt,ldt,rdt表&lt;/h3&gt;
+
+&lt;p&gt;setup.s 做了一系列的操作中，最重要的当然是这三个表的初始化，设置好代码段、数据段后程序就可以跑起来了,具体的细节涉及到”X86保护模式以及编程”。setup.s调用head.s代码，执行完后内存映像如下：
+&lt;img src=&quot;../material/Linux011/heads.png&quot; alt=&quot;head.s内存映像&quot; /&gt;
+注：页表、描述符表等的初始化在head.s代码中&lt;/p&gt;
+
+&lt;h3 id=&quot;内核初始化mainc程序&quot;&gt;内核初始化main.c程序&lt;/h3&gt;
+
+&lt;h4 id=&quot;trap_init&quot;&gt;trap_init()&lt;/h4&gt;
+
+&lt;p&gt;Linux0.11 用过门描述符在idt表中放置了各种异常处理函数(具体操作是traps.c:trap_inti())，包括：除0，段错误等。当异常发生的时候，根据idt表中的段选择符找到中断处理函数，执行相应的处理回调，以除0为例：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;
+#首先进入中断处理(涉及各类寄存器的处理，具体原理要看&quot;X86保护模式及其编程&quot;)，执行asm.s中的&quot;divide_error&quot;:
+
+divide_error:
+	pushl $do_divide_error # 接下来被调用
+no_error_code:
+	xchgl %eax,(%esp)      #寄存器处理
+	pushl %ebx
+	pushl %ecx
+	pushl %edx
+    ...
+    ...
+    iret                  #返回后，CS:EIP 可能已经被改变
+
+void do_divide_error(long esp, long error_code)
+{
+	die(&quot;divide error&quot;,esp,error_code);
+}
+
+static void die(char * str,long esp_ptr,long nr)
+{
+	long * esp = (long *) esp_ptr;
+	int i;
+
+	printk(&quot;%s: %04x\n\r&quot;,str,nr&amp;amp;0xffff);
+	printk(&quot;EIP:\t%04x:%p\nEFLAGS:\t%p\nESP:\t%04x:%p\n&quot;,
+		esp[1],esp[0],esp[2],esp[4],esp[3]);
+	printk(&quot;fs: %04x\n&quot;,_fs());
+	printk(&quot;base: %p, limit: %p\n&quot;,get_base(current-&amp;gt;ldt[1]),get_limit(0x17));
+	if (esp[4] == 0x17) {
+		printk(&quot;Stack: &quot;);
+		for (i=0;i&amp;lt;4;i++)
+			printk(&quot;%p &quot;,get_seg_long(0x17,i+(long *)esp[3]));
+		printk(&quot;\n&quot;);
+	}
+	str(i);
+	printk(&quot;Pid: %d, process nr: %d\n\r&quot;,current-&amp;gt;pid,0xffff &amp;amp; i);
+	for(i=0;i&amp;lt;10;i++)
+		printk(&quot;%02x &quot;,0xff &amp;amp; get_seg_byte(esp[1],(i+(char *)esp[0])));
+	printk(&quot;\n\r&quot;);
+	do_exit(11);		/* play segment exception */
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;可见默认的处理就是”打印出错地址，杀死当前进程”，然后重新调度起另一个进程(do_exit()中)。&lt;/p&gt;
+
+&lt;h3 id=&quot;system_call&quot;&gt;system_call&lt;/h3&gt;
+
+&lt;p&gt;系统调用是使用0x80中断，具体的原理是:在idt表中的第0x80(124)个索引中存放了一个DPL=3的陷进门(sched_init函数中)，所以用户态代码可以以特权级别3（DPL&amp;lt;=MIN(CPL,RPL))来访问这个陷进门。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;set_system_gate(0x80,&amp;amp;system_call);
+
+//dpl = 3 , 所以用户态代码可以通过这个门进入内核
+//type = 15 陷阱门
+#define set_system_gate(n,addr) \
+	_set_gate(&amp;amp;idt[n],15,3,addr)
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;在system_call中根据系统调用号来决定调用哪一个系统调用函数，每个系统调用函数都存放在一个函数指针数组：sys_call_table中。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;system_call:   
+	cmpl $nr_system_calls-1,%eax
+	ja bad_sys_call
+	push %ds
+	push %es
+	push %fs
+	pushl %edx
+	pushl %ecx		# push %ebx,%ecx,%edx as parameters
+	pushl %ebx		# to the system call
+	movl $0x10,%edx		# set up ds,es to kernel space
+	mov %dx,%ds
+	mov %dx,%es
+	movl $0x17,%edx		# fs points to local data space
+	mov %dx,%fs
+	call sys_call_table(,%eax,4)  #执行具体的系统调用
+	pushl %eax
+	movl current,%eax
+	cmpl $0,state(%eax)		# state
+	jne reschedule
+	cmpl $0,counter(%eax)		# counter
+	je reschedule       # 重新调度
+ret_from_system_call:   # 在这里处理了&quot;信号处理句柄&quot;
+    ...
+    ...
+    iret                # 可见，先处理信号（如果有的话），在执行用户程序
+&lt;/code&gt;&lt;/pre&gt;
 </description>
         <pubDate>Fri, 11 Jan 2019 17:13:17 +0800</pubDate>
         <link>http://MemeTao.github.io//os_study/</link>
@@ -561,6 +599,249 @@ Old long-lived branch release: &lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;nv
         
         
         <category>c++</category>
+        
+      </item>
+    
+      <item>
+        <title>C++成员函数指针的大小</title>
+        <description>&lt;hr /&gt;
+
+&lt;h3 id=&quot;c中的函数指针假定在64位机器上&quot;&gt;c++中的函数指针(假定在64位机器上)&lt;/h3&gt;
+
+&lt;p&gt;我们知道指针的大小恒定的,跟机器位数有关,32位机下,指针是4字节大小,64位机下指针是8字节大小.但是在C++中,有一个比较特殊的地方是C++的类成员函数
+指针,它的大小是普通指针的2倍.先看一个实例:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;void foo(void)
+{
+}
+class A{
+public:
+    void foo(){}
+}
+
+int main()
+{
+    void (*pfun)(void);
+    pfun = foo;
+    void (A::*pMfun)(void);
+    pMfun = &amp;amp;A::foo;
+    std::cout&amp;lt;&amp;lt;&quot;normal function pointer size:&quot;&amp;lt;&amp;lt;sizeof(pfun)&amp;lt;&amp;lt;std::endl;
+    std::cout&amp;lt;&amp;lt;&quot;member function pointer size:&quot;&amp;lt;&amp;lt;sizeof(pMfun)&amp;lt;&amp;lt;std::endl;
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;运行结果:&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;normal &lt;span class=&quot;k&quot;&gt;function &lt;/span&gt;pointer size:8
+member &lt;span class=&quot;k&quot;&gt;function &lt;/span&gt;pointer size:16
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;证明完毕.下面解释为什么会这样.&lt;/p&gt;
+&lt;h3 id=&quot;this指针的调整&quot;&gt;this指针的调整&lt;/h3&gt;
+
+&lt;p&gt;再看一个例子:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;class A{
+public;
+    void foo()
+    {
+        //假设我们需要在这里去使用数组a
+        std::cout&amp;lt;&amp;lt;&quot;addr of this:%x&quot;&amp;lt;&amp;lt;this&amp;lt;&amp;lt;std::endl;
+    }
+private:
+    int a[4];
+};
+class B{
+public:
+    void bar()
+    { 
+        //假设我们需要在这里去使用数组b
+        std::cout&amp;lt;&amp;lt;&quot;addr of this:%x&quot;&amp;lt;&amp;lt;this&amp;lt;&amp;lt;std::endl;
+    }
+prviate:
+    int b[4];
+};
+class C: public A,B{
+
+};
+
+int main()
+{
+    C c; 
+    c.foo();
+    c.bar();
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;结果&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;addr of this:%x0x7ffd30f4ec00
+addr of this:%x0x7ffd30f4ec10
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;这时候可以看到,传递给foo和bar函数的this指针是不一样的?为什么会不一样呢? 考虑一下函数中的注释.
+所以调用类成员函数指针时,就需要将this指针进行调整,这个调整的信息在哪里?就在这个函数指针中,所以就需要另外的空间去存放这些信息,这也就是为什么类成员函数指针是16字节的原因,因为多出来的8字节,用于编译期的this指针调整.&lt;/p&gt;
+
+</description>
+        <pubDate>Thu, 12 Jul 2018 17:13:17 +0800</pubDate>
+        <link>http://MemeTao.github.io//theSizeOfMemeberFunctionPointer/</link>
+        <guid isPermaLink="true">http://MemeTao.github.io//theSizeOfMemeberFunctionPointer/</guid>
+        
+        
+        <category>c++</category>
+        
+      </item>
+    
+      <item>
+        <title>Socket注意事项:非阻塞connect的返回值</title>
+        <description>&lt;hr /&gt;
+
+&lt;h3 id=&quot;问题引入&quot;&gt;问题引入：&lt;/h3&gt;
+&lt;p&gt;为了测试1S内TCP服务器单线程能accept多少并发TCP连接，由于正常的TCP建立可能需要几十毫秒，所以客户端发起的连接应该是这样子的:&lt;/p&gt;
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;AF_INET&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SOCK_STREAM&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SOCK_NONBLOCK&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//非阻塞connect
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;serverAddr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sockaddr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;代码运行后，我发现connect()返回值一直是false，但是使用tcpdump抓包发现tcp三次握手正常，也就是说仅仅是connect函数的返回值不符合预期。&lt;/p&gt;
+
+&lt;h3 id=&quot;解决问题&quot;&gt;解决问题&lt;/h3&gt;
+&lt;p&gt;我再一次翻开«UNP»，在书上发现：&lt;strong&gt;当在一个非阻塞的TCP套接字上调用connect时，将立即返回一个EINPROGRESS错误，不过已经发起的TCP三路握手继续进行&lt;/strong&gt;，
+这样问题就清晰了，修改代码如下：&lt;/p&gt;
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;AF_INET&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SOCK_STREAM&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SOCK_NONBLOCK&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//非阻塞connect
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;serverAddr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sockaddr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;errno&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;EINPROGRESS&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;注:errno是线程安全的，每个线程都保留一份errno。&lt;/p&gt;
+&lt;h3 id=&quot;总结&quot;&gt;总结&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;纸上得来终觉浅，绝知此事需躬行&lt;/strong&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Sat, 10 Feb 2018 15:13:17 +0800</pubDate>
+        <link>http://MemeTao.github.io//SocketConnect/</link>
+        <guid isPermaLink="true">http://MemeTao.github.io//SocketConnect/</guid>
+        
+        
+        <category>network</category>
+        
+        <category>program</category>
+        
+      </item>
+    
+      <item>
+        <title>TCP四次挥手中，Poll返回了几次？</title>
+        <description>&lt;hr /&gt;
+
+&lt;h3 id=&quot;问题&quot;&gt;问题&lt;/h3&gt;
+&lt;p&gt;我在给多线程TCP服务器写被动关闭逻辑时遇到了一个疑问，Poll返回的时机是什么时候？TCP四次挥手能够引起几次Poll返回？&lt;/p&gt;
+&lt;h3 id=&quot;如何引入的问题&quot;&gt;如何引入的问题&lt;/h3&gt;
+&lt;p&gt;一般的服务器编程逻辑，一般是由客户端发起的主动关闭，服务端实行被动关闭。按正常的流程是这样的:对端发送FIN，服务端发送ACK，如果没有多余数据，随即再发送FIN分节，对端继续发送ACK便进入熟知的TIME_WAIT状态，等待2MSL时间后进入CLOSE状态，本次TCP连接顺利断开。依照这个模型，我们只要在fd上注册一个回调函数，等poll返回时，用read系统调用即可判断是正常数据还是FIN分节，很容易得到如下回调函数伪代码:&lt;/p&gt;
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;handleRead&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;ssize_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; 
+    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//对端发来信息
+&lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;c1&quot;&gt;//正常处理信息
+&lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//说明对端发送了FIN分节
+&lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;addTask&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;freeMemory&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//让其它空闲线程来处理这个连接的资源
+&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;          &lt;span class=&quot;c1&quot;&gt;//发送FIN
+&lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;Error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;上述代码在实际的运行时，发生了错误，操作系统提示我一个关键词：&lt;strong&gt;double free&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;寻找症结&quot;&gt;寻找症结&lt;/h3&gt;
+
+&lt;p&gt;根据提示:我猜测是某些资源释放了多次。在多次复现问题后，最终发现这个问题出现在TCP连接断开的时候。&lt;/p&gt;
+
+&lt;p&gt;我用Linux下的NC工具模拟了客户端TCP连接，并用tcpdump试图分析出一点蛛丝马迹：&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;./TcpServer &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt; 65500     //在本地65500端口启动服务器
+    &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;nc 127.0.0.1 65500       //连接到服务器65500端口
+    &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;Ctrl-D                   //一段时间后，NC主动断开连接 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;以下是tcpdump本地抓包结果：
+&lt;img src=&quot;../material/POLL/tcpdump.png&quot; alt=&quot;TCPDUMP&quot; /&gt;
+首先是TCP三次握手，随后等我键入Ctrl-D断开连接，TCP四次挥手也很正常(由于FIN分节携带了ACK，所以表现出来是3个报文),然后服务端依然奔溃，并提示double free!&lt;/p&gt;
+
+&lt;p&gt;用netstat命令显示的TCP状态变化:&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;protocol&lt;/th&gt;
+      &lt;th&gt;port1&lt;/th&gt;
+      &lt;th&gt;port2&lt;/th&gt;
+      &lt;th&gt;status&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;tcp&lt;/td&gt;
+      &lt;td&gt;—65500—&lt;/td&gt;
+      &lt;td&gt;—59580—&lt;/td&gt;
+      &lt;td&gt;—–ESTABLISHED&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;tcp&lt;/td&gt;
+      &lt;td&gt;—59580—&lt;/td&gt;
+      &lt;td&gt;—65500—&lt;/td&gt;
+      &lt;td&gt;—–TIME_WAIT&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;说明连接是正常建立，正常断开的，一切都很正常!看来是一场硬仗，得调试代码了，由于当前还没有加入日志模块，用gdb又好像有点小题大作，先用printf大法试一下再说，最终发现&lt;strong&gt;在TCP四次挥手中，read() = 0 返回了两次！&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;引起poll返回的事件&quot;&gt;引起poll返回的事件&lt;/h3&gt;
+
+&lt;p&gt;根据我的代码结构，回调之前是poll，随即开始查资料，在《APUE》中发现，以下条件是引起poll返回的特定revent:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;有数据可读，专业的说法是：套接字接收缓冲区中的数据字节数大于等于套接字接收缓冲区低潮限度的当前值。可以使用套接字选项SO_RCVLOWAT来设置低潮限度，对于TCP和UDP套接字，其值缺省为1&lt;/li&gt;
+  &lt;li&gt;连接的读这一半关闭，也就是说接收了FIN的TCP连接。对这样的套接字的套接字将不阻塞且返回0（即文件结束符）&lt;/li&gt;
+  &lt;li&gt;套接字是一个监听套接字且已完成的连接数为非0，即连接建立后可读&lt;/li&gt;
+  &lt;li&gt;有一个套接字错误待处理。对这样的套接字的读操作将不阻塞且返回一个错误（-1），errno则设置成明确的错误条件。这些待处理的错误也可以通过指定套接口选项SO_ERROR调用getsockopt来取得并清除。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;«UNP»还有如下补充:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;所有TCP和UDP正规数据都被认为是普通数据&lt;/li&gt;
+  &lt;li&gt;TCP的待外数据被认为是优先级带数据&lt;/li&gt;
+  &lt;li&gt;当TCP连接的读半部关闭时(譬如收到一个对端的FIN)，也被认为是普通数据，随后的读操作将返回0&lt;/li&gt;
+  &lt;li&gt;…&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;那客户端进入TIME_WAIT状态时发送的最后一次ACK是不是一次普通数据呢?&lt;/strong&gt;在这个情况下，没有其它什么事件能够引起poll返回了，很明显了，罪魁祸首就是&lt;strong&gt;TCP四次挥手的第四次ACK！&lt;/strong&gt;&lt;/p&gt;
+&lt;h3 id=&quot;问题的关键以及解决方案&quot;&gt;问题的关键以及解决方案&lt;/h3&gt;
+&lt;p&gt;之所以会出现这样的问题，是由于我的代码执行顺序的问题，由于是多线程，一个线程close(fd)使得tcp发送FIN分节，理论上，再此之前我们就应该注销掉这个连接的资源了。而我的代码试图将资源释放这个问题推迟一些以便于处理当下更紧急的其它任务，所以在poll所关注的事件列表中还有这个连接所关注的事件，所以引起了这个问题。清楚了原因之后，立马找到了解决方案：我只要注销掉poll中的该事件对应的fd即可，依然可以使得资源释放稍后执行。&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;方案一：具体是在read()返回0，后随机注销掉该socket_fd的一切事件。伪代码描述如下:
+    &lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+  &lt;span class=&quot;n&quot;&gt;pollfd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;events&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;   &lt;span class=&quot;c1&quot;&gt;//如果不懂,请查阅struct pollfd
+&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;addTask&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;freeMemory&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//让其他线程来处理该连接的资源
+&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; 
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;方案二:一个TCP连接的所以资源自始自终都由某一个线程管理，不要转移fd。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;我修改了代码，两种方案都可以达到预期目标，考虑代码结构的问题，我采用了方案二。&lt;/p&gt;
+&lt;h3 id=&quot;总结&quot;&gt;总结&lt;/h3&gt;
+&lt;p&gt;解决了上述问题后，我反思自己:当初看APUE和UNP的时候对上述问题之所以没有留下深刻的印象，原因恐怕是没有实际情况作为参照。想起一句名句:&lt;strong&gt;纸上得来终觉浅，绝知此事需躬行&lt;/strong&gt;&lt;/p&gt;
+</description>
+        <pubDate>Sun, 04 Feb 2018 15:13:17 +0800</pubDate>
+        <link>http://MemeTao.github.io//Poll/</link>
+        <guid isPermaLink="true">http://MemeTao.github.io//Poll/</guid>
+        
+        
+        <category>network</category>
+        
+        <category>program</category>
         
       </item>
     
