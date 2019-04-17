@@ -7,8 +7,8 @@
 </description>
     <link>http://MemeTao.github.io//</link>
     <atom:link href="http://MemeTao.github.io//feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 16 Apr 2019 15:29:26 +0800</pubDate>
-    <lastBuildDate>Tue, 16 Apr 2019 15:29:26 +0800</lastBuildDate>
+    <pubDate>Wed, 17 Apr 2019 14:45:12 +0800</pubDate>
+    <lastBuildDate>Wed, 17 Apr 2019 14:45:12 +0800</lastBuildDate>
     <generator>Jekyll v3.1.6</generator>
     
       <item>
@@ -379,6 +379,142 @@ ret_from_system_call:   # 在这里处理了&quot;信号处理句柄&quot;
     ...
     ...
     iret                # 可见，先处理信号（如果有的话），在执行用户程序
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;信号处理&quot;&gt;信号处理&lt;/h3&gt;
+&lt;p&gt;任务的数据结构中信号部分:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;struct task_struct {
+    ...
+    long blocked;	/*信号屏蔽码*/
+	long signal;    /*当前发生的信号*/
+	struct sigaction sigaction[32];
+    ...
+}
+
+struct sigaction {
+	void (*sa_handler)(int);  /*信号回调*/
+	sigset_t sa_mask;         /*执行回调时的信号屏蔽码*/
+	int sa_flags;             
+	void (*sa_restorer)(void);
+};
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;举个例子:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;//进程A向进程B发送信号(sig)
+//第一步是调用对应的系统调用，正真的执行函数如下：
+//p 是对应的进程的任务结构指针
+static inline int send_sig(long sig,struct task_struct * p,int priv)
+{
+	if (!p || sig&amp;lt;1 || sig&amp;gt;32)
+		return -EINVAL;
+	if (priv || (current-&amp;gt;euid==p-&amp;gt;euid) || suser())
+		p-&amp;gt;signal |= (1&amp;lt;&amp;lt;(sig-1));  //将指定进程的signal添加sig信号标记
+	else
+		return -EPERM;
+	return 0;
+}
+//进程B执行系统调用(不管是主动还是被动，总是要执行)，将要返回的时候，会执行do_signal函数:
+ret_from_sys_call:
+	movl current,%eax		# task[0] cannot have signals
+	cmpl task,%eax
+	je 3f
+	cmpw $0x0f,CS(%esp)		# was old code segment supervisor ?
+	jne 3f
+	cmpw $0x17,OLDSS(%esp)		# was stack segment = 0x17 ?
+	jne 3f
+	movl signal(%eax),%ebx
+	movl blocked(%eax),%ecx
+	notl %ecx
+	andl %ebx,%ecx
+	bsfl %ecx,%ecx
+	je 3f
+	btrl %ecx,%ebx
+	movl %ebx,signal(%eax)
+	incl %ecx
+	pushl %ecx
+	call do_signal    # 看下当前有没有人给我发送了信号
+    ...
+    iret
+//do_signal函数比较复杂，主要作用是将信号处理函数(sa_handler)插入到用户态堆栈中去而不是在内核态运行
+//这里比较奇妙
+void do_signal(long signr,long eax, long ebx, long ecx, long edx,
+	long fs, long es, long ds,
+	long eip, long cs, long eflags,
+	unsigned long * esp, long ss)
+{
+	unsigned long sa_handler;
+	long old_eip=eip;
+	struct sigaction * sa = current-&amp;gt;sigaction + signr - 1;
+	int longs;
+	unsigned long * tmp_esp;
+
+	sa_handler = (unsigned long) sa-&amp;gt;sa_handler;
+	if (sa_handler==1)
+		return;
+	if (!sa_handler) {
+		if (signr==SIGCHLD)
+			return;
+		else
+			do_exit(1&amp;lt;&amp;lt;(signr-1));
+	}
+	if (sa-&amp;gt;sa_flags &amp;amp; SA_ONESHOT)
+		sa-&amp;gt;sa_handler = NULL;
+	*(&amp;amp;eip) = sa_handler;
+	longs = (sa-&amp;gt;sa_flags &amp;amp; SA_NOMASK)?7:8;
+	*(&amp;amp;esp) -= longs;
+	verify_area(esp,longs*4);
+	tmp_esp=esp;
+	put_fs_long((long) sa-&amp;gt;sa_restorer,tmp_esp++);
+	put_fs_long(signr,tmp_esp++);
+	if (!(sa-&amp;gt;sa_flags &amp;amp; SA_NOMASK))
+		put_fs_long(current-&amp;gt;blocked,tmp_esp++);
+	put_fs_long(eax,tmp_esp++);
+	put_fs_long(ecx,tmp_esp++);
+	put_fs_long(edx,tmp_esp++);
+	put_fs_long(eflags,tmp_esp++);
+	put_fs_long(old_eip,tmp_esp++);
+	current-&amp;gt;blocked |= sa-&amp;gt;sa_mask;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;这个函数的具体原理其实也没必要去理解(还是那句话’x86原理’)，执行效果如下:
+&lt;img src=&quot;../material/Linux011/do_signal.png&quot; alt=&quot;在用户堆栈中运行&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;还有相关的sys_signal\sys_sigaction比较简单，只是简单的修改一下任务结构中的值。&lt;/p&gt;
+
+&lt;h3 id=&quot;exitc-文件&quot;&gt;exit.c 文件&lt;/h3&gt;
+
+&lt;p&gt;这里是基于信号的一些应用函数，比如sys_exit()，tell_father()，sys_wait()等，略。&lt;/p&gt;
+
+&lt;h3 id=&quot;forkc-文件&quot;&gt;fork.c 文件&lt;/h3&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;fork()函数是用户态的API接口，最终会展开为一段包含int 0x80这个编程异常指令以及movl eax, res; return res的汇编代码，从而触发编程异常，从用户态进入内核，执行system_call异常处理函数。
+
+而system_call通过保存在eax寄存器中的系统调用号会去调用内核中真正实现fork功能的系统调用sys_fork。
+
+sys_fork要做的工作首先是为新创建的子进程找到一个可用的pid，即last_pid。然后调用copy_process复制父进程的pcb数据到子进程的pcb。当然复制完成后要做一些修改，把子进程的父进程号设置为当前调用fork()API的父进程，同时将子进程tss结构体中的eax寄存器的值设置为0。并将子进程的状态设置为就绪态，从而使得子进程后面可以得到CPU的调度。再进行其他一些数据复制和处理以后，sys_fork函数返回到异常处理函数system_call，返回值为子进程的pid即last_pid。
+
+system_call检查父进程是否需要重新调度。如果需要再次调度，则执行调度。否则system_call将系统调用sys_fork的返回值存入寄存器eax中，执行异常返回操作从内核返回到用户态，接着从父进程int 0x80后的下一条指令开始执行，也就是执行movl eax, res; return res，这就实现了父进程从fork() API调用的返回，返回值就是保存在eax寄存器的last_pid。如果system_call执行调度，父进程就会被换入到就绪队列中，失去CPU的使用权。那么可能是子进程也可能是其他进程继而得到CPU的使用权，开始执行。
+
+总之，子进程总会有执行的时刻，而子进程的pcb中的cs,eip寄存器保存的是和父进程通过int 0x80编程异常进入内核处理函数时一样的指令地址，即子进程也是从int 0x80后面的指令movl eax, res; return res开始执行，而子进程的eax的值被设置为0，从而子进程开始执行时的指令流程，和父进程从异常处理函数system_call返回到用户空间后的执行流程是一样的，将eax的值作为fork()API的返回值，从而完成子进程像是从fork()API返回的样子，但实质只是其执行流程是从fork()API返回处开始执行的，且返回值是0。而父进程不管是不经过调度先进入内核执行sys_fork系统调用，再从内核返回到fork()API，再从fork()API返回；还是经过调度被换出后进入等待队列，到再次得到CPU开始执行，两者的指令的执行流程都是一样。综上，父进程和子进程都要执行，返回值也不一样，所以fork()API表现为一次调用两次返回，但实质任何函数调用都只会返回一次，父进程是返回，而子进程只是从父进程的返回指令处开始执行。
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;写时拷贝的原理:
+根本原因还是在于只为子进程分配了”虚拟地址空间”，且父子进程的虚拟地址空间指向同一段物理内存。并为这些页面设置”不可写”,如果有任何一方试图对这些页面进行写操作，就会触发写保护异常，此时才真正执行内存分配操作。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;void write_verify(unsigned long address)
+{
+	unsigned long page;
+
+	if (!( (page = *((unsigned long *) ((address&amp;gt;&amp;gt;20) &amp;amp; 0xffc)) )&amp;amp;1))
+		return;
+	page &amp;amp;= 0xfffff000;
+	page += ((address&amp;gt;&amp;gt;10) &amp;amp; 0xffc);
+	if ((3 &amp;amp; *(unsigned long *) page) == 1)  /* non-writeable, present */
+		un_wp_page((unsigned long *) page);
+	return;
+}
 &lt;/code&gt;&lt;/pre&gt;
 </description>
         <pubDate>Fri, 11 Jan 2019 17:13:17 +0800</pubDate>
