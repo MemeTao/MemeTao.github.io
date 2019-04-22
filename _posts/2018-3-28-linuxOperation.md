@@ -37,3 +37,4 @@ s: //表示替换操作
 ### 常用shell
 
 * 环境变量添加 1.echo export PATH=$(pwd):$PATH
+* 进制xx服务开机启动:update-rc disable xx
