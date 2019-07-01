@@ -41,3 +41,13 @@ description:
 ### 2. Redis源码（3个月，8.1前结束）
 网上的大佬们貌似都推荐将Redis作为"非常适合阅读的开源项目"，我也要瞅瞅看。
 
+基本策略就是这样子了：http://blog.huangz.me/diary/2014/how-to-read-redis-source-code.html
+
+#### 2.1.redis 数据结构
+* 1.Redis 的动态字符串(3天)  done!
+* 2.Redis 链表  done!
+* 3.Redis 字典  done!
+
+2019-0627 更新：哔了狗了，最近太忙了。
+
+

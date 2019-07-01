@@ -7,9 +7,320 @@
 </description>
     <link>http://MemeTao.github.io//</link>
     <atom:link href="http://MemeTao.github.io//feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 17 Apr 2019 14:45:12 +0800</pubDate>
-    <lastBuildDate>Wed, 17 Apr 2019 14:45:12 +0800</lastBuildDate>
+    <pubDate>Mon, 01 Jul 2019 11:26:51 +0800</pubDate>
+    <lastBuildDate>Mon, 01 Jul 2019 11:26:51 +0800</lastBuildDate>
     <generator>Jekyll v3.1.6</generator>
+    
+      <item>
+        <title>Google拥塞控制算法--TrendingLine滤波器</title>
+        <description>&lt;hr /&gt;
+
+&lt;h3 id=&quot;延迟梯度&quot;&gt;延迟梯度&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&quot;../material/GccTrendingLineFilter/gradient.png&quot; alt=&quot;延迟梯度&quot; /&gt;
+左边的Tx表示发送时间，右边的tx表示接收时间。&lt;/p&gt;
+
+&lt;p&gt;延迟梯度的计算公式就是： gt(i) = (t(i) - t(i-1)) - (T(i) - T(i-1))，实际上就是发送间隔和接收间隔的差值。&lt;/p&gt;
+
+&lt;p&gt;网络状态良好的情况下，这个值为0，当网络状态变差(发送端速度不变，接收端速度下降)，这个值为正。&lt;/p&gt;
+
+&lt;p&gt;举个例子：发送端以1mbps的速度发送(每1ms发送1kb数据)，接收端的带宽仅有0.5mbsp，如下图:
+&lt;img src=&quot;../material/GccTrendingLineFilter/1mbpssender_0.5mbpsreciver.png&quot; alt=&quot;1mbps0.5mbps&quot; /&gt;
+从第一个1kb到第二个1kb，发送端用时1ms，而接收端需要2ms，梯度= 2 -1 = 1ms。观测”延迟梯度”的值，就可以发现发送端和接收端的带宽不对等，需要改变一方的速度。&lt;/p&gt;
+
+&lt;p&gt;考虑下面这一种情况：
+&lt;img src=&quot;../material/GccTrendingLineFilter/networking.png&quot; alt=&quot;networking&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;发送端与交换机之间的带宽是30mbps，接收端与交换机之间的带宽是10mbps。当发送端以10mbps的速度发送数据时，不考虑其它因素的影响，假设传播时延是10ms，那么任何数据包在10ms内就可以均匀到达接收端。&lt;/p&gt;
+
+&lt;p&gt;当发送端以大于10mbps的速度发送数据时，由于接收端的网络设备的处理能力只有10mbps，会将无法及时转发的流量缓冲在出口队列中。&lt;/p&gt;
+
+&lt;p&gt;模拟这下这种情况：发送端以10mbps的速度发送数据，维持100ms，提高速度到16mbps，维持150ms，下降速度到8mbps，并一直保持这个速度。假设发送端发送的单个报文长度为10k bit。&lt;/p&gt;
+
+&lt;p&gt;前100ms内，接收端的带宽足够，不会有交换机缓冲。接下来的150ms，发送端速度大于接收端的带宽，有一半数据会被缓冲在交换机的队列中，队列长度不断增大，直至丢包。随后发送端速度下降到5mbps，队列中的数据又被不断抽出，直至恢复正常。&lt;/p&gt;
+
+&lt;p&gt;用以下代码对上述情况进行简单的模拟:&lt;/p&gt;
+
+&lt;h4 id=&quot;发送端&quot;&gt;发送端&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;std::vector&amp;lt;Packet&amp;gt; BitSender::send(common::Timestamp at_time)
+{
+    using namespace common::rate;
+    using namespace common::time_interval;
+    //初始化
+    if(!last_sent_time_.is_valid()){
+        last_sent_time_ = at_time;
+    }
+
+    size_t bits_will_send = 0;
+    std::vector&amp;lt;Packet&amp;gt; packets; 
+    bits_will_send = static_cast&amp;lt;size_t&amp;gt;(bps_.value() * 
+            ((at_time - last_sent_time_) / 1_sec));
+    bits_sent_ += bits_will_send;
+    size_t bits_reamin = bits_will_send;
+    //向上取整
+    long n = std::lround(bits_reamin * 1.0 / kPacketSize);
+    for(int i = 0 ; i &amp;lt; n ; i++)
+    {
+        Packet packet;
+        packet.size = kPacketSize;
+        packet.send_time = at_time;
+        packets.push_back(packet);
+    }
+    last_sent_time_ = at_time;
+    return packets;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&quot;转发端&quot;&gt;转发端&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;//接受发送端的数据，放到队列中
+void BitForwarder::recive(std::vector&amp;lt;Packet&amp;gt;&amp;amp; packets)
+{
+    for(auto&amp;amp; packet : packets)
+    {
+        packet.delay = packet.delay + 5_ms; //发送端-&amp;gt;转发端  传输时延
+        fifo_.push(packet);
+    }
+}
+//发送队列中的数据
+std::vector&amp;lt;Packet&amp;gt; BitForwarder::forward(common::Timestamp at_time)
+{
+    size_t bits_will_forward = 0;
+    if(!last_forwarded_time_.is_valid()){
+        last_forwarded_time_ = at_time;
+    }
+    std::vector&amp;lt;Packet&amp;gt; forward_packets;
+    bits_will_forward = static_cast&amp;lt;size_t&amp;gt;(bps_.value() *
+            ((at_time - last_forwarded_time_) / 1_sec));
+    bits_forwarded_ += bits_will_forward;
+    size_t bits_remain = bits_will_forward;
+    while(bits_remain &amp;amp;&amp;amp; fifo_.size()){
+        if(fifo_.front().size &amp;lt;= bits_remain){
+            forward_packets.push_back(fifo_.front());
+            bits_remain -= fifo_.front().size;
+            fifo_.pop();
+        }else{
+            break;
+        }
+    }
+    last_forwarded_time_ = at_time;
+    return forward_packets;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&quot;接收端&quot;&gt;接收端&lt;/h4&gt;
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;void BitReciver::recive(std::vector&amp;lt;Packet&amp;gt;&amp;amp; packets,
+        common::Timestamp at_time)
+{
+    for(auto&amp;amp; packet : packets){
+        packet.delay = packet.delay + 5_ms;  //转发端-&amp;gt;接收端 传输时延
+        packet.recive_time = at_time;
+    }
+    record(packets); //对每个包的发送、接收时间进行记录
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h4 id=&quot;主函数&quot;&gt;主函数&lt;/h4&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;int main()
+{
+    BitSender sender(0_mbps);
+    BitReciver reciver(10_mbps);
+    BitForwarder forwarder(reciver.bps());
+
+    const auto start_time = common::Timestamp::now();
+    const auto kFirstStageEndTime = start_time + 100_ms;
+    const auto kSecondStageEndTime = start_time + 150_ms;
+    const auto kThirdStageEndTime = start_time + 300_ms;
+
+    const auto kFirstStageBps = 10_mbps;
+    const auto kSecondStageBps = 16_mbps;
+    const auto kThirdStageBps = 8_mbps;
+    //粒度是5ms
+    auto cur_time = start_time;
+    sender.set_bps(kFirstStageBps);
+    while(cur_time &amp;lt; kFirstStageEndTime){
+        auto packets = sender.send(cur_time);
+        forwarder.recive(packets); 
+        auto packets_f = forwarder.forward(cur_time);
+        reciver.recive(packets_f, cur_time);
+        cur_time = cur_time + 2_ms; //2ms处理间隔(尽量小,来模拟&quot;时时刻刻&quot;都在处理)
+    }
+    sender.set_bps(kSecondStageBps);
+    while(cur_time &amp;lt; kSecondStageEndTime){
+        auto packets = sender.send(cur_time);
+        forwarder.recive(packets); 
+        auto packets_f = forwarder.forward(cur_time);
+        reciver.recive(packets_f, cur_time);
+        cur_time = cur_time + 2_ms;
+    }
+    sender.set_bps(kThirdStageBps);
+    while(cur_time &amp;lt; kThirdStageEndTime){
+        auto packets = sender.send(cur_time);
+        forwarder.recive(packets); 
+        auto packets_f = forwarder.forward(cur_time);
+        reciver.recive(packets_f, cur_time);
+        cur_time = cur_time + 2_ms;
+    }
+
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;以时间t为横坐标，当前延迟梯度的累计和m(t)为纵坐标:
+&lt;img src=&quot;../material/GccTrendingLineFilter/trendingChange.png&quot; alt=&quot;统计图&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;变化方向&quot;&gt;变化方向&lt;/h3&gt;
+
+&lt;p&gt;对上图中的&lt;strong&gt;“曲线(实际情况中应该是曲线)”&lt;/strong&gt;求切线:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;斜率&amp;gt;0，转发设备中的缓冲队列在增大，&lt;strong&gt;如果继续保持这个速度，情况会不断恶化&lt;/strong&gt;&lt;/li&gt;
+  &lt;li&gt;斜率&amp;lt;0，转发设备中的缓冲队列在减小，&lt;strong&gt;如果继续保持这个速度，情况会不断改善&lt;/strong&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;线性回归&quot;&gt;线性回归&lt;/h3&gt;
+
+&lt;p&gt;TrendingLine模块的任务就是，根据历史的数据(时间和延迟梯度和)，计算当前一小段时间内的”斜率”，也就是”变化方向”，用于给速度控制模块参考信息。&lt;/p&gt;
+
+&lt;p&gt;线性回归过程主要解决的就是如何通过样本来获取最佳的拟合线。最常用的方法便是最小二乘法，它是一种数学优化技术，它通过最小化误差的平方和寻找数据的最佳函数匹配。&lt;/p&gt;
+
+&lt;h4 id=&quot;最小二乘法&quot;&gt;最小二乘法&lt;/h4&gt;
+
+&lt;p&gt;&lt;img src=&quot;../material/GccTrendingLineFilter/linear_regresion.png&quot; alt=&quot;linear_regresion&quot; /&gt;&lt;/p&gt;
+
+&lt;h4 id=&quot;代码实现&quot;&gt;代码实现&lt;/h4&gt;
+
+&lt;p&gt;计算延迟梯度时，以5ms为间隔，对达到的数据进行分组(5ms内达到的数据为一组)，论文中是以一帧为间隔。webrtc中的代码不太好懂，我自己的实现(可能也不太好懂)：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;// 对每一个到达的数据进行统计
+void TrendingLineFilter::incoming_packet_feedback(int64_t send_time,
+        int64_t recive_time,size_t size)
+{
+    (void) size;
+    if(common::TimeDelta(send_time - cur_group_.first_packet_send_time) &amp;gt; kSampleGroupInterval
+            &amp;amp;&amp;amp; cur_group_.initialized()){  //新的一组
+        do{
+            if(!prev_group_.initialized()){
+                break;
+            }
+            //计算一组值
+            assert(cur_group_.first_packet_send_time &amp;gt; 
+                    prev_group_.first_packet_send_time);
+            assert(cur_group_.last_packet_recive_time &amp;gt; 
+                    prev_group_.last_packet_recive_time);
+            int64_t send_time_delta = cur_group_.first_packet_send_time 
+                            - prev_group_.first_packet_send_time;
+            int64_t recive_time_delta = cur_group_.last_packet_recive_time 
+                            - prev_group_.last_packet_recive_time;
+
+            int64_t delta_us = recive_time_delta - send_time_delta;
+
+            insert_new_sample_and_update(delta_us,recive_time);
+            detect(send_time_delta,recive_time);
+            //...
+        } while(false);
+        prev_group_ = cur_group_;
+        cur_group_ = TimestampGroup();
+    }
+    if(cur_group_.first_packet_send_time &amp;gt; 0){
+        cur_group_.first_packet_send_time = std::min(cur_group_.first_packet_send_time, send_time);
+    }
+    else{
+        cur_group_.first_packet_send_time = send_time;
+    }
+    cur_group_.last_packet_recive_time = std::max(cur_group_.last_packet_recive_time, recive_time);
+    
+}
+
+void TrendingLineFilter::insert_new_sample_and_update(int64_t delta_us,int64_t complete_time_us)
+{
+    const int64_t delta_ms = std::lround(delta_us * 1.0 / 1000);
+    int64_t complete_time_ms = std::lround(complete_time_us * 1.0 / 1000);
+    first_arrive_time_ms_ = std::min(first_arrive_time_ms_, complete_time_ms);
+    acc_delay_ += delta_ms;
+    num_delay_delta_ ++;
+    num_delay_delta_ = std::min&amp;lt;int64_t&amp;gt;(num_delay_delta_,1000);
+    smoothed_delay_ =  smooth_coeff_ * smoothed_delay_ + (1 - smooth_coeff_) * acc_delay_;
+    sample_points_.push_back(
+            {   //由于是&quot;差&quot;，所以每一组数据都不会非常大，数值不会溢出，可以放心用于后续的数学计算
+        complete_time_ms - first_arrive_time_ms_,
+                smoothed_delay_
+            });
+    if(sample_points_.size() &amp;gt;= window_size_) {
+        /**@explain:
+         *  trend 可以认为是对当前网络状态的一个反映 : (send_rate - capacity) / capacity;
+         *  trend &amp;gt; 0,网络的排队延迟正在朝着增大的方向发展
+         *  trend &amp;lt; 0,网络的排队延迟正在朝..减少........
+         *  trend = 0,没有变化
+         */
+        cur_trend_ = linear_regresion();
+        sample_points_.pop_front();
+    }
+}
+// 根据数据公式进行计算
+double TrendingLineFilter::linear_regresion()
+{
+    assert(sample_points_.size() == window_size_);
+    double trend = cur_trend_;
+    double sum_x = 0;
+    double sum_y = 0;
+    //TODO: 在求平均数这个事情上可以有优化的措施
+    //但是意义并不大
+    for (const auto&amp;amp; point : sample_points_) {
+        sum_x += point.x;
+        sum_y += point.y;
+    }
+    double x_avg = sum_x / sample_points_.size();
+    double y_avg = sum_y / sample_points_.size();
+    double numerator = 0;
+    double denominator = 0;
+    for (const auto&amp;amp; point : sample_points_) {
+        numerator += (point.x - x_avg) * (point.y - y_avg);
+        denominator += (point.x - x_avg) * (point.x - x_avg);
+    }
+    //TODO:C++17 的optional 可以用在分母为0的处理
+    if( denominator != 0 ){
+        trend = numerator / denominator;
+    }
+    return trend;
+}
+
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;h3 id=&quot;联系我&quot;&gt;联系我&lt;/h3&gt;
+
+&lt;p&gt;meemetao@gmail.com&lt;/p&gt;
+</description>
+        <pubDate>Fri, 28 Jun 2019 10:13:17 +0800</pubDate>
+        <link>http://MemeTao.github.io//GccTrendlineFilter/</link>
+        <guid isPermaLink="true">http://MemeTao.github.io//GccTrendlineFilter/</guid>
+        
+        
+        <category>network,gcc,udp</category>
+        
+      </item>
+    
+      <item>
+        <title>redis摘记</title>
+        <description>&lt;hr /&gt;
+
+&lt;h3 id=&quot;redis源码阅读小笔记&quot;&gt;redis源码阅读小笔记&lt;/h3&gt;
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;ol&gt;
+      &lt;li&gt;解决键冲突的时候，总是将新加入的node放到队首(O1复杂度)&lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        <pubDate>Tue, 21 May 2019 15:13:17 +0800</pubDate>
+        <link>http://MemeTao.github.io//redissourcecode/</link>
+        <guid isPermaLink="true">http://MemeTao.github.io//redissourcecode/</guid>
+        
+        
+        <category>redis</category>
+        
+      </item>
     
       <item>
         <title>总结c++中的cast</title>
@@ -70,7 +381,50 @@
         <title>2019学习计划</title>
         <description>&lt;hr /&gt;
 &lt;h3 id=&quot;1linux-011源码4个月51前学完&quot;&gt;1.Linux 0.11源码(4个月,5.1前学完)&lt;/h3&gt;
-&lt;p&gt;涉及A&amp;amp;TT汇编基础知识、内核早期源码、x86基础知识&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;涉及A&amp;amp;TT汇编基础知识、内核早期源码、x86基础知识.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;今天是4.22日，对于Linux0.11的整体结构已经有了初步的认识:进程的切换、文件系统、字符设备驱动等也有了&lt;strong&gt;具体&lt;/strong&gt;的、源码级的了解。&lt;/p&gt;
+
+&lt;p&gt;以前只看了操作系统的大学教材，对操作系统的认识仅仅停留在理论阶段，这次学习算是解决了最初的困扰吧：&lt;strong&gt;操作系统究竟是怎么运行起来的？&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;不过这次仅仅了解个皮毛，对于堆栈切换、中断过程等细节完全没有掌握，选择不深究避免陷入细节的深渊无法自拔的原因不仅因为这些内容的复杂、难，还包括：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;是否实用&lt;/li&gt;
+  &lt;li&gt;学了不用就会忘&lt;/li&gt;
+  &lt;li&gt;…
+毕竟精力是有限的。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;现在摆在眼前的另外一个问题：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;要不要将这些细节全部掌握&lt;/li&gt;
+  &lt;li&gt;要不要继续深入学习&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;要不要将那些具体的细节掌握？&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;如果未来不是做操作系统相关的工作，应该是没有必要的。
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;要不要继续深入学习？&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;肯定要，但是不是现在，等到以后对Linux的认识更上一层楼，在应用层遇到了瓶颈的时候，再选择某一个子模块深入研究（肯定是网络模块或者文件系统了）。现在更迫切的是将已经掌握的知识加强，以前看过的书再看一遍（真觉得有必要再把APUE,UNP，CSAPP等书再过一遍）。
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;给这次学习计划打个分：6分吧，时间的投入，知识的掌握都不符合预期。&lt;/p&gt;
+
+&lt;h3 id=&quot;2-redis源码3个月81前结束&quot;&gt;2. Redis源码（3个月，8.1前结束）&lt;/h3&gt;
+&lt;p&gt;网上的大佬们貌似都推荐将Redis作为”非常适合阅读的开源项目”，我也要瞅瞅看。&lt;/p&gt;
+
+&lt;p&gt;基本策略就是这样子了：http://blog.huangz.me/diary/2014/how-to-read-redis-source-code.html&lt;/p&gt;
+
+&lt;h4 id=&quot;21redis-数据结构&quot;&gt;2.1.redis 数据结构&lt;/h4&gt;
+&lt;ul&gt;
+  &lt;li&gt;1.Redis 的动态字符串(3天)  done!&lt;/li&gt;
+  &lt;li&gt;2.Redis 链表  done!&lt;/li&gt;
+  &lt;li&gt;3.Redis 字典  done!&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;2019-0627 更新：哔了狗了，最近太忙了。&lt;/p&gt;
 
 </description>
         <pubDate>Mon, 14 Jan 2019 17:13:17 +0800</pubDate>
@@ -478,8 +832,9 @@ void do_signal(long signr,long eax, long ebx, long ecx, long edx,
 }
 &lt;/code&gt;&lt;/pre&gt;
 
-&lt;p&gt;这个函数的具体原理其实也没必要去理解(还是那句话’x86原理’)，执行效果如下:
-&lt;img src=&quot;../material/Linux011/do_signal.png&quot; alt=&quot;在用户堆栈中运行&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;这个函数的具体原理其实也没必要去理解(还是那句话’x86原理’)，执行效果如下:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;../material/Linux011/do_signal.png&quot; alt=&quot;在用户堆栈中运行&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;还有相关的sys_signal\sys_sigaction比较简单，只是简单的修改一下任务结构中的值。&lt;/p&gt;
 
@@ -516,6 +871,11 @@ system_call检查父进程是否需要重新调度。如果需要再次调度，
 	return;
 }
 &lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&quot;文件系统&quot;&gt;文件系统&lt;/h3&gt;
+
+&lt;h3 id=&quot;块设备驱动&quot;&gt;块设备驱动&lt;/h3&gt;
+
+&lt;h3 id=&quot;字符设备驱动&quot;&gt;字符设备驱动&lt;/h3&gt;
 </description>
         <pubDate>Fri, 11 Jan 2019 17:13:17 +0800</pubDate>
         <link>http://MemeTao.github.io//os_study/</link>
@@ -819,165 +1179,6 @@ addr of this:%x0x7ffd30f4ec10
         
         
         <category>c++</category>
-        
-      </item>
-    
-      <item>
-        <title>Socket注意事项:非阻塞connect的返回值</title>
-        <description>&lt;hr /&gt;
-
-&lt;h3 id=&quot;问题引入&quot;&gt;问题引入：&lt;/h3&gt;
-&lt;p&gt;为了测试1S内TCP服务器单线程能accept多少并发TCP连接，由于正常的TCP建立可能需要几十毫秒，所以客户端发起的连接应该是这样子的:&lt;/p&gt;
-&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;AF_INET&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SOCK_STREAM&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SOCK_NONBLOCK&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//非阻塞connect
-&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;serverAddr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sockaddr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;代码运行后，我发现connect()返回值一直是false，但是使用tcpdump抓包发现tcp三次握手正常，也就是说仅仅是connect函数的返回值不符合预期。&lt;/p&gt;
-
-&lt;h3 id=&quot;解决问题&quot;&gt;解决问题&lt;/h3&gt;
-&lt;p&gt;我再一次翻开«UNP»，在书上发现：&lt;strong&gt;当在一个非阻塞的TCP套接字上调用connect时，将立即返回一个EINPROGRESS错误，不过已经发起的TCP三路握手继续进行&lt;/strong&gt;，
-这样问题就清晰了，修改代码如下：&lt;/p&gt;
-&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;AF_INET&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SOCK_STREAM&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SOCK_NONBLOCK&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//非阻塞connect
-&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;serverAddr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sockaddr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;errno&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;EINPROGRESS&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;注:errno是线程安全的，每个线程都保留一份errno。&lt;/p&gt;
-&lt;h3 id=&quot;总结&quot;&gt;总结&lt;/h3&gt;
-&lt;p&gt;&lt;strong&gt;纸上得来终觉浅，绝知此事需躬行&lt;/strong&gt;&lt;/p&gt;
-
-</description>
-        <pubDate>Sat, 10 Feb 2018 15:13:17 +0800</pubDate>
-        <link>http://MemeTao.github.io//SocketConnect/</link>
-        <guid isPermaLink="true">http://MemeTao.github.io//SocketConnect/</guid>
-        
-        
-        <category>network</category>
-        
-        <category>program</category>
-        
-      </item>
-    
-      <item>
-        <title>TCP四次挥手中，Poll返回了几次？</title>
-        <description>&lt;hr /&gt;
-
-&lt;h3 id=&quot;问题&quot;&gt;问题&lt;/h3&gt;
-&lt;p&gt;我在给多线程TCP服务器写被动关闭逻辑时遇到了一个疑问，Poll返回的时机是什么时候？TCP四次挥手能够引起几次Poll返回？&lt;/p&gt;
-&lt;h3 id=&quot;如何引入的问题&quot;&gt;如何引入的问题&lt;/h3&gt;
-&lt;p&gt;一般的服务器编程逻辑，一般是由客户端发起的主动关闭，服务端实行被动关闭。按正常的流程是这样的:对端发送FIN，服务端发送ACK，如果没有多余数据，随即再发送FIN分节，对端继续发送ACK便进入熟知的TIME_WAIT状态，等待2MSL时间后进入CLOSE状态，本次TCP连接顺利断开。依照这个模型，我们只要在fd上注册一个回调函数，等poll返回时，用read系统调用即可判断是正常数据还是FIN分节，很容易得到如下回调函数伪代码:&lt;/p&gt;
-&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;handleRead&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;ssize_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; 
-    &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//对端发来信息
-&lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;c1&quot;&gt;//正常处理信息
-&lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;n&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//说明对端发送了FIN分节
-&lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;addTask&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;freeMemory&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//让其它空闲线程来处理这个连接的资源
-&lt;/span&gt;        &lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;          &lt;span class=&quot;c1&quot;&gt;//发送FIN
-&lt;/span&gt;    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;else&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;Error&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;();&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;上述代码在实际的运行时，发生了错误，操作系统提示我一个关键词：&lt;strong&gt;double free&lt;/strong&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;寻找症结&quot;&gt;寻找症结&lt;/h3&gt;
-
-&lt;p&gt;根据提示:我猜测是某些资源释放了多次。在多次复现问题后，最终发现这个问题出现在TCP连接断开的时候。&lt;/p&gt;
-
-&lt;p&gt;我用Linux下的NC工具模拟了客户端TCP连接，并用tcpdump试图分析出一点蛛丝马迹：&lt;/p&gt;
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;./TcpServer &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt; 65500     //在本地65500端口启动服务器
-    &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;nc 127.0.0.1 65500       //连接到服务器65500端口
-    &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;Ctrl-D                   //一段时间后，NC主动断开连接 
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;以下是tcpdump本地抓包结果：
-&lt;img src=&quot;../material/POLL/tcpdump.png&quot; alt=&quot;TCPDUMP&quot; /&gt;
-首先是TCP三次握手，随后等我键入Ctrl-D断开连接，TCP四次挥手也很正常(由于FIN分节携带了ACK，所以表现出来是3个报文),然后服务端依然奔溃，并提示double free!&lt;/p&gt;
-
-&lt;p&gt;用netstat命令显示的TCP状态变化:&lt;/p&gt;
-
-&lt;table&gt;
-  &lt;thead&gt;
-    &lt;tr&gt;
-      &lt;th&gt;protocol&lt;/th&gt;
-      &lt;th&gt;port1&lt;/th&gt;
-      &lt;th&gt;port2&lt;/th&gt;
-      &lt;th&gt;status&lt;/th&gt;
-    &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td&gt;tcp&lt;/td&gt;
-      &lt;td&gt;—65500—&lt;/td&gt;
-      &lt;td&gt;—59580—&lt;/td&gt;
-      &lt;td&gt;—–ESTABLISHED&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;tcp&lt;/td&gt;
-      &lt;td&gt;—59580—&lt;/td&gt;
-      &lt;td&gt;—65500—&lt;/td&gt;
-      &lt;td&gt;—–TIME_WAIT&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;p&gt;说明连接是正常建立，正常断开的，一切都很正常!看来是一场硬仗，得调试代码了，由于当前还没有加入日志模块，用gdb又好像有点小题大作，先用printf大法试一下再说，最终发现&lt;strong&gt;在TCP四次挥手中，read() = 0 返回了两次！&lt;/strong&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;引起poll返回的事件&quot;&gt;引起poll返回的事件&lt;/h3&gt;
-
-&lt;p&gt;根据我的代码结构，回调之前是poll，随即开始查资料，在《APUE》中发现，以下条件是引起poll返回的特定revent:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;有数据可读，专业的说法是：套接字接收缓冲区中的数据字节数大于等于套接字接收缓冲区低潮限度的当前值。可以使用套接字选项SO_RCVLOWAT来设置低潮限度，对于TCP和UDP套接字，其值缺省为1&lt;/li&gt;
-  &lt;li&gt;连接的读这一半关闭，也就是说接收了FIN的TCP连接。对这样的套接字的套接字将不阻塞且返回0（即文件结束符）&lt;/li&gt;
-  &lt;li&gt;套接字是一个监听套接字且已完成的连接数为非0，即连接建立后可读&lt;/li&gt;
-  &lt;li&gt;有一个套接字错误待处理。对这样的套接字的读操作将不阻塞且返回一个错误（-1），errno则设置成明确的错误条件。这些待处理的错误也可以通过指定套接口选项SO_ERROR调用getsockopt来取得并清除。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;«UNP»还有如下补充:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;所有TCP和UDP正规数据都被认为是普通数据&lt;/li&gt;
-  &lt;li&gt;TCP的待外数据被认为是优先级带数据&lt;/li&gt;
-  &lt;li&gt;当TCP连接的读半部关闭时(譬如收到一个对端的FIN)，也被认为是普通数据，随后的读操作将返回0&lt;/li&gt;
-  &lt;li&gt;…&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;strong&gt;那客户端进入TIME_WAIT状态时发送的最后一次ACK是不是一次普通数据呢?&lt;/strong&gt;在这个情况下，没有其它什么事件能够引起poll返回了，很明显了，罪魁祸首就是&lt;strong&gt;TCP四次挥手的第四次ACK！&lt;/strong&gt;&lt;/p&gt;
-&lt;h3 id=&quot;问题的关键以及解决方案&quot;&gt;问题的关键以及解决方案&lt;/h3&gt;
-&lt;p&gt;之所以会出现这样的问题，是由于我的代码执行顺序的问题，由于是多线程，一个线程close(fd)使得tcp发送FIN分节，理论上，再此之前我们就应该注销掉这个连接的资源了。而我的代码试图将资源释放这个问题推迟一些以便于处理当下更紧急的其它任务，所以在poll所关注的事件列表中还有这个连接所关注的事件，所以引起了这个问题。清楚了原因之后，立马找到了解决方案：我只要注销掉poll中的该事件对应的fd即可，依然可以使得资源释放稍后执行。&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;方案一：具体是在read()返回0，后随机注销掉该socket_fd的一切事件。伪代码描述如下:
-    &lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;read&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;n&quot;&gt;pollfd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;events&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;   &lt;span class=&quot;c1&quot;&gt;//如果不懂,请查阅struct pollfd
-&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;addTask&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;freeMemory&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//让其他线程来处理该连接的资源
-&lt;/span&gt;  &lt;span class=&quot;n&quot;&gt;close&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt; 
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;方案二:一个TCP连接的所以资源自始自终都由某一个线程管理，不要转移fd。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;我修改了代码，两种方案都可以达到预期目标，考虑代码结构的问题，我采用了方案二。&lt;/p&gt;
-&lt;h3 id=&quot;总结&quot;&gt;总结&lt;/h3&gt;
-&lt;p&gt;解决了上述问题后，我反思自己:当初看APUE和UNP的时候对上述问题之所以没有留下深刻的印象，原因恐怕是没有实际情况作为参照。想起一句名句:&lt;strong&gt;纸上得来终觉浅，绝知此事需躬行&lt;/strong&gt;&lt;/p&gt;
-</description>
-        <pubDate>Sun, 04 Feb 2018 15:13:17 +0800</pubDate>
-        <link>http://MemeTao.github.io//Poll/</link>
-        <guid isPermaLink="true">http://MemeTao.github.io//Poll/</guid>
-        
-        
-        <category>network</category>
-        
-        <category>program</category>
         
       </item>
     

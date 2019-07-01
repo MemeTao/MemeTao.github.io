@@ -294,8 +294,9 @@ void do_signal(long signr,long eax, long ebx, long ecx, long edx,
 }
 </code></pre>
 
-<p>这个函数的具体原理其实也没必要去理解(还是那句话’x86原理’)，执行效果如下:
-<img src="../material/Linux011/do_signal.png" alt="在用户堆栈中运行" /></p>
+<p>这个函数的具体原理其实也没必要去理解(还是那句话’x86原理’)，执行效果如下:</p>
+
+<p><img src="../material/Linux011/do_signal.png" alt="在用户堆栈中运行" /></p>
 
 <p>还有相关的sys_signal\sys_sigaction比较简单，只是简单的修改一下任务结构中的值。</p>
 
@@ -332,6 +333,11 @@ system_call检查父进程是否需要重新调度。如果需要再次调度，
 	return;
 }
 </code></pre>
+<h3 id="文件系统">文件系统</h3>
+
+<h3 id="块设备驱动">块设备驱动</h3>
+
+<h3 id="字符设备驱动">字符设备驱动</h3>
 
   
 </article>
