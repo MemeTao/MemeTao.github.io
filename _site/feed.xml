@@ -7,9 +7,58 @@
 </description>
     <link>http://MemeTao.github.io//</link>
     <atom:link href="http://MemeTao.github.io//feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 01 Jul 2019 11:26:51 +0800</pubDate>
-    <lastBuildDate>Mon, 01 Jul 2019 11:26:51 +0800</lastBuildDate>
+    <pubDate>Tue, 16 Jul 2019 09:53:18 +0800</pubDate>
+    <lastBuildDate>Tue, 16 Jul 2019 09:53:18 +0800</lastBuildDate>
     <generator>Jekyll v3.1.6</generator>
+    
+      <item>
+        <title>enable_shared_from_this 实现机制</title>
+        <description>&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;template&amp;lt;typename T&amp;gt;
+class shared_ptr{
+public:
+    shared_ptr&amp;lt;T&amp;gt;(T* t)
+    {
+        set_ptr(this,t);
+    }
+};
+
+template&amp;lt;typename T&amp;gt;
+class enable_shared_from_this{
+public:
+    shared_ptr&amp;lt;T&amp;gt; shared_from_this(){
+        //if sp_ not null
+        return sp_;
+    }
+private:
+    shared_ptr&amp;lt;T&amp;gt; sp_; //FIXME:weak_ptr
+};
+
+template&amp;lt;typename T&amp;gt;
+void set_ptr(shared_ptr&amp;lt;T&amp;gt; t, enable_shared_from_this&amp;lt;T&amp;gt;* e)
+{
+    e-&amp;gt;set_ptr(t);
+}
+
+void set_ptr(...)
+{
+    //do nothing
+}
+
+class t: public enable_shared_from_this&amp;lt;t&amp;gt;{
+public:
+    t() = default;
+};
+
+&lt;/code&gt;&lt;/pre&gt;
+</description>
+        <pubDate>Tue, 16 Jul 2019 09:13:17 +0800</pubDate>
+        <link>http://MemeTao.github.io//sharedptrTheory/</link>
+        <guid isPermaLink="true">http://MemeTao.github.io//sharedptrTheory/</guid>
+        
+        
+        <category>c++</category>
+        
+      </item>
     
       <item>
         <title>Google拥塞控制算法--TrendingLine滤波器</title>
@@ -1092,90 +1141,6 @@ Old long-lived branch release: &lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;nv
         <pubDate>Thu, 08 Nov 2018 17:13:17 +0800</pubDate>
         <link>http://MemeTao.github.io//string-coding/</link>
         <guid isPermaLink="true">http://MemeTao.github.io//string-coding/</guid>
-        
-        
-        <category>c++</category>
-        
-      </item>
-    
-      <item>
-        <title>C++成员函数指针的大小</title>
-        <description>&lt;hr /&gt;
-
-&lt;h3 id=&quot;c中的函数指针假定在64位机器上&quot;&gt;c++中的函数指针(假定在64位机器上)&lt;/h3&gt;
-
-&lt;p&gt;我们知道指针的大小恒定的,跟机器位数有关,32位机下,指针是4字节大小,64位机下指针是8字节大小.但是在C++中,有一个比较特殊的地方是C++的类成员函数
-指针,它的大小是普通指针的2倍.先看一个实例:&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;void foo(void)
-{
-}
-class A{
-public:
-    void foo(){}
-}
-
-int main()
-{
-    void (*pfun)(void);
-    pfun = foo;
-    void (A::*pMfun)(void);
-    pMfun = &amp;amp;A::foo;
-    std::cout&amp;lt;&amp;lt;&quot;normal function pointer size:&quot;&amp;lt;&amp;lt;sizeof(pfun)&amp;lt;&amp;lt;std::endl;
-    std::cout&amp;lt;&amp;lt;&quot;member function pointer size:&quot;&amp;lt;&amp;lt;sizeof(pMfun)&amp;lt;&amp;lt;std::endl;
-    return 0;
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;运行结果:&lt;/p&gt;
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;normal &lt;span class=&quot;k&quot;&gt;function &lt;/span&gt;pointer size:8
-member &lt;span class=&quot;k&quot;&gt;function &lt;/span&gt;pointer size:16
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;证明完毕.下面解释为什么会这样.&lt;/p&gt;
-&lt;h3 id=&quot;this指针的调整&quot;&gt;this指针的调整&lt;/h3&gt;
-
-&lt;p&gt;再看一个例子:&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;class A{
-public;
-    void foo()
-    {
-        //假设我们需要在这里去使用数组a
-        std::cout&amp;lt;&amp;lt;&quot;addr of this:%x&quot;&amp;lt;&amp;lt;this&amp;lt;&amp;lt;std::endl;
-    }
-private:
-    int a[4];
-};
-class B{
-public:
-    void bar()
-    { 
-        //假设我们需要在这里去使用数组b
-        std::cout&amp;lt;&amp;lt;&quot;addr of this:%x&quot;&amp;lt;&amp;lt;this&amp;lt;&amp;lt;std::endl;
-    }
-prviate:
-    int b[4];
-};
-class C: public A,B{
-
-};
-
-int main()
-{
-    C c; 
-    c.foo();
-    c.bar();
-    return 0;
-}
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;结果&lt;/p&gt;
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;addr of this:%x0x7ffd30f4ec00
-addr of this:%x0x7ffd30f4ec10
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;这时候可以看到,传递给foo和bar函数的this指针是不一样的?为什么会不一样呢? 考虑一下函数中的注释.
-所以调用类成员函数指针时,就需要将this指针进行调整,这个调整的信息在哪里?就在这个函数指针中,所以就需要另外的空间去存放这些信息,这也就是为什么类成员函数指针是16字节的原因,因为多出来的8字节,用于编译期的this指针调整.&lt;/p&gt;
-
-</description>
-        <pubDate>Thu, 12 Jul 2018 17:13:17 +0800</pubDate>
-        <link>http://MemeTao.github.io//theSizeOfMemeberFunctionPointer/</link>
-        <guid isPermaLink="true">http://MemeTao.github.io//theSizeOfMemeberFunctionPointer/</guid>
         
         
         <category>c++</category>

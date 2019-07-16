@@ -7,19 +7,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="author" content="songroger">
 
-  <title>Welcome my site</title>
+  <title>enable_shared_from_this 实现机制</title>
 
-  <meta name="description" content="中国计量大学本科 通信工程 在读(2017) ">
+  <meta name="description" content="&lt;p&gt;```C++template&lt;typename T=&quot;&quot;&gt;class shared_ptr{public:    shared_ptr&lt;T&gt;(T* t)    {        set_ptr(this,t);    }};&lt;/T&gt;&lt;...">
 
   <!-- Open graph data -->
   <meta property="og:site_name" content="Welcome my site">
-  <meta property="og:title" content="Welcome my site">
-  <meta property="og:url" content="http://MemeTao.github.io//">
-  <meta property="og:type" content="website">
-  <meta property="og:description" content="中国计量大学本科 通信工程 在读(2017) ">
+  <meta property="og:title" content="enable_shared_from_this 实现机制">
+  <meta property="og:url" content="http://MemeTao.github.io//sharedptrTheory/">
+  <meta property="og:type" content="article">
+  <meta property="og:description" content="&lt;p&gt;```C++template&lt;typename T=&quot;&quot;&gt;class shared_ptr{public:    shared_ptr&lt;T&gt;(T* t)    {        set_ptr(this,t);    }};&lt;/T&gt;&lt;...">
 
   <!-- Standard Stuff -->
-  <link rel="canonical" href="http://MemeTao.github.io//"/>
+  <link rel="canonical" href="http://MemeTao.github.io//sharedptrTheory/"/>
   <link rel="alternate" type="application/rss+xml" title="Welcome my site" href="http://MemeTao.github.io//feed.xml"/>
 
   <!-- Favicons -->
@@ -61,149 +61,52 @@
   <main class="col">
 
 
+<article class="article">
+  <h2 class="article__title article__title--single">enable_shared_from_this 实现机制</h2>
+  <time class="article__date" datetime="2019-07-16"> 09:13 Jul.16-2019</time>
   
-    <!-- article -->
-    <article class="article">
-      <h3 class="article__title">
-        <a href="/sharedptrTheory/">enable_shared_from_this 实现机制</a>
-      </h3>
-      <time class="article__date" datetime="2019-07-16">Jul 16, 2019</time>
-      <!--<p class="article__excerpt"><p>```C++
-template<typename T="">
+  <pre><code class="language-C++">template&lt;typename T&gt;
 class shared_ptr{
 public:
-    shared_ptr<T>(T* t)
+    shared_ptr&lt;T&gt;(T* t)
     {
         set_ptr(this,t);
     }
-};</T></typename></p>
+};
 
-</p>
-      <a href="/sharedptrTheory/" class="article__more">Read more »</a> -->
-    </article>
+template&lt;typename T&gt;
+class enable_shared_from_this{
+public:
+    shared_ptr&lt;T&gt; shared_from_this(){
+        //if sp_ not null
+        return sp_;
+    }
+private:
+    shared_ptr&lt;T&gt; sp_; //FIXME:weak_ptr
+};
+
+template&lt;typename T&gt;
+void set_ptr(shared_ptr&lt;T&gt; t, enable_shared_from_this&lt;T&gt;* e)
+{
+    e-&gt;set_ptr(t);
+}
+
+void set_ptr(...)
+{
+    //do nothing
+}
+
+class t: public enable_shared_from_this&lt;t&gt;{
+public:
+    t() = default;
+};
+
+</code></pre>
+
   
-    <!-- article -->
-    <article class="article">
-      <h3 class="article__title">
-        <a href="/GccTrendlineFilter/">Google拥塞控制算法--TrendingLine滤波器</a>
-      </h3>
-      <time class="article__date" datetime="2019-06-28">Jun 28, 2019</time>
-      <!--<p class="article__excerpt"><hr />
+</article>
 
-</p>
-      <a href="/GccTrendlineFilter/" class="article__more">Read more »</a> -->
-    </article>
-  
-    <!-- article -->
-    <article class="article">
-      <h3 class="article__title">
-        <a href="/redissourcecode/">redis摘记</a>
-      </h3>
-      <time class="article__date" datetime="2019-05-21">May 21, 2019</time>
-      <!--<p class="article__excerpt"><hr />
 
-</p>
-      <a href="/redissourcecode/" class="article__more">Read more »</a> -->
-    </article>
-  
-    <!-- article -->
-    <article class="article">
-      <h3 class="article__title">
-        <a href="/cppcastall/">总结c++中的cast</a>
-      </h3>
-      <time class="article__date" datetime="2019-03-11">Mar 11, 2019</time>
-      <!--<p class="article__excerpt"><hr />
-
-</p>
-      <a href="/cppcastall/" class="article__more">Read more »</a> -->
-    </article>
-  
-    <!-- article -->
-    <article class="article">
-      <h3 class="article__title">
-        <a href="/timesynchronize/">局域网下时间同步(精度100us)</a>
-      </h3>
-      <time class="article__date" datetime="2019-01-22">Jan 22, 2019</time>
-      <!--<p class="article__excerpt"><hr />
-
-</p>
-      <a href="/timesynchronize/" class="article__more">Read more »</a> -->
-    </article>
-  
-    <!-- article -->
-    <article class="article">
-      <h3 class="article__title">
-        <a href="/studyplay_january/">2019学习计划</a>
-      </h3>
-      <time class="article__date" datetime="2019-01-14">Jan 14, 2019</time>
-      <!--<p class="article__excerpt"><hr />
-<h3 id="1linux-011源码4个月51前学完">1.Linux 0.11源码(4个月,5.1前学完)</h3>
-
-</p>
-      <a href="/studyplay_january/" class="article__more">Read more »</a> -->
-    </article>
-  
-    <!-- article -->
-    <article class="article">
-      <h3 class="article__title">
-        <a href="/att_assembly_manaul/">AT&T汇编摘记</a>
-      </h3>
-      <time class="article__date" datetime="2019-01-14">Jan 14, 2019</time>
-      <!--<p class="article__excerpt"><h3 id="0-寄存器">0. 寄存器</h3>
-<p><strong>通用寄存器</strong>:</p>
-
-</p>
-      <a href="/att_assembly_manaul/" class="article__more">Read more »</a> -->
-    </article>
-  
-    <!-- article -->
-    <article class="article">
-      <h3 class="article__title">
-        <a href="/os_study/">Linux 0.11运行机制</a>
-      </h3>
-      <time class="article__date" datetime="2019-01-11">Jan 11, 2019</time>
-      <!--<p class="article__excerpt"><hr />
-
-</p>
-      <a href="/os_study/" class="article__more">Read more »</a> -->
-    </article>
-  
-    <!-- article -->
-    <article class="article">
-      <h3 class="article__title">
-        <a href="/InstallNvidiaDriver/">ubuntu18.04上安装英伟达驱动</a>
-      </h3>
-      <time class="article__date" datetime="2019-01-09">Jan 9, 2019</time>
-      <!--<p class="article__excerpt"><hr />
-
-</p>
-      <a href="/InstallNvidiaDriver/" class="article__more">Read more »</a> -->
-    </article>
-  
-    <!-- article -->
-    <article class="article">
-      <h3 class="article__title">
-        <a href="/string-coding/">字符串编码</a>
-      </h3>
-      <time class="article__date" datetime="2018-11-08">Nov 8, 2018</time>
-      <!--<p class="article__excerpt"><hr />
-
-</p>
-      <a href="/string-coding/" class="article__more">Read more »</a> -->
-    </article>
-  
-
-    <!-- <nav class="blocks blocks--space">
-      <div class="blocks__item">
-        
-      </div>
-      <div class="blocks__item">
-        Page:  of 
-      </div>
-      <div class="blocks__item">
-        
-      </div>
-    </nav> -->
 
 
 <footer class="footer">
