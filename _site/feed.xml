@@ -7,9 +7,122 @@
 </description>
     <link>http://MemeTao.github.io//</link>
     <atom:link href="http://MemeTao.github.io//feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 16 Jul 2019 09:53:18 +0800</pubDate>
-    <lastBuildDate>Tue, 16 Jul 2019 09:53:18 +0800</lastBuildDate>
+    <pubDate>Mon, 12 Aug 2019 17:56:58 +0800</pubDate>
+    <lastBuildDate>Mon, 12 Aug 2019 17:56:58 +0800</lastBuildDate>
     <generator>Jekyll v3.1.6</generator>
+    
+      <item>
+        <title>webrtc带宽预测中的Probe（探测）模块</title>
+        <description>&lt;hr /&gt;
+
+&lt;h3 id=&quot;probe&quot;&gt;Probe&lt;/h3&gt;
+&lt;p&gt;webrtc使用gcc（google congestion control）来估计带宽，控制当前的发送速度。gcc中基于丢包和基于延迟的算法有个特点：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;1.能迅速响应带宽的衰减&lt;/li&gt;
+  &lt;li&gt;2.不能迅速响应带宽的增加&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;举个例子，如果当前带宽是20mbps，由于其它因素，带宽骤降至15mbps，gcc能快速的给出over-using信号(rtt为10ms环境下，响应速度是100-200ms)。&lt;/p&gt;
+
+&lt;p&gt;如果当前带宽是20mbps，由于其它因素，带宽升至了25mbps，依赖gcc自身的调整的话需要几十秒的时间（加性增减性乘的效果）。&lt;/p&gt;
+
+&lt;p&gt;由于以上的原因，如果从0bps开始运行gcc算法（纯算法本身），要达到一定的带宽需要太长的时间。&lt;/p&gt;
+
+&lt;p&gt;webrtc中有一个用来在起始阶段（或周期性）迅速探测到当前带宽的措施—就是Probe模块，和TCP的慢启动比较像啦！&lt;/p&gt;
+
+&lt;h3 id=&quot;原理&quot;&gt;原理&lt;/h3&gt;
+&lt;p&gt;Probe的原理简单说起来就是这样的：发送端以一定的速度发送数据包，同时记录这些数据包的发送时间、序列号（全局唯一）、探测组的id.&lt;/p&gt;
+
+&lt;p&gt;接收端每过一段时间（50-150ms）会反馈数据包的到达时间，就像这样：
+&lt;img src=&quot;../material/WebrtcProbe/1.png&quot; alt=&quot;probeExample&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;s_t表示发送时间、r_t标识接受时间，这样我们就知道了发送速度、接收速度:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;//发送端发送这些数据包的时间间隔
+common::TimeDelta send_interval = common::TimeDelta(state.last_send - state.first_send);
+//接收端接收这些数据包的时间间隔
+common::TimeDelta recive_interval = common::TimeDelta(state.last_recive - state.first_recive);
+//发送的字节数(已发送的字节减去最后一个数据包的字节，不难理解吧?)
+size_t size_send = state.size_total_sent - state.size_last_sent;
+//接收端收到的字节数(已接收的字节减去第一个数据包的字节，不难理解吧?)
+size_t size_recive = state.size_total_recived - state.size_first_recived;
+//从而就得到了双方的速度
+common::DataRate send_bps = 1_bps * (size_send * 8 / ( send_interval / 1_sec));
+common::DataRate receive_bps = 1_bps * (size_recive * 8 / ( recive_interval / 1_sec));
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;我们定义S1为发送速度，R1为接收速度，那么可以认定当前的网络带宽至少是min(S1,R1)。
+在这里涉及到几个问题：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;如何控制发送端的速度&lt;/li&gt;
+  &lt;li&gt;探测包的大小如果设置才会比较合理&lt;/li&gt;
+  &lt;li&gt;探测应该持续多久，尽可能的避免对正常数据的影响&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;控制探测速度包大小探测时长&quot;&gt;控制探测速度、包大小、探测时长&lt;/h3&gt;
+&lt;p&gt;webrtc中探测包是通过一个定时器来控制速度的。&lt;/p&gt;
+
+&lt;p&gt;假设我们需要探测的目标速度是10mbps，探测时间是10ms，&lt;/p&gt;
+
+&lt;p&gt;那么我们总共需要发送的所有探测包的总大小 total_bytes = 10mbps * 15ms  / 8 ;&lt;/p&gt;
+
+&lt;p&gt;第一个探测包的大小取值为 bytes1 = 10_mbps * 1_ms / 8，立即发送。
+为了控制速度，我们需要考虑第二个探测包的发送时间，假设是dt时间后发送，计算dt:&lt;/p&gt;
+
+&lt;p&gt;dt = sent_bytes * 8 /  1_mbps;&lt;/p&gt;
+
+&lt;p&gt;意思就是已发送比特数 除以 目标码率，在dt的时间后发送第二个探测包，这样我们就精确地控制了发送速度就是我们希望的速度。&lt;/p&gt;
+
+&lt;p&gt;以这种方式发送数据包，直到”已发送字节”大于等于total_bytes，该轮探测结束。&lt;/p&gt;
+
+&lt;p&gt;上述中15ms就是探测需要持续的时间(可以自定义)，bytes1就是探测包的大小(通过修改”1_ms”可以自定义大小)&lt;/p&gt;
+
+&lt;p&gt;通过一定的手段，我们可以将正常数据流上的数据包变为探测包，减少对正常数据流的影响。&lt;/p&gt;
+
+&lt;p&gt;探测一般都是已当前速度的几倍去发送数据，所以必不可免的会影响当前的数据流，可以修改”15_ms”来自定义探测时长。&lt;/p&gt;
+
+&lt;h3 id=&quot;乘性探测&quot;&gt;乘性探测&lt;/h3&gt;
+
+&lt;p&gt;为了快速的探测到实际带宽的大致值，使用乘性探测。&lt;/p&gt;
+
+&lt;p&gt;举个例子，假设起始速度设置为450kbps，那么探测速度就设置为900kbps，如果探测结果在900kbps * 0.7 = 630kbps以上，继续向上探测，探测速度是1.8mbps，如果第二次探测结果在1.8mbps * 0.7以上，继续向上探测，探测速度是3.6mbps…..直到某一个探测结果不符合 “0.7以上”，那么就判定链路带宽应该在此次探测结果附近。&lt;/p&gt;
+
+&lt;p&gt;然后，以这个速度发送数据流，在这个基础上运行gcc算法，通过延迟梯度和丢包来控制发送码率。&lt;/p&gt;
+
+&lt;h3 id=&quot;实际情况&quot;&gt;实际情况&lt;/h3&gt;
+
+&lt;p&gt;在我的实现中。在rtt 10ms的环境下，可以立刻探测到带宽上限。
+运行日志如下：&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;probe successful,send speed:892.845kbps,receive speed:898.797kbps
+probe successful,send speed:888.780kbps,receive speed:891.707kbps
+probe successful,send speed:1.771mbps,receive speed:1.628mbps
+probe successful,send speed:1.777mbps,receive speed:2.214mbps
+probe successful,send speed:3.358mbps,receive speed:3.337mbps
+probe successful,send speed:3.521mbps,receive speed:3.591mbps
+...
+probe successful,send speed:30.376mbps,receive speed:31.149mbps
+probe successful,send speed:59.897mbps,receive speed:45.238mbps &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;达到带宽上限&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;则认为当前带宽的上限是45.238mbps(我通过tc命令设置的带宽就是45mbps，探测结果非常的准)&lt;/p&gt;
+
+&lt;p&gt;从300kbps的起始速度上升到45mbps，用时800ms。&lt;/p&gt;
+
+&lt;p&gt;在实际环境中，webrtc就是通过该机制在起始阶段迅速的”跳跃”到一个合适的码率上。&lt;/p&gt;
+
+&lt;h3 id=&quot;解答&quot;&gt;解答&lt;/h3&gt;
+&lt;p&gt;meemetao@gmail.com&lt;/p&gt;
+</description>
+        <pubDate>Mon, 12 Aug 2019 09:13:17 +0800</pubDate>
+        <link>http://MemeTao.github.io//gcc_testing/</link>
+        <guid isPermaLink="true">http://MemeTao.github.io//gcc_testing/</guid>
+        
+        
+        <category>network</category>
+        
+        <category>program</category>
+        
+      </item>
     
       <item>
         <title>enable_shared_from_this 实现机制</title>
@@ -979,171 +1092,6 @@ Old long-lived branch release: &lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;nv
         
         
         <category>Linux</category>
-        
-      </item>
-    
-      <item>
-        <title>字符串编码</title>
-        <description>&lt;hr /&gt;
-
-&lt;h3 id=&quot;前言&quot;&gt;前言&lt;/h3&gt;
-&lt;p&gt;一直以来，字符串编码总是我摸不着头脑。对待字符串编码问题的策略也是简单粗暴，直接规避：一律使用utf-8。但是，猿在码界漂，哪能不挨刀。今天就总结一下字符串编码问题。&lt;/p&gt;
-&lt;h3 id=&quot;编码类型介绍&quot;&gt;编码类型介绍&lt;/h3&gt;
-&lt;h4 id=&quot;ascii&quot;&gt;ascii&lt;/h4&gt;
-&lt;p&gt;编码格式花样很多。由于计算机是老美发明的，因此，最早只有127个字符被编码到计算机中，着127个字符被称为ascii编码集。由于ascii字符集只有127个字符，故只要一个字节就可以表示。&lt;/p&gt;
-
-&lt;h4 id=&quot;else&quot;&gt;else&lt;/h4&gt;
-&lt;p&gt;但是，世界上那么多国家、那么多语言，全世界人民都想体验一把先进文化，于是八仙过海，各显神通，日本把日文编码到Shift-jis中，韩国把韩文编码到Euc-kr中。我们国家陆续有gb2312、gbk、gb18030，后者都是对前者的扩展。拿我们汉字举例，汉字有成千上万个，所以一个字节表示不了那么多的汉字，所以就需要多个字节(2个或3个)来表示。&lt;/p&gt;
-&lt;h4 id=&quot;unicode&quot;&gt;unicode&lt;/h4&gt;
-&lt;p&gt;大家要是没有一套统一的编码格式的话，还怎么促进文化的交流、各国码农感情的培养。于是，unicode应运而生，unicode把所有语言都统一到一套编码中，这样大家就可以顺畅的交流了。为了表示那么多的语言，unicode也只能采用多字节表示法，就是一个字符用多个字节的数据表示。&lt;/p&gt;
-
-&lt;p&gt;于是，新的问题又出现了。对于大部分西方国家，他们使用的英语，一个字节就可以表示一个字符。如果使用unicode，那岂不是很浪费空间。于是又有人想出来了一种更佳妙的方式：对unicode继续编码。（可以理解成对unicode压缩编码）&lt;/p&gt;
-
-&lt;p&gt;也就说，utf-8,utf-16,utf-32是在unicode基础上，对unicode再次编码。&lt;/p&gt;
-
-&lt;p&gt;以UTF-8来说：UTF-8编码把一个Unicode字符根据不同的数字大小编码成1-6个字节，常用的英文字母被编码成1个字节，汉字通常是3个字节，只有很生僻的字符才会被编码成4-6个字节。如果你要传输的文本包含大量英文字符，用UTF-8编码就能节省空间：&lt;/p&gt;
-
-&lt;table&gt;
-  &lt;thead&gt;
-    &lt;tr&gt;
-      &lt;th style=&quot;text-align: left&quot;&gt;字符&lt;/th&gt;
-      &lt;th style=&quot;text-align: left&quot;&gt;ascii&lt;/th&gt;
-      &lt;th style=&quot;text-align: left&quot;&gt;unicode&lt;/th&gt;
-      &lt;th style=&quot;text-align: left&quot;&gt;utf-8&lt;/th&gt;
-    &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;A&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;01000001&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;00000000 01000001&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;01000001&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;中&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;?&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;01001110 00101101  11100100 10111000&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;10101101&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;p&gt;这么多编码格式，大家的一个共同点就是：完全对ascii码兼容。也就是说ascii中的’a’，和gb2312中的’a’是同样的表示方法(假设是0x63)。&lt;/p&gt;
-
-&lt;h3 id=&quot;实际环境&quot;&gt;实际环境&lt;/h3&gt;
-&lt;h4 id=&quot;linux&quot;&gt;Linux&lt;/h4&gt;
-&lt;p&gt;如果您是在linux上开发，通常是碰不到这些问题的。(没错，我就是舔狗)&lt;/p&gt;
-
-&lt;p&gt;在Linux上，系统默认就是utf-8格式。这是什么意思？&lt;/p&gt;
-
-&lt;p&gt;举例来说，当你 “touch main.cpp” 这个文件就是采用的utf-8来编码里面的所有数据。
-当你&lt;/p&gt;
-&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pstr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;中文ABC&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;%s&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pstr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;这个pstr中的内容就会以utf-8格式存储。
-当你:&lt;/p&gt;
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;g++ main.cpp &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; a.out
-&amp;amp; ./a.out
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;编译器会忠于你的文件编码格式，按此编码格式处理该源文件。pstr中的内容会被取出来放在内存中，并以utf-8格式输出在终端环境上。终端能不能正常显示，就看你的终端能不能支持utf-8。&lt;/p&gt;
-
-&lt;p&gt;任何的字符串乱码问题，就是上面这三种中的某一个或多个编码格式不一样导致。&lt;/p&gt;
-&lt;h4 id=&quot;windows&quot;&gt;Windows&lt;/h4&gt;
-&lt;p&gt;在windows上，呵呵呵了。中文windows默认采用gb2312格式。&lt;/p&gt;
-
-&lt;p&gt;举例来说。当你”新建一个文件”，这个文件通常是gb2312格式，如果这个文件只在本地使用，这时候通常是没问题的。&lt;/p&gt;
-
-&lt;p&gt;但是当你因为某些原因需要使用在windows上使用”unicode”，问题就来了。
-还是以上面main.cpp为例：&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;1.如果main.cpp为gb2312，用vs编译，pstr为gb2312格式，终端可以显示。&lt;/li&gt;
-  &lt;li&gt;2.如果main.cpp为纯unicode，用vs编译，pstr在内存里为gb2312格式，终端可以显示。&lt;/li&gt;
-  &lt;li&gt;3.如果main.cpp为utf-8(无bom)，用vs编译，pstr在内存里为utf-8格式，但是终端显示不了中文。&lt;/li&gt;
-  &lt;li&gt;4.如果main.cpp为utf-8(bom)，用vs编译，pstr在内存里为gb2312格式，终端可以显示。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;看到了吧，vs的”睿智”。这个问题如果搭配上”wchar_t”，更加让人恼火。&lt;/p&gt;
-
-&lt;p&gt;上面的测试可以采用如下程序：&lt;/p&gt;
-&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pstr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;size_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;size_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;%x,&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pstr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]);&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-
-&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;str&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;abc中文ABC&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pstr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const_cast&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c_str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pstr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-
-    &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wstring&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wstr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;L&quot;abc中文ABC&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;kt&quot;&gt;wchar_t&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pwstr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const_cast&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;wchar_t&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wstr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c_str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt;
-    &lt;span class=&quot;n&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pwstr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-
-    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;将结果和各个编码表进行对照，既可得出结论。&lt;/p&gt;
-
-&lt;p&gt;在unicode方面，对windows的批评滔滔不绝，”utf-8 everywhere”认为微软在字符串处理上误入歧途，因为他们比别的厂商更早做了决定。微软虽然有理由说，windows先于unicode问世。但是这么多年过去了，windows的API还是不完全支持unicode。&lt;/p&gt;
-
-&lt;p&gt;windows不遵守基本法，也不是一天两天了，嘻嘻。&lt;/p&gt;
-
-&lt;p&gt;关于如何在windows处理utf-8，以及对windwos的更多批评，可以从这篇文章起步: &lt;a href=&quot;http://utf8everywhere.org/zh-cn#faq.almostfw&quot;&gt;utf8 everywhere&lt;/a&gt; “&lt;/p&gt;
-&lt;h3 id=&quot;char与wchar_tstring与wstring&quot;&gt;char与wchar_t，string与wstring&lt;/h3&gt;
-&lt;p&gt;如果您不幸遇到了string和wstring方便的困扰，恭喜您。&lt;/p&gt;
-
-&lt;p&gt;首先，std::string 和 std::wstring都继承与std::basic_string。
-只不过std::string的模板参数是char，std::wstring的模板参数是wchar_t。
-在linux上，wchar_t占用4个字节，windows上则是占用2个字节。他们之间的差别，&lt;strong&gt;仅此而已。&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;你如果使用wstring存放字符串，Linux是没有啥问题的，采用utf-32编码wstring。&lt;/p&gt;
-
-&lt;p&gt;但是如果是windows上，嘻嘻，问题又来了。假设在main.cpp中存放了一个std::wstring = “abc中文”,那么：&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;1.a.cpp如果是gb2312格式，wstring在内存中是unicode格式。&lt;/li&gt;
-  &lt;li&gt;2.a.cpp如果是unicode格式，wstring在内存中是unicode格式。&lt;/li&gt;
-  &lt;li&gt;3.a.cpp如果是utf-8格式，wstring在内存中是ucs-2be格式。&lt;/li&gt;
-  &lt;li&gt;4.a.cpp如果是utf-8-bom格式，wstring在内存中是unicode格式。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;您肯定还有一个疑惑，&lt;strong&gt;关于wstring和string之间的互相转换&lt;/strong&gt;。
-那么，您需要确保你非常了解待转换的数据的格式，或者待转换数据仅来自本地。&lt;/p&gt;
-
-&lt;p&gt;在windows上，windows有一个奇技淫巧：&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;WideCharToMultiByte系列API，通过参数设定你就可以获得你所希望的结果。&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;详见windows api说明，如何正确使用，请看： &lt;a href=&quot;https://stackoverflow.com/questions/215963/how-do-you-properly-use-widechartomultibyte&quot;&gt;stackoverflow&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;当然，c++标准库也可以做到：std::locale、std::codecvt结合使用。&lt;/p&gt;
-
-&lt;h3 id=&quot;帮组文档&quot;&gt;帮组文档&lt;/h3&gt;
-
-&lt;p&gt;&lt;a href=&quot;http://utf8everywhere.org/zh-cn#faq.almostfw&quot;&gt;utf8 everywhere&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://blog.csdn.net/benkaoya/article/details/59522148&quot;&gt;潜谈C/C++编程中的字符编码转换&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://my.oschina.net/ybusad/blog/363139&quot;&gt;C++字符编码问题探究和中文乱码的产生&lt;/a&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;获得帮助&quot;&gt;获得帮助&lt;/h3&gt;
-&lt;p&gt;meemetao@gmail.com&lt;/p&gt;
-</description>
-        <pubDate>Thu, 08 Nov 2018 17:13:17 +0800</pubDate>
-        <link>http://MemeTao.github.io//string-coding/</link>
-        <guid isPermaLink="true">http://MemeTao.github.io//string-coding/</guid>
-        
-        
-        <category>c++</category>
         
       </item>
     
