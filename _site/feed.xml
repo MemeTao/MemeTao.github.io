@@ -7,8 +7,8 @@
 </description>
     <link>http://MemeTao.github.io//</link>
     <atom:link href="http://MemeTao.github.io//feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 03 Sep 2019 11:55:00 +0800</pubDate>
-    <lastBuildDate>Tue, 03 Sep 2019 11:55:00 +0800</lastBuildDate>
+    <pubDate>Tue, 24 Sep 2019 17:41:42 +0800</pubDate>
+    <lastBuildDate>Tue, 24 Sep 2019 17:41:42 +0800</lastBuildDate>
     <generator>Jekyll v3.1.6</generator>
     
       <item>
@@ -566,14 +566,84 @@ double TrendingLineFilter::linear_regresion()
 
 &lt;h3 id=&quot;前言&quot;&gt;前言&lt;/h3&gt;
 &lt;p&gt;此文算是一个notes，总结一下C++中的各类cast用法和原理。&lt;/p&gt;
-
 &lt;h3 id=&quot;static_cast&quot;&gt;static_cast&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;总结:反转一个定义良好的隐式类型转换&lt;/strong&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;static_cast 执行关联类型之间的转换，比如一种指针类型向同一个类层次中其它指针类型的转换，或者整数类型向枚举类型的转换，或者浮点类型向整数类型的转换。它还能执行构造函数和转换运算符。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;strong&gt;同一类层次&lt;/strong&gt;&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;class B{
+};
+class D : public B{
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;B和D就叫做同一个类层次。&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;char* ptr_c = nullptr;
+int* ptr_i = static_cast&amp;lt;int*&amp;gt;(ptr_c); //编译失败
+B* ptr_b = new B();
+D* ptr_d = ptr_b; //编译失败
+D* ptr_d = static_cast&amp;lt;D*&amp;gt;(ptr_b); //fine
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;但是，down_cast是没有任何保证的，程序员必须明白会发生什么事情。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;整数类型向枚举类型的转换&lt;/strong&gt;&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;enum class E : uint8_t{
+    kValue = 1
+};
+uint8_t v = E::kValue ; //编译失败
+uint8_t v = static_cast&amp;lt;uint8_t&amp;gt;(E::kValue); //fine
+&lt;/code&gt;&lt;/pre&gt;
 
 &lt;h3 id=&quot;const_cast&quot;&gt;const_cast&lt;/h3&gt;
+&lt;p&gt;const_cast&lt;type&gt;(expression)&lt;/type&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;&lt;strong&gt;参与转换的类型仅在const修饰符及volatile修饰符上有所区别&lt;/strong&gt;，除此以外new_type和expression的类型是一样。&lt;/p&gt;
+  &lt;ul&gt;
+    &lt;li&gt;常量指针被转化成非常量的指针，并且仍然指向原来的对象。&lt;/li&gt;
+    &lt;li&gt;常量引用被转化成非常量的引用，并且仍然指向原来的对象。&lt;/li&gt;
+  &lt;/ul&gt;
+&lt;/blockquote&gt;
 
 &lt;h3 id=&quot;dynamic_cast&quot;&gt;dynamic_cast&lt;/h3&gt;
+&lt;p&gt;dynamic_cast&amp;lt;type*&amp;gt;(e) 执行指针或者引用向类层次体系的类型转换，并执行运行时检查。&lt;/p&gt;
+
+&lt;p&gt;不管是向上或者向下或者向左右都可以调用dynamic_cast。&lt;/p&gt;
+
+&lt;p&gt;对于upcast，可以但没必要，向上塑性直接写就完事儿了。&lt;/p&gt;
 
 &lt;h3 id=&quot;reinterpret_cast&quot;&gt;reinterpret_cast&lt;/h3&gt;
+&lt;p&gt;reinterpret_cast&lt;type&gt;(expression)&lt;/type&gt;&lt;/p&gt;
+
+&lt;p&gt;这玩意就用的比较少了，和static_cast不一样，只有以下情况可以使用reinterpret_cast:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;1.表达式是整形、枚举、指针、或者成员指针&lt;/li&gt;
+  &lt;li&gt;2.指针和整形互转&lt;/li&gt;
+  &lt;li&gt;3.T1* 可以和 T2* 互转&lt;/li&gt;
+  &lt;li&gt;4.T1左值可以转化为T2引用&lt;/li&gt;
+  &lt;li&gt;5.函数指针可以随便转，不用管类型。这里的函数指针包括类成员函数。
+相对与static_cast的区别，有以下一个例子:&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;class A {
+    public:
+    int m_a;
+};
+class B {
+    public:
+    int m_b;
+};
+class C : public A, public B {};
+
+C c;
+printf(&quot;%p, %p, %p&quot;, &amp;amp;c, reinterpret_cast&amp;lt;B*&amp;gt;(&amp;amp;c), static_cast &amp;lt;B*&amp;gt;(&amp;amp;c));
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;前两个的输出值是相同的，最后一个则会在原基础上偏移4个字节，这是因为static_cast计算了父子类指针转换的偏移量，并将之转换到正确的地址（c里面有m_a,m_b，转换为B*指针后指到m_b处），而reinterpret_cast却不会做这一层转换。因此, 你需要谨慎使用 reinterpret_cast。
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;h3 id=&quot;static_pointer_cast&quot;&gt;static_pointer_cast&lt;/h3&gt;
 
@@ -583,6 +653,39 @@ double TrendingLineFilter::linear_regresion()
 
 &lt;h3 id=&quot;reinterpret_cast-1&quot;&gt;reinterpret_cast&lt;/h3&gt;
 
+&lt;p&gt;总结上述4个:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;template&amp;lt; class T, class U &amp;gt; 
+std::shared_ptr&amp;lt;T&amp;gt; static_pointer_cast( const std::shared_ptr&amp;lt;U&amp;gt;&amp;amp; r ) noexcept
+{
+    auto p = static_cast&amp;lt;typename std::shared_ptr&amp;lt;T&amp;gt;::element_type*&amp;gt;(r.get());
+    return std::shared_ptr&amp;lt;T&amp;gt;(r, p);
+}
+
+template&amp;lt; class T, class U &amp;gt; 
+std::shared_ptr&amp;lt;T&amp;gt; dynamic_pointer_cast( const std::shared_ptr&amp;lt;U&amp;gt;&amp;amp; r ) noexcept
+{
+    if (auto p = dynamic_cast&amp;lt;typename std::shared_ptr&amp;lt;T&amp;gt;::element_type*&amp;gt;(r.get())) {
+        return std::shared_ptr&amp;lt;T&amp;gt;(r, p);
+    } else {
+        return std::shared_ptr&amp;lt;T&amp;gt;();
+    }
+}
+
+template&amp;lt; class T, class U &amp;gt; 
+std::shared_ptr&amp;lt;T&amp;gt; const_pointer_cast( const std::shared_ptr&amp;lt;U&amp;gt;&amp;amp; r ) noexcept
+{
+    auto p = const_cast&amp;lt;typename std::shared_ptr&amp;lt;T&amp;gt;::element_type*&amp;gt;(r.get());
+    return std::shared_ptr&amp;lt;T&amp;gt;(r, p);
+}
+
+template&amp;lt; class T, class U &amp;gt; 
+std::shared_ptr&amp;lt;T&amp;gt; reinterpret_pointer_cast( const std::shared_ptr&amp;lt;U&amp;gt;&amp;amp; r ) noexcept
+{
+    auto p = reinterpret_cast&amp;lt;typename std::shared_ptr&amp;lt;T&amp;gt;::element_type*&amp;gt;(r.get());
+    return std::shared_ptr&amp;lt;T&amp;gt;(r, p);
+}
+&lt;/code&gt;&lt;/pre&gt;
 </description>
         <pubDate>Mon, 11 Mar 2019 12:13:17 +0800</pubDate>
         <link>http://MemeTao.github.io//cppcastall/</link>
@@ -590,28 +693,6 @@ double TrendingLineFilter::linear_regresion()
         
         
         <category>c++</category>
-        
-      </item>
-    
-      <item>
-        <title>局域网下时间同步(精度100us)</title>
-        <description>&lt;hr /&gt;
-
-&lt;h3 id=&quot;介绍&quot;&gt;介绍&lt;/h3&gt;
-&lt;p&gt;本文介绍在&lt;strong&gt;非异常恶劣&lt;/strong&gt;的网络中，如何同步两台机器的本地时间，我们的目标是&lt;strong&gt;尽量(大概率上)&lt;/strong&gt;将时间同步的误差控制在0.1ms。&lt;/p&gt;
-
-&lt;p&gt;众所周知，网络中存在time服务器，利用ntp协议可以将网络中主机的本地时间同步到1s的误差范围。对于正常应用，这个精度应该是够的。但是总存在一些特殊应用，它对时间的精度要求更高。在这种情况下，time服务已经不满足我们的需要了。&lt;/p&gt;
-
-&lt;h3 id=&quot;基本方式&quot;&gt;基本方式&lt;/h3&gt;
-&lt;p&gt;在ping模式下，机器A发送一个包，并记录发包时间t1，机器B收到Icmp包后发送ack包，机器A收到ack包后记录收包时间t2，t2减t1就被认为是rtt。&lt;/p&gt;
-
-</description>
-        <pubDate>Tue, 22 Jan 2019 11:13:17 +0800</pubDate>
-        <link>http://MemeTao.github.io//timesynchronize/</link>
-        <guid isPermaLink="true">http://MemeTao.github.io//timesynchronize/</guid>
-        
-        
-        <category>algorithm</category>
         
       </item>
     
@@ -662,7 +743,8 @@ double TrendingLineFilter::linear_regresion()
   &lt;li&gt;3.Redis 字典  done!&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;2019-0627 更新：哔了狗了，最近太忙了。&lt;/p&gt;
+&lt;p&gt;2019-0627 更新：哔了狗了，最近太忙了。
+2019-0923 更新：哔了狗了，最近太忙了。&lt;/p&gt;
 
 </description>
         <pubDate>Mon, 14 Jan 2019 17:13:17 +0800</pubDate>
@@ -1118,6 +1200,53 @@ system_call检查父进程是否需要重新调度。如果需要再次调度，
         <pubDate>Fri, 11 Jan 2019 17:13:17 +0800</pubDate>
         <link>http://MemeTao.github.io//os_study/</link>
         <guid isPermaLink="true">http://MemeTao.github.io//os_study/</guid>
+        
+        
+        <category>Linux</category>
+        
+      </item>
+    
+      <item>
+        <title>ubuntu18.04上安装英伟达驱动</title>
+        <description>&lt;hr /&gt;
+
+&lt;h3 id=&quot;1查看显卡设备&quot;&gt;1.查看显卡设备&lt;/h3&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#lspci &lt;/span&gt;
+00:02.0 VGA compatible controller: Intel Corporation HD Graphics 620 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;rev 02&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+302:00.0 3D controller: NVIDIA Corporation GM108M &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;GeForce 940MX]
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;一个是集成显卡,一个是独立显卡。点击”设置”-”详细信息”可以看到当前所使用的是哪一个显卡。&lt;/p&gt;
+
+&lt;p&gt;查看推荐的显卡驱动&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# sudo ubuntu-drivers devices&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; /sys/devices/pci0000:00/0000:00:1c.0/0000:02:00.0 &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt;
+modalias : pci:v000010DEd0000134Dsv000017AAsd00002246bc03sc02i00
+vendor   : NVIDIA Corporation
+model    : GM108M &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;GeForce 940MX]
+driver   : nvidia-driver-390 - distro non-free recommended
+driver   : xserver-xorg-video-nouveau - distro free &lt;span class=&quot;nb&quot;&gt;builtin&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;或者&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#sudo add-apt-repository ppa:graphics-drivers&lt;/span&gt;
+Current long-lived branch release: &lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;nvidia-410&lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;410.66&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+Old long-lived branch release: &lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;nvidia-390&lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;390.87&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;不知道为啥，找不到410&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#sudo apt update&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;h3 id=&quot;2安装&quot;&gt;2.安装&lt;/h3&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+&lt;span class=&quot;c&quot;&gt;#sudo apt-get install nvidia-390   //安装390驱动&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#重启&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;#重启完就ojbk了&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+</description>
+        <pubDate>Wed, 09 Jan 2019 12:13:17 +0800</pubDate>
+        <link>http://MemeTao.github.io//InstallNvidiaDriver/</link>
+        <guid isPermaLink="true">http://MemeTao.github.io//InstallNvidiaDriver/</guid>
         
         
         <category>Linux</category>
