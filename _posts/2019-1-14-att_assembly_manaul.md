@@ -14,6 +14,8 @@ categories: Linux
 **Segment Register**:
 * 1. CS:存放程序在内存中的基地址
 * 2. DS:数据段地址(.data?)
+* 3. SS:存放栈的段地址
+* 4. SP:存放栈的偏移地址
 
 <<Linux 0.11完全注释>>P90有关于这个的介绍
 
