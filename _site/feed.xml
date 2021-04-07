@@ -7,83 +7,150 @@
 </description>
     <link>http://MemeTao.github.io//</link>
     <atom:link href="http://MemeTao.github.io//feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 08 Jan 2020 19:34:37 +0800</pubDate>
-    <lastBuildDate>Wed, 08 Jan 2020 19:34:37 +0800</lastBuildDate>
+    <pubDate>Wed, 07 Apr 2021 11:08:34 +0800</pubDate>
+    <lastBuildDate>Wed, 07 Apr 2021 11:08:34 +0800</lastBuildDate>
     <generator>Jekyll v3.1.6</generator>
     
       <item>
-        <title>记录一次线上bug</title>
+        <title>lea和mov指令的真正区别</title>
         <description>&lt;hr /&gt;
 
-&lt;h3 id=&quot;起因&quot;&gt;起因&lt;/h3&gt;
+&lt;h3 id=&quot;lea指令&quot;&gt;lea指令&lt;/h3&gt;
 
-&lt;p&gt;之前写了一个加密工具，用来加解密本地的json配置，后来发现
-加密工具的release、debug版本互相不能加解密。
-起初是认为是openssl的aes-128加密算法，在”-DDEBUG”或者”-O3”选项下有不一样的行为。
-后来发现是一段汇编代码被编译器优化了。&lt;/p&gt;
+&lt;p&gt;lea指令的解释是:load effective address.&lt;/p&gt;
 
-&lt;h3 id=&quot;排查&quot;&gt;排查&lt;/h3&gt;
+&lt;p&gt;网上有很多解释, 比如知乎高赞&lt;a href=&quot;https://www.zhihu.com/question/40720890/answer/110774673&quot;&gt;汇编语言中mov和lea的区别有哪些？&lt;/a&gt; :&lt;/p&gt;
 
-&lt;p&gt;加密的秘钥是一个全局数组:&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;lea是“load effective address”的缩写，简单的说，
 
-&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;static unsigned char key[19];
-&lt;/code&gt;&lt;/pre&gt;
+lea指令可以用来将一个内存地址直接赋给目的操作数，
 
-&lt;p&gt;为了不直接暴露秘钥字符串，在加密函数中有一段内敛汇编(花指令)用来给”秘钥”赋值，这么做的原因是：
-&lt;strong&gt;&lt;a href=&quot;https://wizardforcel.gitbooks.io/re-for-beginners/content/Part-III/Chapter-50.html&quot;&gt;«逆向工程入门指南-第50章»&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;
+例如：lea eax,[ebx+8]就是将ebx+8这个值直接赋给eax，
 
-&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;    unsigned char *p = key; //取全局key地址
-	asm(
-		&quot;mov %1,%%rax\n&quot;
-		&quot;movb $48,(%%rax)\n&quot;  //开始对key赋值
-		&quot;movb $49,1(%%rax)\n&quot;
-        &quot;...&quot;
-        &quot;...&quot;
-		&quot;movb $0,16(%%rax)&quot;  //结束
-		: &quot;+a&quot;(p) //输出参数p，可读可写
-		: &quot;r&quot;(p) 
-	   );
-    //其它c++代码
-    //调用openssl加密，传入key
-    EVP_CipherInit_ex(ctx,nullptr,nullptr,key,iv,opt);
-&lt;/code&gt;&lt;/pre&gt;
+而不是把ebx+8处的内存地址里的数据赋给eax。
 
-&lt;p&gt;两个不同版本(有无编译器优化选项)目标文件的汇编代码如下:&lt;/p&gt;
+而mov指令则恰恰相反，例如：mov eax,[ebx+8]
 
-&lt;h4 id=&quot;g-xxxcpp--o-aout没有任何优化选项&quot;&gt;g++ xxx.cpp -O a.out(没有任何优化选项)&lt;/h4&gt;
-&lt;p&gt;&lt;img src=&quot;../material/DEBUG/noo3dump.png&quot; alt=&quot;noo3dump&quot; /&gt;&lt;/p&gt;
+则是把内存地址为ebx+8处的数据赋给eax。
 
-&lt;h4 id=&quot;g--o3-xxxcpp--o-aouto3优化&quot;&gt;g++ -O3 xxx.cpp -O a.out(O3优化)&lt;/h4&gt;
-&lt;p&gt;&lt;img src=&quot;../material/DEBUG/o3dump.png&quot; alt=&quot;o3dump&quot; /&gt;&lt;/p&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;在第一个目标文件中，key被设置成了一个指定的秘钥。
-而在第二个目标文件中(O3选项)，编译器认为这段内联汇编与上下文无关，很本就没有编译进目标文件。这就导致了debug（没有-O3）和release(-O3)下的秘钥不一致，互相不能加解密。&lt;/p&gt;
+&lt;p&gt;说的没错, 可是仍旧是没有解释&lt;strong&gt;为什么用mov就不行&lt;/strong&gt;, 比如:&lt;/p&gt;
 
-&lt;p&gt;修改加密函数如下，可以解决该问题：&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;lea eax, &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;ebx+8]&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 将ebx+8这个值直接赋给eax
+难道不等价与:
+mov eax, ebx+8&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; 
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;    unsigned char *p = key; 
-	asm(
-		&quot;mov %1,%%rax\n&quot;
-		&quot;movb $48,(%%rax)\n&quot;  
-		&quot;movb $49,1(%%rax)\n&quot;
-        &quot;...&quot;
-        &quot;...&quot;
-		&quot;movb $0,16(%%rax)&quot; 
-		: &quot;+a&quot;(p) //输出参数p，可读可写
-		: &quot;r&quot;(p) 
-	   );
-    EVP_CipherInit_ex(ctx,nullptr,nullptr,p,iv,opt);
-&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;其实,这才是&lt;strong&gt;初学者&lt;/strong&gt;真正想问的问题.&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;修改key-&amp;gt;p&lt;/strong&gt;，告诉编译器&lt;strong&gt;上下文相关，不要优化汇编段&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;原因也很搞笑: &lt;strong&gt;mov指令的源操作数不支持立即数.&lt;/strong&gt;&lt;/p&gt;
 
+&lt;p&gt;上面的例子中, “ebx + 8”是立即数.&lt;/p&gt;
 </description>
-        <pubDate>Tue, 03 Sep 2019 01:13:17 +0800</pubDate>
-        <link>http://MemeTao.github.io//onlineBug/</link>
-        <guid isPermaLink="true">http://MemeTao.github.io//onlineBug/</guid>
+        <pubDate>Wed, 07 Apr 2021 08:13:17 +0800</pubDate>
+        <link>http://MemeTao.github.io//leaVSmov/</link>
+        <guid isPermaLink="true">http://MemeTao.github.io//leaVSmov/</guid>
         
         
-        <category>debug</category>
+        <category>Linux</category>
+        
+      </item>
+    
+      <item>
+        <title>X86汇编笔记</title>
+        <description>&lt;hr /&gt;
+
+&lt;p&gt;###notes&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;在8086处理器上,如果要用寄存器来提供偏移地址,只能使用BX,si,di,bP,不能使用其它寄存器.以下指令是非法的: mov [ax], dl&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;8086处理器只支持以下几种基地址寄存器和变址寄存器的组合:[bx+si] [bx+di] [bp+si] [bp+di]&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;条件转移指令&quot;&gt;条件转移指令&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;js  当SF == 1则跳转 , jns与之相反&lt;/li&gt;
+  &lt;li&gt;jz  当zF == 1则跳转,  jnz与之相反&lt;/li&gt;
+  &lt;li&gt;jo  当OF == 1则跳转,  jno与之相反&lt;/li&gt;
+  &lt;li&gt;jc  当CF == 1则跳转,  jnc与之相反&lt;/li&gt;
+  &lt;li&gt;jp  当PF == 1则跳转,  jnp与之相反&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;常用指令&quot;&gt;常用指令&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;movsb | movsw
+```shell
+DS:SI –&amp;gt; ES:DI
+DF = 0 low-&amp;gt;high
+DF = 1 high-&amp;gt;low&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;instruction ‘cld’ can clear df&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+* div
+A / B. A是被除数, B是为除数.
+
+被除数A默认存在AX中, 或者AX和DX中(DX存高x位)
+
+如果除数是8位，那么除法的结果AL保存商，AH保存余数.
+
+如果除数16位，那么除法的结果 AX保存商，DX保存余数。
+
+* cli &amp;amp;&amp;amp; sti 清除和设置IF(中断标志位)
+
+### ret
+* ret 弹栈到IP寄存器 
+* retf 弹栈到IP,再弹栈到CS
+* iret 弹栈到IP,再弹栈到CS,再弹栈到FLAGS
+
+### call 指令
+
+call 指令有三种形式:
+
+第一种是16位相对近调用, 近调用的意思是被调用的目标过程位于当前代码段内,而非另一个不同的代码段,所以只需要得到偏移地址即可.
+
+16位相对近调用是三字节指令, 操作码为0xE8. 在指令执行阶段, 处理器看到操作码0xE8, 就知道它应当调用一个过程. 于是,它用指令指针寄存器IP的当前内容加上指令中的操作数, 再加上3, 得到一个新的偏移地址. 接着将IP的原有内容压入栈. 最后,用刚才的偏移地址取代IP原油的内容. 这直接导致处理器的执行流程转移到目标位置处.
+
+第二种是16位间接绝对近调用, 这种调用也是近调用, 只能调用当前代码段内的过程, 指令中的操作数不是偏移量, 而是被调用过程的真实偏移地址, 故称绝对地址. 这个地址不是直接出现在指令中,而是由16位的通用寄存器或者16位的内存单元简介给出. 
+
+第三种是16位直接绝对远调用, 调用另一个代码段内的过程. 
+比如: 
+```shell
+call 0x20000:0x0030
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;如果被调用过程处于当前代码段, 也没关系.&lt;/p&gt;
+
+&lt;p&gt;第四种是16位间接绝对远调用, 这也属于段间调用,被调用过程属于另一个代码段. 比如:&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;call far &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;0x2000]
+call far &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;bx]
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;间接远调用必须使用&lt;strong&gt;far&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;中断&quot;&gt;中断&lt;/h3&gt;
+
+&lt;p&gt;实模式下,处理器要求中断向量表需要存放在物理地址0x00000-&amp;gt;0x003ff,同1k的空间内,共256个中断,每个中断向量4个字节.&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;0x00000 ... -&amp;gt; ....0x003ff
+---------------------------------------------
+偏移地址(2字节) | 段地址(2字节)    | 偏移地址..
+---------------------------------------------
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+</description>
+        <pubDate>Sat, 12 Dec 2020 17:13:17 +0800</pubDate>
+        <link>http://MemeTao.github.io//x84-assembly/</link>
+        <guid isPermaLink="true">http://MemeTao.github.io//x84-assembly/</guid>
+        
+        
+        <category>assembly</category>
         
       </item>
     
@@ -539,28 +606,6 @@ double TrendingLineFilter::linear_regresion()
       </item>
     
       <item>
-        <title>redis摘记</title>
-        <description>&lt;hr /&gt;
-
-&lt;h3 id=&quot;redis源码阅读小笔记&quot;&gt;redis源码阅读小笔记&lt;/h3&gt;
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;ol&gt;
-      &lt;li&gt;解决键冲突的时候，总是将新加入的node放到队首(O1复杂度)&lt;/li&gt;
-    &lt;/ol&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-</description>
-        <pubDate>Tue, 21 May 2019 15:13:17 +0800</pubDate>
-        <link>http://MemeTao.github.io//redissourcecode/</link>
-        <guid isPermaLink="true">http://MemeTao.github.io//redissourcecode/</guid>
-        
-        
-        <category>redis</category>
-        
-      </item>
-    
-      <item>
         <title>总结c++中的cast</title>
         <description>&lt;hr /&gt;
 
@@ -697,68 +742,6 @@ std::shared_ptr&amp;lt;T&amp;gt; reinterpret_pointer_cast( const std::shared_ptr
       </item>
     
       <item>
-        <title>2019学习计划</title>
-        <description>&lt;hr /&gt;
-&lt;h3 id=&quot;1linux-011源码4个月51前学完&quot;&gt;1.Linux 0.11源码(4个月,5.1前学完)&lt;/h3&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;涉及A&amp;amp;TT汇编基础知识、内核早期源码、x86基础知识.
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;今天是4.22日，对于Linux0.11的整体结构已经有了初步的认识:进程的切换、文件系统、字符设备驱动等也有了&lt;strong&gt;具体&lt;/strong&gt;的、源码级的了解。&lt;/p&gt;
-
-&lt;p&gt;以前只看了操作系统的大学教材，对操作系统的认识仅仅停留在理论阶段，这次学习算是解决了最初的困扰吧：&lt;strong&gt;操作系统究竟是怎么运行起来的？&lt;/strong&gt;&lt;/p&gt;
-
-&lt;p&gt;不过这次仅仅了解个皮毛，对于堆栈切换、中断过程等细节完全没有掌握，选择不深究避免陷入细节的深渊无法自拔的原因不仅因为这些内容的复杂、难，还包括：&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;是否实用&lt;/li&gt;
-  &lt;li&gt;学了不用就会忘&lt;/li&gt;
-  &lt;li&gt;…
-毕竟精力是有限的。&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;现在摆在眼前的另外一个问题：&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;要不要将这些细节全部掌握&lt;/li&gt;
-  &lt;li&gt;要不要继续深入学习&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;要不要将那些具体的细节掌握？&lt;/p&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;如果未来不是做操作系统相关的工作，应该是没有必要的。
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;要不要继续深入学习？&lt;/p&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;肯定要，但是不是现在，等到以后对Linux的认识更上一层楼，在应用层遇到了瓶颈的时候，再选择某一个子模块深入研究（肯定是网络模块或者文件系统了）。现在更迫切的是将已经掌握的知识加强，以前看过的书再看一遍（真觉得有必要再把APUE,UNP，CSAPP等书再过一遍）。
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;给这次学习计划打个分：6分吧，时间的投入，知识的掌握都不符合预期。&lt;/p&gt;
-
-&lt;h3 id=&quot;2-redis源码3个月81前结束&quot;&gt;2. Redis源码（3个月，8.1前结束）&lt;/h3&gt;
-&lt;p&gt;网上的大佬们貌似都推荐将Redis作为”非常适合阅读的开源项目”，我也要瞅瞅看。&lt;/p&gt;
-
-&lt;p&gt;基本策略就是这样子了：http://blog.huangz.me/diary/2014/how-to-read-redis-source-code.html&lt;/p&gt;
-
-&lt;h4 id=&quot;21redis-数据结构&quot;&gt;2.1.redis 数据结构&lt;/h4&gt;
-&lt;ul&gt;
-  &lt;li&gt;1.Redis 的动态字符串(3天)  done!&lt;/li&gt;
-  &lt;li&gt;2.Redis 链表  done!&lt;/li&gt;
-  &lt;li&gt;3.Redis 字典  done!&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;2019-0627 更新：哔了狗了，最近太忙了。
-2019-0923 更新：哔了狗了，最近太忙了。&lt;/p&gt;
-
-</description>
-        <pubDate>Mon, 14 Jan 2019 17:13:17 +0800</pubDate>
-        <link>http://MemeTao.github.io//studyplay_january/</link>
-        <guid isPermaLink="true">http://MemeTao.github.io//studyplay_january/</guid>
-        
-        
-        <category>study</category>
-        
-        <category>plan</category>
-        
-      </item>
-    
-      <item>
         <title>AT&amp;T汇编摘记</title>
         <description>&lt;h3 id=&quot;0-寄存器&quot;&gt;0. 寄存器&lt;/h3&gt;
 &lt;p&gt;&lt;strong&gt;通用寄存器&lt;/strong&gt;:&lt;/p&gt;
@@ -776,6 +759,21 @@ std::shared_ptr&amp;lt;T&amp;gt; reinterpret_pointer_cast( const std::shared_ptr
   &lt;li&gt;
     &lt;ol&gt;
       &lt;li&gt;DS:数据段地址(.data?)&lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;ol&gt;
+      &lt;li&gt;SS:存放栈的段地址&lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;ol&gt;
+      &lt;li&gt;SP:存放栈的偏移地址&lt;/li&gt;
+    &lt;/ol&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;ol&gt;
+      &lt;li&gt;ES:扩展的段寄存器(不够用了可以用这个)&lt;/li&gt;
     &lt;/ol&gt;
   &lt;/li&gt;
 &lt;/ul&gt;
@@ -1207,49 +1205,251 @@ system_call检查父进程是否需要重新调度。如果需要再次调度，
       </item>
     
       <item>
-        <title>ubuntu18.04上安装英伟达驱动</title>
+        <title>字符串编码</title>
         <description>&lt;hr /&gt;
 
-&lt;h3 id=&quot;1查看显卡设备&quot;&gt;1.查看显卡设备&lt;/h3&gt;
+&lt;h3 id=&quot;前言&quot;&gt;前言&lt;/h3&gt;
+&lt;p&gt;一直以来，字符串编码总是我摸不着头脑。对待字符串编码问题的策略也是简单粗暴，直接规避：一律使用utf-8。但是，猿在码界漂，哪能不挨刀。今天就总结一下字符串编码问题。&lt;/p&gt;
+&lt;h3 id=&quot;编码类型介绍&quot;&gt;编码类型介绍&lt;/h3&gt;
+&lt;h4 id=&quot;ascii&quot;&gt;ascii&lt;/h4&gt;
+&lt;p&gt;编码格式花样很多。由于计算机是老美发明的，因此，最早只有127个字符被编码到计算机中，着127个字符被称为ascii编码集。由于ascii字符集只有127个字符，故只要一个字节就可以表示。&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#lspci &lt;/span&gt;
-00:02.0 VGA compatible controller: Intel Corporation HD Graphics 620 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;rev 02&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-302:00.0 3D controller: NVIDIA Corporation GM108M &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;GeForce 940MX]
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;一个是集成显卡,一个是独立显卡。点击”设置”-”详细信息”可以看到当前所使用的是哪一个显卡。&lt;/p&gt;
+&lt;h4 id=&quot;else&quot;&gt;else&lt;/h4&gt;
+&lt;p&gt;但是，世界上那么多国家、那么多语言，全世界人民都想体验一把先进文化，于是八仙过海，各显神通，日本把日文编码到Shift-jis中，韩国把韩文编码到Euc-kr中。我们国家陆续有gb2312、gbk、gb18030，后者都是对前者的扩展。拿我们汉字举例，汉字有成千上万个，所以一个字节表示不了那么多的汉字，所以就需要多个字节(2个或3个)来表示。&lt;/p&gt;
+&lt;h4 id=&quot;unicode&quot;&gt;unicode&lt;/h4&gt;
+&lt;p&gt;大家要是没有一套统一的编码格式的话，还怎么促进文化的交流、各国码农感情的培养。于是，unicode应运而生，unicode把所有语言都统一到一套编码中，这样大家就可以顺畅的交流了。为了表示那么多的语言，unicode也只能采用多字节表示法，就是一个字符用多个字节的数据表示。&lt;/p&gt;
 
-&lt;p&gt;查看推荐的显卡驱动&lt;/p&gt;
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# sudo ubuntu-drivers devices&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; /sys/devices/pci0000:00/0000:00:1c.0/0000:02:00.0 &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt;
-modalias : pci:v000010DEd0000134Dsv000017AAsd00002246bc03sc02i00
-vendor   : NVIDIA Corporation
-model    : GM108M &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;GeForce 940MX]
-driver   : nvidia-driver-390 - distro non-free recommended
-driver   : xserver-xorg-video-nouveau - distro free &lt;span class=&quot;nb&quot;&gt;builtin&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;或者&lt;/p&gt;
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#sudo add-apt-repository ppa:graphics-drivers&lt;/span&gt;
-Current long-lived branch release: &lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;nvidia-410&lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;410.66&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-Old long-lived branch release: &lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;nvidia-390&lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;390.87&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;不知道为啥，找不到410&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;#sudo apt update&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;h3 id=&quot;2安装&quot;&gt;2.安装&lt;/h3&gt;
+&lt;p&gt;于是，新的问题又出现了。对于大部分西方国家，他们使用的英语，一个字节就可以表示一个字符。如果使用unicode，那岂不是很浪费空间。于是又有人想出来了一种更佳妙的方式：对unicode继续编码。（可以理解成对unicode压缩编码）&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
-&lt;span class=&quot;c&quot;&gt;#sudo apt-get install nvidia-390   //安装390驱动&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;#重启&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;#重启完就ojbk了&lt;/span&gt;
+&lt;p&gt;也就说，utf-8,utf-16,utf-32是在unicode基础上，对unicode再次编码。&lt;/p&gt;
 
+&lt;p&gt;以UTF-8来说：UTF-8编码把一个Unicode字符根据不同的数字大小编码成1-6个字节，常用的英文字母被编码成1个字节，汉字通常是3个字节，只有很生僻的字符才会被编码成4-6个字节。如果你要传输的文本包含大量英文字符，用UTF-8编码就能节省空间：&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;字符&lt;/th&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;ascii&lt;/th&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;unicode&lt;/th&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;utf-8&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;A&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;01000001&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;00000000 01000001&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;01000001&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;中&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;?&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;01001110 00101101  11100100 10111000&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;10101101&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;这么多编码格式，大家的一个共同点就是：完全对ascii码兼容。也就是说ascii中的’a’，和gb2312中的’a’是同样的表示方法(假设是0x63)。&lt;/p&gt;
+
+&lt;h3 id=&quot;实际环境&quot;&gt;实际环境&lt;/h3&gt;
+&lt;h4 id=&quot;linux&quot;&gt;Linux&lt;/h4&gt;
+&lt;p&gt;如果您是在linux上开发，通常是碰不到这些问题的。(没错，我就是舔狗)&lt;/p&gt;
+
+&lt;p&gt;在Linux上，系统默认就是utf-8格式。这是什么意思？&lt;/p&gt;
+
+&lt;p&gt;举例来说，当你 “touch main.cpp” 这个文件就是采用的utf-8来编码里面的所有数据。
+当你&lt;/p&gt;
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pstr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;中文ABC&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;%s&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pstr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;这个pstr中的内容就会以utf-8格式存储。
+当你:&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;g++ main.cpp &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; a.out
+&amp;amp; ./a.out
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;编译器会忠于你的文件编码格式，按此编码格式处理该源文件。pstr中的内容会被取出来放在内存中，并以utf-8格式输出在终端环境上。终端能不能正常显示，就看你的终端能不能支持utf-8。&lt;/p&gt;
+
+&lt;p&gt;任何的字符串乱码问题，就是上面这三种中的某一个或多个编码格式不一样导致。&lt;/p&gt;
+&lt;h4 id=&quot;windows&quot;&gt;Windows&lt;/h4&gt;
+&lt;p&gt;在windows上，呵呵呵了。中文windows默认采用gb2312格式。&lt;/p&gt;
+
+&lt;p&gt;举例来说。当你”新建一个文件”，这个文件通常是gb2312格式，如果这个文件只在本地使用，这时候通常是没问题的。&lt;/p&gt;
+
+&lt;p&gt;但是当你因为某些原因需要使用在windows上使用”unicode”，问题就来了。
+还是以上面main.cpp为例：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;1.如果main.cpp为gb2312，用vs编译，pstr为gb2312格式，终端可以显示。&lt;/li&gt;
+  &lt;li&gt;2.如果main.cpp为纯unicode，用vs编译，pstr在内存里为gb2312格式，终端可以显示。&lt;/li&gt;
+  &lt;li&gt;3.如果main.cpp为utf-8(无bom)，用vs编译，pstr在内存里为utf-8格式，但是终端显示不了中文。&lt;/li&gt;
+  &lt;li&gt;4.如果main.cpp为utf-8(bom)，用vs编译，pstr在内存里为gb2312格式，终端可以显示。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;看到了吧，vs的”睿智”。这个问题如果搭配上”wchar_t”，更加让人恼火。&lt;/p&gt;
+
+&lt;p&gt;上面的测试可以采用如下程序：&lt;/p&gt;
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pstr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;size_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;size_t&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;++&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;%x,&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pstr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]);&lt;/span&gt;
+    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;printf&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\n&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+
+&lt;span class=&quot;kt&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;string&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;str&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;abc中文ABC&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pstr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const_cast&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c_str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pstr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+    &lt;span class=&quot;n&quot;&gt;std&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wstring&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;wstr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;L&quot;abc中文ABC&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;kt&quot;&gt;wchar_t&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pwstr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;const_cast&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;wchar_t&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;wstr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c_str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;());&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;foo&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;unsigned&lt;/span&gt; &lt;span class=&quot;kt&quot;&gt;char&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pwstr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;str&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
+
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;将结果和各个编码表进行对照，既可得出结论。&lt;/p&gt;
+
+&lt;p&gt;在unicode方面，对windows的批评滔滔不绝，”utf-8 everywhere”认为微软在字符串处理上误入歧途，因为他们比别的厂商更早做了决定。微软虽然有理由说，windows先于unicode问世。但是这么多年过去了，windows的API还是不完全支持unicode。&lt;/p&gt;
+
+&lt;p&gt;windows不遵守基本法，也不是一天两天了，嘻嘻。&lt;/p&gt;
+
+&lt;p&gt;关于如何在windows处理utf-8，以及对windwos的更多批评，可以从这篇文章起步: &lt;a href=&quot;http://utf8everywhere.org/zh-cn#faq.almostfw&quot;&gt;utf8 everywhere&lt;/a&gt; “&lt;/p&gt;
+&lt;h3 id=&quot;char与wchar_tstring与wstring&quot;&gt;char与wchar_t，string与wstring&lt;/h3&gt;
+&lt;p&gt;如果您不幸遇到了string和wstring方便的困扰，恭喜您。&lt;/p&gt;
+
+&lt;p&gt;首先，std::string 和 std::wstring都继承与std::basic_string。
+只不过std::string的模板参数是char，std::wstring的模板参数是wchar_t。
+在linux上，wchar_t占用4个字节，windows上则是占用2个字节。他们之间的差别，&lt;strong&gt;仅此而已。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;你如果使用wstring存放字符串，Linux是没有啥问题的，采用utf-32编码wstring。&lt;/p&gt;
+
+&lt;p&gt;但是如果是windows上，嘻嘻，问题又来了。假设在main.cpp中存放了一个std::wstring = “abc中文”,那么：&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;1.a.cpp如果是gb2312格式，wstring在内存中是unicode格式。&lt;/li&gt;
+  &lt;li&gt;2.a.cpp如果是unicode格式，wstring在内存中是unicode格式。&lt;/li&gt;
+  &lt;li&gt;3.a.cpp如果是utf-8格式，wstring在内存中是ucs-2be格式。&lt;/li&gt;
+  &lt;li&gt;4.a.cpp如果是utf-8-bom格式，wstring在内存中是unicode格式。&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;您肯定还有一个疑惑，&lt;strong&gt;关于wstring和string之间的互相转换&lt;/strong&gt;。
+那么，您需要确保你非常了解待转换的数据的格式，或者待转换数据仅来自本地。&lt;/p&gt;
+
+&lt;p&gt;在windows上，windows有一个奇技淫巧：&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;WideCharToMultiByte系列API，通过参数设定你就可以获得你所希望的结果。&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;详见windows api说明，如何正确使用，请看： &lt;a href=&quot;https://stackoverflow.com/questions/215963/how-do-you-properly-use-widechartomultibyte&quot;&gt;stackoverflow&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;当然，c++标准库也可以做到：std::locale、std::codecvt结合使用。&lt;/p&gt;
+
+&lt;h3 id=&quot;帮组文档&quot;&gt;帮组文档&lt;/h3&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://utf8everywhere.org/zh-cn#faq.almostfw&quot;&gt;utf8 everywhere&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://blog.csdn.net/benkaoya/article/details/59522148&quot;&gt;潜谈C/C++编程中的字符编码转换&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://my.oschina.net/ybusad/blog/363139&quot;&gt;C++字符编码问题探究和中文乱码的产生&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;获得帮助&quot;&gt;获得帮助&lt;/h3&gt;
+&lt;p&gt;meemetao@gmail.com&lt;/p&gt;
+</description>
+        <pubDate>Thu, 08 Nov 2018 17:13:17 +0800</pubDate>
+        <link>http://MemeTao.github.io//string-coding/</link>
+        <guid isPermaLink="true">http://MemeTao.github.io//string-coding/</guid>
+        
+        
+        <category>c++</category>
+        
+      </item>
+    
+      <item>
+        <title>C++成员函数指针的大小</title>
+        <description>&lt;hr /&gt;
+
+&lt;h3 id=&quot;c中的函数指针假定在64位机器上&quot;&gt;c++中的函数指针(假定在64位机器上)&lt;/h3&gt;
+
+&lt;p&gt;我们知道指针的大小恒定的,跟机器位数有关,32位机下,指针是4字节大小,64位机下指针是8字节大小.但是在C++中,有一个比较特殊的地方是C++的类成员函数
+指针,它的大小是普通指针的2倍.先看一个实例:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;void foo(void)
+{
+}
+class A{
+public:
+    void foo(){}
+}
+
+int main()
+{
+    void (*pfun)(void);
+    pfun = foo;
+    void (A::*pMfun)(void);
+    pMfun = &amp;amp;A::foo;
+    std::cout&amp;lt;&amp;lt;&quot;normal function pointer size:&quot;&amp;lt;&amp;lt;sizeof(pfun)&amp;lt;&amp;lt;std::endl;
+    std::cout&amp;lt;&amp;lt;&quot;member function pointer size:&quot;&amp;lt;&amp;lt;sizeof(pMfun)&amp;lt;&amp;lt;std::endl;
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;运行结果:&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;normal &lt;span class=&quot;k&quot;&gt;function &lt;/span&gt;pointer size:8
+member &lt;span class=&quot;k&quot;&gt;function &lt;/span&gt;pointer size:16
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;证明完毕.下面解释为什么会这样.&lt;/p&gt;
+&lt;h3 id=&quot;this指针的调整&quot;&gt;this指针的调整&lt;/h3&gt;
+
+&lt;p&gt;再看一个例子:&lt;/p&gt;
+&lt;pre&gt;&lt;code class=&quot;language-C++&quot;&gt;class A{
+public;
+    void foo()
+    {
+        //假设我们需要在这里去使用数组a
+        std::cout&amp;lt;&amp;lt;&quot;addr of this:%x&quot;&amp;lt;&amp;lt;this&amp;lt;&amp;lt;std::endl;
+    }
+private:
+    int a[4];
+};
+class B{
+public:
+    void bar()
+    { 
+        //假设我们需要在这里去使用数组b
+        std::cout&amp;lt;&amp;lt;&quot;addr of this:%x&quot;&amp;lt;&amp;lt;this&amp;lt;&amp;lt;std::endl;
+    }
+prviate:
+    int b[4];
+};
+class C: public A,B{
+
+};
+
+int main()
+{
+    C c; 
+    c.foo();
+    c.bar();
+    return 0;
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;结果&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;addr of this:%x0x7ffd30f4ec00
+addr of this:%x0x7ffd30f4ec10
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;这时候可以看到,传递给foo和bar函数的this指针是不一样的?为什么会不一样呢? 考虑一下函数中的注释.
+所以调用类成员函数指针时,就需要将this指针进行调整,这个调整的信息在哪里?就在这个函数指针中,所以就需要另外的空间去存放这些信息,这也就是为什么类成员函数指针是16字节的原因,因为多出来的8字节,用于编译期的this指针调整.&lt;/p&gt;
 
 </description>
-        <pubDate>Wed, 09 Jan 2019 12:13:17 +0800</pubDate>
-        <link>http://MemeTao.github.io//InstallNvidiaDriver/</link>
-        <guid isPermaLink="true">http://MemeTao.github.io//InstallNvidiaDriver/</guid>
+        <pubDate>Thu, 12 Jul 2018 17:13:17 +0800</pubDate>
+        <link>http://MemeTao.github.io//theSizeOfMemeberFunctionPointer/</link>
+        <guid isPermaLink="true">http://MemeTao.github.io//theSizeOfMemeberFunctionPointer/</guid>
         
         
-        <category>Linux</category>
+        <category>c++</category>
         
       </item>
     
