@@ -24,6 +24,9 @@ public:
         //if sp_ not null
         return sp_;
     }
+    void set_ptr(shared_ptr<T> p) {
+        sp_ = p;
+    }
 private:
     shared_ptr<T> sp_; //FIXME:weak_ptr
 };
@@ -45,3 +48,7 @@ public:
 };
 
 ```
+
+当使用shared_ptr创建t对象时,t对象内部通过set_ptr将这个share_ptr对象包含在自己内部。
+
+但是这样子的话t永远无法析构自己，所以需要将内部的这个指针改为weak_ptr。
