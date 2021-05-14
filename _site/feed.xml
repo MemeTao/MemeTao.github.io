@@ -7,8 +7,8 @@
 </description>
     <link>http://MemeTao.github.io//</link>
     <atom:link href="http://MemeTao.github.io//feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 14 May 2021 16:28:33 +0800</pubDate>
-    <lastBuildDate>Fri, 14 May 2021 16:28:33 +0800</lastBuildDate>
+    <pubDate>Fri, 14 May 2021 18:06:42 +0800</pubDate>
+    <lastBuildDate>Fri, 14 May 2021 18:06:42 +0800</lastBuildDate>
     <generator>Jekyll v3.1.6</generator>
     
       <item>
@@ -18,142 +18,39 @@
 &lt;h3 id=&quot;卡尔曼增益简单介绍及推导&quot;&gt;卡尔曼增益简单介绍及推导&lt;/h3&gt;
 
 &lt;blockquote&gt;
-  &lt;p&gt;有一把尺子测量一枚硬币的直径, 记录每次测量出的结果:$x_1$, $x_2$, $x_3$, ….&lt;/p&gt;
+  &lt;p&gt;有一把尺子测量一枚硬币的直径, 记录每次测量出的结果(测量值):$x_1$, $x_2$, $x_3$, ….&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;p&gt;那么, 对硬币直径的估计值:&lt;/p&gt;
 
-&lt;blockquote&gt;
-  &lt;p&gt;$\overline{\text{x}}_n$ = ($x_1$+$x_2$+$x_3$+…+$x_n$) / n&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;center&gt; 
+    $\overline{x}_n$ = $\frac {(x_1+x_2+x_3+...+x_n)} {n}$
+&lt;/center&gt;
 
 &lt;p&gt;进一步, 写成递归形式:&lt;/p&gt;
+&lt;center&gt; 
+    $\overline{x}_n$ =  $\overline{x}_{n-1}$ + $\frac{1}{n} (x_n - \overline{x}_{n-1})$ 
+&lt;/center&gt;
+&lt;p&gt;可见, 随着 ${n\to+\infty}$, 测量结果已经不再重要.&lt;/p&gt;
 
-&lt;blockquote&gt;
-  &lt;p&gt;$\overline{\text{x}}_n$ = ($x_1$+$x_2$+$x_3$+…+$x_n$) / n&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;p&gt;文字表示为:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;当前的估计值 = 上一次的估计值 + 系数 * (当前的测试量 - 上一次的估计值)&lt;/script&gt;
+
+&lt;p&gt;假设要考虑上一次的估计误差和本次的测量误差, 一个很直观的想法就是:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;如果估计误差大于测量误差, 也就是说测量的更佳准确, 那么当前的估计值应该偏向于本次的测量值&lt;/li&gt;
+  &lt;li&gt;如果估计误差小于测量误差, 也就是说测量的不准确, 那么当前的估计值应该偏向于上一次的估计值&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;这就是数据融合的思想, 此时, 这个&lt;strong&gt;系数&lt;/strong&gt;就是卡尔曼增益系数:&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;G = \frac {估计误差}{估计误差+测量误差}&lt;/script&gt;
 </description>
         <pubDate>Fri, 14 May 2021 14:13:17 +0800</pubDate>
         <link>http://MemeTao.github.io//webrtc-jitter-buffer/</link>
         <guid isPermaLink="true">http://MemeTao.github.io//webrtc-jitter-buffer/</guid>
-        
-        
-        <category>webrtc</category>
-        
-      </item>
-    
-      <item>
-        <title>google 拥塞控制算法</title>
-        <description>&lt;hr /&gt;
-
-&lt;h2 id=&quot;1&quot;&gt;1&lt;/h2&gt;
-
-&lt;p&gt;webrtc中使用gcc(google congestion controller)作为默认的拥塞控制算法,gcc最初发表于: gcc 论文链接. 目的是为了解决以下的问题:&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;It is known that the well-established TCP congestion control is not suitable for real-time communication due to its retransmissions and in-order delivery mechanisms which induce significant latency. Real-time communication requires not only congestion control but also minimization of queuing delays to provide interactivity.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;可见, gcc的目的是”minimization of queuing delays”.&lt;/p&gt;
-
-&lt;h3 id=&quot;2&quot;&gt;2&lt;/h3&gt;
-
-&lt;p&gt;在gcc中, 主要通过两个指标来衡量网络的情况:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;丢包率&lt;/li&gt;
-  &lt;li&gt;延迟梯度&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;延迟梯度是这么定义的: 假设网络包1的发送时间是t1, 到达时间是t2. 网络包2到达发送时间是t3, 达到时间是t4, 那么这组包的延迟梯度就等于 (t4-t2) - (t3-t1). 注意, 这里使用的都是各端自己的时间戳所以不需要时间同步. 如果网络没有一点拥塞那么这个值应该是0. 需要特别说明的是: 在工程实现中, 并不是每一个包就计算一个梯度值, 而是一组包计算一次.&lt;/p&gt;
-
-&lt;p&gt;这里有三种情况: &amp;gt;0, =0, &amp;lt;0.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../material/gcc/tidu1.png&quot; alt=&quot;&amp;gt;0&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;这种情况下, 延迟梯度&amp;gt;0, 我们可以明显看出是网络出现了拥塞.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;../material/gcc/tidu2.png&quot; alt=&quot;&amp;gt;0&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;这种情况下, 延迟梯度小于0, 我们可以推测出网络出现过拥塞, 且正在恢复(姑且先这么认为).&lt;/p&gt;
-
-&lt;p&gt;gcc得的基于丢包 + 基于延迟的估计后, 会对两个值做个权衡, 并输出最终的带宽估计值.&lt;/p&gt;
-
-&lt;h3 id=&quot;基于丢包的带宽估计&quot;&gt;基于丢包的带宽估计&lt;/h3&gt;
-
-&lt;p&gt;论文中的描述非常的简单:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;丢包低于2%, 以1.05的增速提高估计值&lt;/li&gt;
-  &lt;li&gt;丢包高于2%, 低于10%, 估计值保持不变(保持这个值, 如果估计值偏高, 丢包会持续增大)&lt;/li&gt;
-  &lt;li&gt;丢包大于10%, 以丢包的一半降低估计值&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;img src=&quot;../material/gcc/loss-based-rule.png&quot; alt=&quot;基于丢包的规则&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;三条规则非常简单, 工程实现也是非常简洁就不多说了.&lt;/p&gt;
-
-&lt;p&gt;从实际情况的观测中发现, 丢包通常是”剧烈的”, 往往是某一个小片刻内的所有包都丢失, 几乎不存在随机丢包的情况(丢包均匀的分散在时间轴上). 在一些特殊的场景下确实观测到过udp随机丢包: 某些区域跨运营商网络.&lt;/p&gt;
-
-&lt;h3 id=&quot;基于延迟的带宽估计&quot;&gt;基于延迟的带宽估计&lt;/h3&gt;
-
-&lt;p&gt;先简单的说明下gcc选择延迟梯度作为指标的理由之一:&lt;/p&gt;
-
-&lt;p&gt;首先,容易想到的指标是rtt, rtt变大了就表明网络拥塞了. 但是rtt毕竟是一个”two way”值, 不仅和A-&amp;gt;B延迟有关, 还和B-&amp;gt;A的延迟有关, B-&amp;gt;A有拥塞不能说明A-&amp;gt;B也有拥塞.比如多人wifi环境下, 主要是下行流量多, 上行流量比较少.&lt;/p&gt;
-
-&lt;p&gt;所以gcc就提出了一种”one-way”的方式, 就是延迟梯度, 但是这玩意也不是新鲜东西了, 90年代就有人尝试过.&lt;/p&gt;
-
-&lt;p&gt;先抛开数学公式, 从宏观上理解下”&lt;strong&gt;队列延迟&lt;/strong&gt;”:&lt;/p&gt;
-
-&lt;p&gt;网络中A端到达C端, 需要经过很多中间设备: 路由器, 交换机等,统称为R端. 既 A-&amp;gt;R-&amp;gt;C.&lt;/p&gt;
-
-&lt;p&gt;R端转为一个”中间节点”, 主要的功能将A的流量转发给C. 为了较好的执行这个转换, R端需要一个缓冲区, 用来存放A端瞬间输入的过多的来不及完全转发出去的流量.&lt;/p&gt;
-
-&lt;p&gt;队列延迟是因为缓冲区增大引起的, “延迟梯度”的变化趋势其实就是”队列延迟”的变化趋势, 需要特别说明是: 并不是反映”值”, 而是&lt;strong&gt;趋势&lt;/strong&gt;, 这点非常关键.&lt;/p&gt;
-
-&lt;p&gt;(—未完待续—)&lt;/p&gt;
-
-&lt;h4 id=&quot;ack码率的计算&quot;&gt;ACK码率的计算&lt;/h4&gt;
-
-&lt;p&gt;低通滤波器: 贝叶斯估计模型&lt;/p&gt;
-
-&lt;h4 id=&quot;工程实现&quot;&gt;工程实现&lt;/h4&gt;
-
-&lt;p&gt;更新出trend之后:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;over-using 事件:
-    &lt;ol&gt;
-      &lt;li&gt;in alr, 使用先前的码率作为接收端码率&lt;/li&gt;
-      &lt;li&gt;ack 有效, 使用ack作为接收端码率&lt;/li&gt;
-      &lt;li&gt;ack 无效, 当前值降低一半作为接收端码率&lt;/li&gt;
-    &lt;/ol&gt;
-  &lt;/li&gt;
-  &lt;li&gt;其它信号: 正常aimd处理&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;最后的状态机如下:&lt;/p&gt;
-
-&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    &lt;span class=&quot;n&quot;&gt;swtich&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;trending&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Trending&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;kNormal&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//这段的理解需要看论文中的解释
-&lt;/span&gt;        &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;state_&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;State&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;kHold&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-            &lt;span class=&quot;c1&quot;&gt;//仅在第一次增加的时候记录时间
-&lt;/span&gt;            &lt;span class=&quot;n&quot;&gt;latest_bitrate_change_&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;at_time&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-            &lt;span class=&quot;n&quot;&gt;state_&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;State&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;kIncrease&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Trending&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;kOverusing&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt; 
-        &lt;span class=&quot;n&quot;&gt;state_&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;State&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;kDecrease&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;k&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;Trending&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;kUnderusing&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;n&quot;&gt;state_&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;State&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;kHold&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-        &lt;span class=&quot;k&quot;&gt;break&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-    &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-</description>
-        <pubDate>Fri, 07 May 2021 11:13:17 +0800</pubDate>
-        <link>http://MemeTao.github.io//google-congestion-controller/</link>
-        <guid isPermaLink="true">http://MemeTao.github.io//google-congestion-controller/</guid>
         
         
         <category>webrtc</category>
@@ -1162,6 +1059,47 @@ addr of this:%x0x7ffd30f4ec10
         
         
         <category>c++</category>
+        
+      </item>
+    
+      <item>
+        <title>Socket注意事项:非阻塞connect的返回值</title>
+        <description>&lt;hr /&gt;
+
+&lt;h3 id=&quot;问题引入&quot;&gt;问题引入：&lt;/h3&gt;
+&lt;p&gt;为了测试1S内TCP服务器单线程能accept多少并发TCP连接，由于正常的TCP建立可能需要几十毫秒，所以客户端发起的连接应该是这样子的:&lt;/p&gt;
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;AF_INET&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SOCK_STREAM&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SOCK_NONBLOCK&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//非阻塞connect
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;serverAddr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sockaddr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;代码运行后，我发现connect()返回值一直是false，但是使用tcpdump抓包发现tcp三次握手正常，也就是说仅仅是connect函数的返回值不符合预期。&lt;/p&gt;
+
+&lt;h3 id=&quot;解决问题&quot;&gt;解决问题&lt;/h3&gt;
+&lt;p&gt;我再一次翻开«UNP»，在书上发现：&lt;strong&gt;当在一个非阻塞的TCP套接字上调用connect时，将立即返回一个EINPROGRESS错误，不过已经发起的TCP三路握手继续进行&lt;/strong&gt;，
+这样问题就清晰了，修改代码如下：&lt;/p&gt;
+&lt;div class=&quot;language-c++ highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;kt&quot;&gt;bool&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;n&quot;&gt;fd&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;AF_INET&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;SOCK_STREAM&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SOCK_NONBLOCK&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;&lt;span class=&quot;c1&quot;&gt;//非阻塞connect
+&lt;/span&gt;    &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;connect&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;fd_&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;serverAddr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;sizeof&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;sockaddr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
+    &lt;span class=&quot;k&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;errno&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;EINPROGRESS&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;注:errno是线程安全的，每个线程都保留一份errno。&lt;/p&gt;
+&lt;h3 id=&quot;总结&quot;&gt;总结&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;纸上得来终觉浅，绝知此事需躬行&lt;/strong&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Sat, 10 Feb 2018 15:13:17 +0800</pubDate>
+        <link>http://MemeTao.github.io//SocketConnect/</link>
+        <guid isPermaLink="true">http://MemeTao.github.io//SocketConnect/</guid>
+        
+        
+        <category>network</category>
+        
+        <category>program</category>
         
       </item>
     

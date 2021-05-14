@@ -70,20 +70,35 @@
 <h3 id="卡尔曼增益简单介绍及推导">卡尔曼增益简单介绍及推导</h3>
 
 <blockquote>
-  <p>有一把尺子测量一枚硬币的直径, 记录每次测量出的结果:$x_1$, $x_2$, $x_3$, ….</p>
+  <p>有一把尺子测量一枚硬币的直径, 记录每次测量出的结果(测量值):$x_1$, $x_2$, $x_3$, ….</p>
 </blockquote>
 
 <p>那么, 对硬币直径的估计值:</p>
 
-<blockquote>
-  <p>$\overline{\text{x}}_n$ = ($x_1$+$x_2$+$x_3$+…+$x_n$) / n</p>
-</blockquote>
+<center> 
+    $\overline{x}_n$ = $\frac {(x_1+x_2+x_3+...+x_n)} {n}$
+</center>
 
 <p>进一步, 写成递归形式:</p>
+<center> 
+    $\overline{x}_n$ =  $\overline{x}_{n-1}$ + $\frac{1}{n} (x_n - \overline{x}_{n-1})$ 
+</center>
+<p>可见, 随着 ${n\to+\infty}$, 测量结果已经不再重要.</p>
 
-<blockquote>
-  <p>$\overline{\text{x}}_n$ = ($x_1$+$x_2$+$x_3$+…+$x_n$) / n</p>
-</blockquote>
+<p>文字表示为:</p>
+
+<script type="math/tex; mode=display">当前的估计值 = 上一次的估计值 + 系数 * (当前的测试量 - 上一次的估计值)</script>
+
+<p>假设要考虑上一次的估计误差和本次的测量误差, 一个很直观的想法就是:</p>
+
+<ul>
+  <li>如果估计误差大于测量误差, 也就是说测量的更佳准确, 那么当前的估计值应该偏向于本次的测量值</li>
+  <li>如果估计误差小于测量误差, 也就是说测量的不准确, 那么当前的估计值应该偏向于上一次的估计值</li>
+</ul>
+
+<p>这就是数据融合的思想, 此时, 这个<strong>系数</strong>就是卡尔曼增益系数:</p>
+
+<script type="math/tex; mode=display">G = \frac {估计误差}{估计误差+测量误差}</script>
 
   
 </article>
