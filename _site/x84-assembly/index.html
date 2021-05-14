@@ -111,6 +111,10 @@ A / B. A是被除数, B是为除数.
 
 * cli &amp;&amp; sti 清除和设置IF(中断标志位)
 
+* repe/repne 相等(ZF==0)/不相等的时候重复
+
+* scasb(w|d) 两个对比数分别为 EAX / AX / AL 和 DS:EDI, 并且将edi-+1（2|4)
+
 ### ret
 * ret 弹栈到IP寄存器 
 * retf 弹栈到IP,再弹栈到CS
@@ -150,6 +154,21 @@ call far <span class="o">[</span>bx]
 偏移地址(2字节) | 段地址(2字节)    | 偏移地址..
 ---------------------------------------------
 </code></pre></div></div>
+<h2 id="内联汇编">内联汇编</h2>
+
+<h3 id="常用约束">常用约束</h3>
+
+<ul>
+  <li>r : Register(s)</li>
+  <li>a: %eax, %ax, %al</li>
+  <li>b: %ebx, %bx, %bl</li>
+  <li>c: %ecx, %cx, %cl</li>
+  <li>d: %edx, %dx, %dl</li>
+  <li>S: %esi, %si</li>
+  <li>D: %edi, %di</li>
+  <li>i: 直接操作数</li>
+  <li>=: 只写</li>
+</ul>
 
   
 </article>

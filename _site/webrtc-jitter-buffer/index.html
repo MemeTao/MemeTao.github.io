@@ -7,19 +7,19 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="author" content="songroger">
 
-  <title>Archive</title>
+  <title>webrtc接收端jitter公式推导</title>
 
-  <meta name="description" content="中国计量大学本科 通信工程 在读(2017) ">
+  <meta name="description" content="&lt;hr /&gt;">
 
   <!-- Open graph data -->
   <meta property="og:site_name" content="Welcome my site">
-  <meta property="og:title" content="Archive">
-  <meta property="og:url" content="http://MemeTao.github.io//archive/page5/">
+  <meta property="og:title" content="webrtc接收端jitter公式推导">
+  <meta property="og:url" content="http://MemeTao.github.io//webrtc-jitter-buffer/">
   <meta property="og:type" content="article">
-  <meta property="og:description" content="中国计量大学本科 通信工程 在读(2017) ">
+  <meta property="og:description" content="&lt;hr /&gt;">
 
   <!-- Standard Stuff -->
-  <link rel="canonical" href="http://MemeTao.github.io//archive/page5/"/>
+  <link rel="canonical" href="http://MemeTao.github.io//webrtc-jitter-buffer/"/>
   <link rel="alternate" type="application/rss+xml" title="Welcome my site" href="http://MemeTao.github.io//feed.xml"/>
 
   <!-- Favicons -->
@@ -61,30 +61,33 @@
   <main class="col">
 
 
-<h2 class="article__title article__title--single">Archive</h2>
-<ul>
+<article class="article">
+  <h2 class="article__title article__title--single">webrtc接收端jitter公式推导</h2>
+  <time class="article__date" datetime="2021-05-14"> 14:13 May.14-2021</time>
   
-    <div class="arch-item">
-      <li>
-        <a href="/markdown-manual/" class="arch-title">Markdown</a>
-        <time>Oct.12, 2016</time>
-      </li>
-      <div class="arch-desc">love markdown, love plain texts. Enjoy its manual</div>
-    </div>
-  
-</ul>
+  <hr />
 
-    <nav class="blocks blocks--space">
-      <div class="blocks__item">
-        <a href="/archive/page4">Previous</a>
-      </div>
-      <div class="blocks__item">
-        Page: 5 of 5
-      </div>
-      <div class="blocks__item">
-        
-      </div>
-    </nav>
+<h3 id="卡尔曼增益简单介绍及推导">卡尔曼增益简单介绍及推导</h3>
+
+<blockquote>
+  <p>有一把尺子测量一枚硬币的直径, 记录每次测量出的结果:$x_1$, $x_2$, $x_3$, ….</p>
+</blockquote>
+
+<p>那么, 对硬币直径的估计值:</p>
+
+<blockquote>
+  <p>$\overline{\text{x}}_n$ = ($x_1$+$x_2$+$x_3$+…+$x_n$) / n</p>
+</blockquote>
+
+<p>进一步, 写成递归形式:</p>
+
+<blockquote>
+  <p>$\overline{\text{x}}_n$ = ($x_1$+$x_2$+$x_3$+…+$x_n$) / n</p>
+</blockquote>
+
+  
+</article>
+
 
 
 
