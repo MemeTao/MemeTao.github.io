@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>webrtc接收端jitter公式推导-memetao</title>
+  <meta charset="utf-8" />
+  <meta http-equiv="content-language" content="zh-CN" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="supported-color-schemes" content="light dark">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="applicable-device" content="pc,mobile">
+  <meta name="google-site-verification" content="ckhUaoa05QCmWoE1FafzTBcqYI4yBOy-UJKopXDS18M" />
+  <meta name="author" content="memetao" />
+  <meta name="description" content="webrtc接收端jitter公式推导"/>
+  <meta name="keywords" content="memetao,webrtc"/>
+  <link rel="stylesheet" href="/static/css/common.css?t=20210516002110">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20210516002110">
+  <link rel="stylesheet" href="/static/css/post.css?t=20210516002110">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20210516002110">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20210516002110">
+  <script>
+    window.blog = {
+      baseurl:"",
+      buildAt:"20210516002110",
+      darkTheme: false,
+      setDarkTheme: function (dark) {
+        this.darkTheme = Boolean(dark);
+        document.documentElement.className = this.darkTheme ? 'dark': '';
+        document.querySelector('meta[name=theme-color]').setAttribute('content', this.darkTheme ? '#2D2E32': '#FFFFFF');
+      }
+    }
+    if (sessionStorage.darkTheme !== undefined) {
+      blog.setDarkTheme(sessionStorage.darkTheme === 'true'); // 记忆值，单个窗口内有效
+    } else {
+      blog.setDarkTheme(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches); // 跟随系统
+    }
+    if (window.matchMedia) {
+      var media = window.matchMedia('(prefers-color-scheme: dark)');
+      media.addListener(function (ev) {
+        blog.setDarkTheme(ev.currentTarget.matches);
+        sessionStorage.removeItem('darkTheme');
+      });
+    }
+  </script>
+</head>
+<body ondragstart="return false;">
+<header class="header">
+  <img class="logo" src="/static/img/logo.jpg" alt="logo"/>
+  <nav class="menu">
+    <a href="/" class="hover-underline">首页</a>
+    <a href="/pages/categories.html" class="hover-underline">归类</a>
+    <a href="/pages/about.html" class="hover-underline">关于</a>
+    </nav>
+</header>
+<div class="page page-post">
+  <h1 class="title" id="webrtc接收端jitter公式推导">webrtc接收端jitter公式推导</h1>
+  
+  <div class="subtitle">memetao 于 2021-05-14 发布</div>
+  
+  <div class="post">
+    <hr />
+
+<h3 id="卡尔曼增益简单介绍及推导">卡尔曼增益简单介绍及推导</h3>
+
+<blockquote>
+  <p>有一把尺子测量一枚硬币的直径, 记录每次测量出的结果(测量值):$x_1$, $x_2$, $x_3$, ….</p>
+</blockquote>
+
+<p>那么, 对硬币直径的估计值:</p>
+
+<center> 
+    $\overline{x}_n$ = $\frac {(x_1+x_2+x_3+...+x_n)} {n}$
+</center>
+
+<p>进一步, 写成递归形式:</p>
+<center> 
+    $\overline{x}_n$ =  $\overline{x}_{n-1}$ + $\frac{1}{n} (x_n - \overline{x}_{n-1})$ 
+</center>
+<p>可见, 随着 ${n\to+\infty}$, 测量结果已经不再重要.</p>
+
+<p>文字表示为:</p>
+
+<script type="math/tex; mode=display">当前的估计值 = 上一次的估计值 + 系数 * (当前的测试量 - 上一次的估计值)</script>
+
+<p>假设要考虑上一次的估计误差和本次的测量误差, 一个很直观的想法就是:</p>
+
+<ul>
+  <li>如果估计误差大于测量误差, 也就是说测量的更佳准确, 那么当前的估计值应该偏向于本次的测量值</li>
+  <li>如果估计误差小于测量误差, 也就是说测量的不准确, 那么当前的估计值应该偏向于上一次的估计值</li>
+</ul>
+
+<p>这就是数据融合的思想, 此时, 这个<strong>系数</strong>就是卡尔曼增益系数:</p>
+
+<script type="math/tex; mode=display">G = \frac {估计误差}{估计误差+测量误差}</script>
+
+  </div>
+  
+</div>
+<footer class="footer">
+  <span>Copyright © 2021 memetao</span>
+  <a href="/static/xml/rss.xml">RSS订阅</a>
+  <span>Theme By</span>
+  <a href="https://github.com/TMaize/tmaize-blog">TMaize</a>
+</footer>
+<div id="to-top">
+  <span></span>
+  <span></span>
+</div>
+<script type="text/javascript" src="/static/js/blog.js?t=20210516002110"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20210516002110"></script>
+<!-- 腾讯MTA移动分析 -->
+<script>
+  var _mtac = {performanceMonitor: 1, senseQuery: 1}
+  ;(function() {
+    if (window.location.hostname == '127.0.0.1') {
+      return
+    }
+    var mta = document.createElement('script')
+    mta.src = '//pingjs.qq.com/h5/stats.js?v2.0.4'
+    mta.setAttribute('name', 'MTAH5')
+    mta.setAttribute('sid', '500581966')
+    mta.setAttribute('cid', '500581972')
+    var s = document.getElementsByTagName('script')[0]
+    s.parentNode.insertBefore(mta, s)
+  })()
+</script>
+
+<!-- 百度自动推送 -->
+<script>
+  ;(function () {
+    if (window.location.hostname == '127.0.0.1') {
+      return
+    }
+    var bp = document.createElement('script')
+    var curProtocol = window.location.protocol.split(':')[0]
+    if (curProtocol === 'https') {
+      bp.src = 'https://zz.bdstatic.com/linksubmit/push.js'
+    } else {
+      bp.src = 'http://push.zhanzhang.baidu.com/push.js'
+    }
+    var s = document.getElementsByTagName('script')[0]
+    s.parentNode.insertBefore(bp, s)
+  })()
+</script>
+
+<!-- MathJax数学公式支持 -->
+<style>
+  .has-jax {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-color: transparent !important;
+    line-height: normal !important;
+    word-break: normal !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .has-jax * {
+    outline: 0;
+  }
+</style>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    showProcessingMessages: false,
+    messageStyle: "none",
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'a']
+    },
+    "HTML-CSS": {
+      showMathMenu: false
+    }
+  });
+  // 父级元素添加类名，便于css控制
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax();
+    var i = 0;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script
+  type="text/javascript"
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+></script>
+
+
+</body>
+</html>

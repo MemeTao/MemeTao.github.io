@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>总结c++中的cast-memetao</title>
+  <meta charset="utf-8" />
+  <meta http-equiv="content-language" content="zh-CN" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="supported-color-schemes" content="light dark">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="applicable-device" content="pc,mobile">
+  <meta name="google-site-verification" content="ckhUaoa05QCmWoE1FafzTBcqYI4yBOy-UJKopXDS18M" />
+  <meta name="author" content="memetao" />
+  <meta name="description" content="总结c++中的cast"/>
+  <meta name="keywords" content="memetao,c++"/>
+  <link rel="stylesheet" href="/static/css/common.css?t=20210516002300">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20210516002300">
+  <link rel="stylesheet" href="/static/css/post.css?t=20210516002300">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20210516002300">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20210516002300">
+  <script>
+    window.blog = {
+      baseurl:"",
+      buildAt:"20210516002300",
+      darkTheme: false,
+      setDarkTheme: function (dark) {
+        this.darkTheme = Boolean(dark);
+        document.documentElement.className = this.darkTheme ? 'dark': '';
+        document.querySelector('meta[name=theme-color]').setAttribute('content', this.darkTheme ? '#2D2E32': '#FFFFFF');
+      }
+    }
+    if (sessionStorage.darkTheme !== undefined) {
+      blog.setDarkTheme(sessionStorage.darkTheme === 'true'); // 记忆值，单个窗口内有效
+    } else {
+      blog.setDarkTheme(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches); // 跟随系统
+    }
+    if (window.matchMedia) {
+      var media = window.matchMedia('(prefers-color-scheme: dark)');
+      media.addListener(function (ev) {
+        blog.setDarkTheme(ev.currentTarget.matches);
+        sessionStorage.removeItem('darkTheme');
+      });
+    }
+  </script>
+</head>
+<body ondragstart="return false;">
+<header class="header">
+  <img class="logo" src="/static/img/logo.jpg" alt="logo"/>
+  <nav class="menu">
+    <a href="/" class="hover-underline">首页</a>
+    <a href="/pages/categories.html" class="hover-underline">归类</a>
+    <a href="/pages/about.html" class="hover-underline">关于</a>
+    </nav>
+</header>
+<div class="page page-post">
+  <h1 class="title" id="总结c++中的cast">总结c++中的cast</h1>
+  
+  <div class="subtitle">memetao 于 2019-03-11 发布</div>
+  
+  <div class="post">
+    <hr />
+
+<h3 id="前言">前言</h3>
+<p>此文算是一个notes，总结一下C++中的各类cast用法和原理。</p>
+<h3 id="static_cast">static_cast</h3>
+<p><strong>总结:反转一个定义良好的隐式类型转换</strong></p>
+
+<blockquote>
+  <p>static_cast 执行关联类型之间的转换，比如一种指针类型向同一个类层次中其它指针类型的转换，或者整数类型向枚举类型的转换，或者浮点类型向整数类型的转换。它还能执行构造函数和转换运算符。</p>
+</blockquote>
+
+<p><strong>同一类层次</strong></p>
+
+<pre><code class="language-C++">class B{
+};
+class D : public B{
+}
+</code></pre>
+<p>B和D就叫做同一个类层次。</p>
+<pre><code class="language-C++">char* ptr_c = nullptr;
+int* ptr_i = static_cast&lt;int*&gt;(ptr_c); //编译失败
+B* ptr_b = new B();
+D* ptr_d = ptr_b; //编译失败
+D* ptr_d = static_cast&lt;D*&gt;(ptr_b); //fine
+</code></pre>
+<p>但是，down_cast是没有任何保证的，程序员必须明白会发生什么事情。</p>
+
+<p><strong>整数类型向枚举类型的转换</strong></p>
+<pre><code class="language-C++">enum class E : uint8_t{
+    kValue = 1
+};
+uint8_t v = E::kValue ; //编译失败
+uint8_t v = static_cast&lt;uint8_t&gt;(E::kValue); //fine
+</code></pre>
+
+<h3 id="const_cast">const_cast</h3>
+<p>const_cast<type>(expression)</type></p>
+<blockquote>
+  <p><strong>参与转换的类型仅在const修饰符及volatile修饰符上有所区别</strong>，除此以外new_type和expression的类型是一样。</p>
+  <ul>
+    <li>常量指针被转化成非常量的指针，并且仍然指向原来的对象。</li>
+    <li>常量引用被转化成非常量的引用，并且仍然指向原来的对象。</li>
+  </ul>
+</blockquote>
+
+<h3 id="dynamic_cast">dynamic_cast</h3>
+<p>dynamic_cast&lt;type*&gt;(e) 执行指针或者引用向类层次体系的类型转换，并执行运行时检查。</p>
+
+<p>不管是向上或者向下或者向左右都可以调用dynamic_cast。</p>
+
+<p>对于upcast，可以但没必要，向上塑性直接写就完事儿了。</p>
+
+<h3 id="reinterpret_cast">reinterpret_cast</h3>
+<p>reinterpret_cast<type>(expression)</type></p>
+
+<p>这玩意就用的比较少了，和static_cast不一样，只有以下情况可以使用reinterpret_cast:</p>
+
+<ul>
+  <li>1.表达式是整形、枚举、指针、或者成员指针</li>
+  <li>2.指针和整形互转</li>
+  <li>3.T1* 可以和 T2* 互转</li>
+  <li>4.T1左值可以转化为T2引用</li>
+  <li>5.函数指针可以随便转，不用管类型。这里的函数指针包括类成员函数。
+相对与static_cast的区别，有以下一个例子:</li>
+</ul>
+
+<pre><code class="language-C++">class A {
+    public:
+    int m_a;
+};
+class B {
+    public:
+    int m_b;
+};
+class C : public A, public B {};
+
+C c;
+printf("%p, %p, %p", &amp;c, reinterpret_cast&lt;B*&gt;(&amp;c), static_cast &lt;B*&gt;(&amp;c));
+</code></pre>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt;前两个的输出值是相同的，最后一个则会在原基础上偏移4个字节，这是因为static_cast计算了父子类指针转换的偏移量，并将之转换到正确的地址（c里面有m_a,m_b，转换为B*指针后指到m_b处），而reinterpret_cast却不会做这一层转换。因此, 你需要谨慎使用 reinterpret_cast。
+</code></pre></div></div>
+
+<h3 id="static_pointer_cast">static_pointer_cast</h3>
+
+<h3 id="dynamic_pointer_cast">dynamic_pointer_cast</h3>
+
+<h3 id="const_pointer_cast">const_pointer_cast</h3>
+
+<h3 id="reinterpret_cast-1">reinterpret_cast</h3>
+
+<p>总结上述4个:</p>
+
+<pre><code class="language-C++">template&lt; class T, class U &gt; 
+std::shared_ptr&lt;T&gt; static_pointer_cast( const std::shared_ptr&lt;U&gt;&amp; r ) noexcept
+{
+    auto p = static_cast&lt;typename std::shared_ptr&lt;T&gt;::element_type*&gt;(r.get());
+    return std::shared_ptr&lt;T&gt;(r, p);
+}
+
+template&lt; class T, class U &gt; 
+std::shared_ptr&lt;T&gt; dynamic_pointer_cast( const std::shared_ptr&lt;U&gt;&amp; r ) noexcept
+{
+    if (auto p = dynamic_cast&lt;typename std::shared_ptr&lt;T&gt;::element_type*&gt;(r.get())) {
+        return std::shared_ptr&lt;T&gt;(r, p);
+    } else {
+        return std::shared_ptr&lt;T&gt;();
+    }
+}
+
+template&lt; class T, class U &gt; 
+std::shared_ptr&lt;T&gt; const_pointer_cast( const std::shared_ptr&lt;U&gt;&amp; r ) noexcept
+{
+    auto p = const_cast&lt;typename std::shared_ptr&lt;T&gt;::element_type*&gt;(r.get());
+    return std::shared_ptr&lt;T&gt;(r, p);
+}
+
+template&lt; class T, class U &gt; 
+std::shared_ptr&lt;T&gt; reinterpret_pointer_cast( const std::shared_ptr&lt;U&gt;&amp; r ) noexcept
+{
+    auto p = reinterpret_cast&lt;typename std::shared_ptr&lt;T&gt;::element_type*&gt;(r.get());
+    return std::shared_ptr&lt;T&gt;(r, p);
+}
+</code></pre>
+
+  </div>
+  
+</div>
+<footer class="footer">
+  <span>Copyright © 2021 memetao</span>
+  <a href="/static/xml/rss.xml">RSS订阅</a>
+  <span>Theme By</span>
+  <a href="https://github.com/TMaize/tmaize-blog">TMaize</a>
+</footer>
+<div id="to-top">
+  <span></span>
+  <span></span>
+</div>
+<script type="text/javascript" src="/static/js/blog.js?t=20210516002300"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20210516002300"></script>
+<!-- 腾讯MTA移动分析 -->
+<script>
+  var _mtac = {performanceMonitor: 1, senseQuery: 1}
+  ;(function() {
+    if (window.location.hostname == '127.0.0.1') {
+      return
+    }
+    var mta = document.createElement('script')
+    mta.src = '//pingjs.qq.com/h5/stats.js?v2.0.4'
+    mta.setAttribute('name', 'MTAH5')
+    mta.setAttribute('sid', '500581966')
+    mta.setAttribute('cid', '500581972')
+    var s = document.getElementsByTagName('script')[0]
+    s.parentNode.insertBefore(mta, s)
+  })()
+</script>
+
+<!-- 百度自动推送 -->
+<script>
+  ;(function () {
+    if (window.location.hostname == '127.0.0.1') {
+      return
+    }
+    var bp = document.createElement('script')
+    var curProtocol = window.location.protocol.split(':')[0]
+    if (curProtocol === 'https') {
+      bp.src = 'https://zz.bdstatic.com/linksubmit/push.js'
+    } else {
+      bp.src = 'http://push.zhanzhang.baidu.com/push.js'
+    }
+    var s = document.getElementsByTagName('script')[0]
+    s.parentNode.insertBefore(bp, s)
+  })()
+</script>
+
+<!-- MathJax数学公式支持 -->
+<style>
+  .has-jax {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-color: transparent !important;
+    line-height: normal !important;
+    word-break: normal !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .has-jax * {
+    outline: 0;
+  }
+</style>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    showProcessingMessages: false,
+    messageStyle: "none",
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'a']
+    },
+    "HTML-CSS": {
+      showMathMenu: false
+    }
+  });
+  // 父级元素添加类名，便于css控制
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax();
+    var i = 0;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script
+  type="text/javascript"
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+></script>
+
+
+</body>
+</html>

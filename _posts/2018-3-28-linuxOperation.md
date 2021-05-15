@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: mypost
 title:  "linux操作记录"
 date:   2017-4-12 17:13:17 +0800
 categories: linux 

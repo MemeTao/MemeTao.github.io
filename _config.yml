@@ -1,33 +1,38 @@
-# Site configuration
-domain: "http://songroger.win"
-baseurl: "" # the subpath of your site, e.g. /blog/
-url: "http://MemeTao.github.io/" # the base hostname & protocol for your site
-permalink: /:title/   #永久链接
-avatar: #http://7xof48.com1.z0.glb.clouddn.com/avatar.jpg
-#about 界面的图片链接
-about:  http://b378.photo.store.qq.com/psb?/V1311dRQ1yWisx/kv5WfHv3.AQQMXsqf4MggaUjVPgsSWf.UKJlwgb3yX8!/b/dHoBAAAAAAAA&bo=0ALMA9ACzAMFCSo!&rf=viewer_4
-favicon: http://7xof48.com1.z0.glb.clouddn.com/favicon.png
-basecss: 
-# Theme specific configuration
-title: Welcome my site 
-description: >
-    中国计量大学本科 通信工程 在读(2017)
-     
-# Contact and social media links
-#twitter_username: songrogero
-github_username: MemeTao 
+encoding: utf-8
 
-exclude: ['node_modules', 'gulpfile.js', 'package.json']
+title: memetao
+description: memetao的成长轨迹
+keywords: memetao, blog
+author: memetao
+footerText: 'Copyright © 2021 memetao'
 
+# 这些不要动
+permalink: /posts/:year/:month/:day/:title.html
 kramdown:
+  auto_ids: true
   input: GFM
-  math_engine: mathjax
+  syntax_highlighter: rouge
+exclude: ['CNAME', 'README.md', 'LICENSE', '_site', 'dist', 'Gemfile', 'Gemfile.lock', 'blog.sh']
 
-# If U enable the comment, edit disqus or duoshuo account of "/_layouts/post.html"
-# before deploy your webpage
-enable_comment: false 
+# 菜单
+menu:
+  - title: 首页
+    url: /
+  - title: 归类
+    url: /pages/categories.html
+  - title: 关于
+    url: /pages/about.html
 
-gems: ['jekyll-paginate']
-# Pagination
-paginate: 5
-paginate_path: /archive/page:num
+# 点击页面文字冒出特效,不需要请设置为false
+extClickEffect: false
+# Google Adsense,不需要请设置为false
+# _includes/ext-adsense.html 里面修改为自己的配置
+extAdsense: false
+# 腾讯MTA移动分析,不需要请设置为false
+# _includes/ext-adsense.html 里面修改为自己的配置
+extMTA: true
+# 百度收录自动推送,不需要请设置为false
+extBaidu: true
+
+# 数学公式支持，比较影响加载速度,不需要请设置为false
+extMath: true

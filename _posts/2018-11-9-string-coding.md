@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: mypost
 title:  "字符串编码"
 date:   2018-11-08 17:13:17 +0800
 categories: c++ 

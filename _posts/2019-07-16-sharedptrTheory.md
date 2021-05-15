@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: mypost
 title:  "enable_shared_from_this 实现机制"
 date:   2019-7-16 09:13:17 +0800
 categories: c++

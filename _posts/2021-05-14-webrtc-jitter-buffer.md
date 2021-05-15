@@ -1,10 +1,9 @@
 ---
-layout: post
-title:  "webrtc接收端jitter公式推导"
-date:   2021-05-14 14:13:17 +0800
+layout: mypost
+title: "webrtc接收端jitter公式推导"
+date: 2021-05-14 14:13:17 +0800
 categories: webrtc
 location: HangZhou,China 
-description:  
 ---
 ---
 

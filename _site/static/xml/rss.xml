@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>memetao</title>
+    <link></link>
+    <description>memetao的成长轨迹</description>
+    <language>zh-CN</language>
+    <pubDate>Sun, 16 May 2021 00:23:00 +0800</pubDate>
+    <lastBuildDate>Sun, 16 May 2021 00:23:00 +0800</lastBuildDate>
+    <generator>Jekyll v3.8.6</generator>
+    <atom:link href="/static/xml/rss.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>webrtc接收端jitter公式推导</title>
+      <link>/posts/2021/05/14/webrtc-jitter-buffer.html</link>
+      <description>卡尔曼增益简单介绍及推导有一把尺子测量一枚硬币的直径,记录每次测量出的结果(测量值):$x_1$,$x_2$,$x_3$,….那么,对硬币直径的估计值:$\overline{x}_n$=$\frac{(x_1+x_2+x_3+...+...</description>
+      <pubDate>Fri, 14 May 2021 14:13:17 +0800</pubDate>
+      <gui>/posts/2021/05/14/webrtc-jitter-buffer.html</gui>
+    </item>
+    <item>
+      <title>lea和mov指令的真正区别</title>
+      <link>/posts/2021/04/07/leaVSmov.html</link>
+      <description>lea指令lea指令的解释是:loadeffectiveaddress.网上有很多解释,比如知乎高赞汇编语言中mov和lea的区别有哪些？:lea是“loadeffectiveaddress”的缩写，简单的说，lea指令可以用来将一个...</description>
+      <pubDate>Wed, 07 Apr 2021 08:13:17 +0800</pubDate>
+      <gui>/posts/2021/04/07/leaVSmov.html</gui>
+    </item>
+    <item>
+      <title>X86汇编笔记</title>
+      <link>/posts/2020/12/12/x84-assembly.html</link>
+      <description>###notes在8086处理器上,如果要用寄存器来提供偏移地址,只能使用BX,si,di,bP,不能使用其它寄存器.以下指令是非法的:mov[ax],dl8086处理器只支持以下几种基地址寄存器和变址寄存器的组合:[bx+si][b...</description>
+      <pubDate>Sat, 12 Dec 2020 17:13:17 +0800</pubDate>
+      <gui>/posts/2020/12/12/x84-assembly.html</gui>
+    </item>
+    <item>
+      <title>webrtc带宽预测中的Probe（探测）模块</title>
+      <link>/posts/2019/08/12/webrtc-porber.html</link>
+      <description>Probewebrtc使用gcc（googlecongestioncontrol）来估计带宽，控制当前的发送速度。gcc中基于丢包和基于延迟的算法有个特点：1.能迅速响应带宽的衰减2.不能迅速响应带宽的增加举个例子，如果当前带宽是20...</description>
+      <pubDate>Mon, 12 Aug 2019 09:13:17 +0800</pubDate>
+      <gui>/posts/2019/08/12/webrtc-porber.html</gui>
+    </item>
+    <item>
+      <title>enable_shared_from_this 实现机制</title>
+      <link>/posts/2019/07/16/sharedptrTheory.html</link>
+      <description>template&amp;lt;typenameT&amp;gt;classshared_ptr{public:shared_ptr&amp;lt;T&amp;gt;(T*t){set_ptr(this,t);}};template&amp;lt;typenameT&amp;gt;...</description>
+      <pubDate>Tue, 16 Jul 2019 09:13:17 +0800</pubDate>
+      <gui>/posts/2019/07/16/sharedptrTheory.html</gui>
+    </item>
+    <item>
+      <title>Google拥塞控制算法--TrendingLine滤波器</title>
+      <link>/posts/2019/06/28/GccTrendlineFilter.html</link>
+      <description>延迟梯度左边的Tx表示发送时间，右边的tx表示接收时间。延迟梯度的计算公式就是：gt(i)=(t(i)-t(i-1))-(T(i)-T(i-1))，实际上就是发送间隔和接收间隔的差值。网络状态良好的情况下，这个值为0，当网络状态变差(...</description>
+      <pubDate>Fri, 28 Jun 2019 10:13:17 +0800</pubDate>
+      <gui>/posts/2019/06/28/GccTrendlineFilter.html</gui>
+    </item>
+    <item>
+      <title>总结c++中的cast</title>
+      <link>/posts/2019/03/11/cppcastall.html</link>
+      <description>前言此文算是一个notes，总结一下C++中的各类cast用法和原理。static_cast总结:反转一个定义良好的隐式类型转换static_cast执行关联类型之间的转换，比如一种指针类型向同一个类层次中其它指针类型的转换，或者整数...</description>
+      <pubDate>Mon, 11 Mar 2019 12:13:17 +0800</pubDate>
+      <gui>/posts/2019/03/11/cppcastall.html</gui>
+    </item>
+    <item>
+      <title>字符串编码</title>
+      <link>/posts/2018/11/08/string-coding.html</link>
+      <description>前言一直以来，字符串编码总是我摸不着头脑。对待字符串编码问题的策略也是简单粗暴，直接规避：一律使用utf-8。但是，猿在码界漂，哪能不挨刀。今天就总结一下字符串编码问题。编码类型介绍ascii编码格式花样很多。由于计算机是老美发明的，...</description>
+      <pubDate>Thu, 08 Nov 2018 17:13:17 +0800</pubDate>
+      <gui>/posts/2018/11/08/string-coding.html</gui>
+    </item>
+    <item>
+      <title>C++成员函数指针的大小</title>
+      <link>/posts/2018/07/12/theSizeOfMemeberFunctionPointer.html</link>
+      <description>c++中的函数指针(假定在64位机器上)我们知道指针的大小恒定的,跟机器位数有关,32位机下,指针是4字节大小,64位机下指针是8字节大小.但是在C++中,有一个比较特殊的地方是C++的类成员函数指针,它的大小是普通指针的2倍.先看一...</description>
+      <pubDate>Thu, 12 Jul 2018 17:13:17 +0800</pubDate>
+      <gui>/posts/2018/07/12/theSizeOfMemeberFunctionPointer.html</gui>
+    </item>
+    <item>
+      <title>linux操作记录</title>
+      <link>/posts/2017/04/12/linuxOperation.html</link>
+      <description>安装与卸载apt-getinstallxxx#安装xxxapt-getremovexxx#卸载xxxapt-getupdate#更新软件信息数据库apt-getupgrade#进行系统升级apt-cachesearch#搜索软件包文件...</description>
+      <pubDate>Wed, 12 Apr 2017 17:13:17 +0800</pubDate>
+      <gui>/posts/2017/04/12/linuxOperation.html</gui>
+    </item>
+    <item>
+      <title>维特比算法的实现</title>
+      <link>/posts/2017/04/12/VBIT.html</link>
+      <description>前几天做通信原理的实验，发现网上关于维特比算法的解释太理论化，我结合代码通俗话的解释一下。如果看了以下代码您还是不能理解维特比纠错算法的真实目的，请务必联系我！首先，我问大家一个问题，如下：A，B，C代表三个地点，三条实线代表路径。假...</description>
+      <pubDate>Wed, 12 Apr 2017 17:13:17 +0800</pubDate>
+      <gui>/posts/2017/04/12/VBIT.html</gui>
+    </item>
+  </channel>
+</rss>

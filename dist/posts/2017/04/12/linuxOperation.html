@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>linux操作记录-memetao</title>
+  <meta charset="utf-8" />
+  <meta http-equiv="content-language" content="zh-CN" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="supported-color-schemes" content="light dark">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="applicable-device" content="pc,mobile">
+  <meta name="google-site-verification" content="ckhUaoa05QCmWoE1FafzTBcqYI4yBOy-UJKopXDS18M" />
+  <meta name="author" content="memetao" />
+  <meta name="description" content="linux操作记录"/>
+  <meta name="keywords" content="memetao,linux"/>
+  <link rel="stylesheet" href="/static/css/common.css?t=20210516002110">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20210516002110">
+  <link rel="stylesheet" href="/static/css/post.css?t=20210516002110">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20210516002110">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20210516002110">
+  <script>
+    window.blog = {
+      baseurl:"",
+      buildAt:"20210516002110",
+      darkTheme: false,
+      setDarkTheme: function (dark) {
+        this.darkTheme = Boolean(dark);
+        document.documentElement.className = this.darkTheme ? 'dark': '';
+        document.querySelector('meta[name=theme-color]').setAttribute('content', this.darkTheme ? '#2D2E32': '#FFFFFF');
+      }
+    }
+    if (sessionStorage.darkTheme !== undefined) {
+      blog.setDarkTheme(sessionStorage.darkTheme === 'true'); // 记忆值，单个窗口内有效
+    } else {
+      blog.setDarkTheme(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches); // 跟随系统
+    }
+    if (window.matchMedia) {
+      var media = window.matchMedia('(prefers-color-scheme: dark)');
+      media.addListener(function (ev) {
+        blog.setDarkTheme(ev.currentTarget.matches);
+        sessionStorage.removeItem('darkTheme');
+      });
+    }
+  </script>
+</head>
+<body ondragstart="return false;">
+<header class="header">
+  <img class="logo" src="/static/img/logo.jpg" alt="logo"/>
+  <nav class="menu">
+    <a href="/" class="hover-underline">首页</a>
+    <a href="/pages/categories.html" class="hover-underline">归类</a>
+    <a href="/pages/about.html" class="hover-underline">关于</a>
+    </nav>
+</header>
+<div class="page page-post">
+  <h1 class="title" id="linux操作记录">linux操作记录</h1>
+  
+  <div class="subtitle">memetao 于 2017-04-12 发布</div>
+  
+  <div class="post">
+    <hr />
+
+<h3 id="安装与卸载">安装与卸载</h3>
+<ul>
+  <li>apt-get install xxx #安装xxx</li>
+  <li>apt-get remove xxx  #卸载xxx</li>
+  <li>apt-get update      #更新软件信息数据库</li>
+  <li>apt-get upgrade     #进行系统升级</li>
+  <li>apt-cache search    #搜索软件包
+    <h3 id="文件查找">文件查找</h3>
+  </li>
+  <li>
+    <ol>
+      <li>find / -name filename
+        <h3 id="替换操作">替换操作</h3>
+        <h4 id="语法为-addrs源字符串目的字符串option">语法为 :[addr]s/源字符串/目的字符串/[option]</h4>
+        <div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="n">addr</span><span class="p">]</span> <span class="c1">//表示检索范围，省略时表示当前行。</span>
+<span class="c1">//如:"1，20":表示从第1行到20行；</span>
+<span class="s">"%"</span><span class="o">:</span><span class="c1">//表示整个文件，同“1,$”；</span>
+<span class="s">".,$"</span><span class="o">:</span><span class="c1">//从当前行到文件尾；</span>
+<span class="n">s</span><span class="o">:</span> <span class="c1">//表示替换操作</span>
+<span class="p">[</span><span class="n">option</span><span class="p">]</span><span class="o">:</span><span class="c1">//表示操作类型</span>
+<span class="c1">//如: g 表示全局替换; </span>
+<span class="c1">//c 表示进行确认</span>
+<span class="c1">//p 表示替代结果逐行显示（Ctrl + L恢复屏幕）；</span>
+<span class="c1">//省略option时仅对每行第一个匹配串进行替换；</span>
+<span class="c1">//如果在源字符串和目的字符串中出现特殊字符，需要用”\”转义</span>
+</code></pre></div>        </div>
+      </li>
+    </ol>
+  </li>
+</ul>
+
+<h3 id="压缩解压">压缩、解压</h3>
+
+<p><strong>tar</strong></p>
+<ul>
+  <li>-c: 建立压缩档案</li>
+  <li>-x：解压</li>
+  <li>-t：查看内容</li>
+  <li>-r：向压缩归档文件末尾追加文件</li>
+  <li>-u：更新原压缩包中的文件</li>
+</ul>
+
+<p>这五个是独立的命令，压缩解压都要用到其中一个，可以和别的命令连用但只能用其中一个。下面的参数是根据需要在压缩或解压档案时可选的。</p>
+
+<ul>
+  <li>-z：有gzip属性的</li>
+  <li>-j：有bz2属性的</li>
+  <li>-Z：有compress属性的</li>
+  <li>-v：显示所有过程</li>
+  <li>-O：将文件解开到标准输出</li>
+</ul>
+
+<p>下面的参数-f是必须的</p>
+
+<ul>
+  <li>-f: 使用档案名字，切记，这个参数是最后一个参数，后面只能接档案名。
+ tar -cf all.tar *.jpg
+    <blockquote>
+      <p>这条命令是将所有.jpg的文件打成一个名为all.tar的包。-c是表示产生新的包，-f指定包的文件名。</p>
+    </blockquote>
+  </li>
+  <li>tar -rf all.tar *.gif
+    <blockquote>
+      <p>这条命令是将所有.gif的文件增加到all.tar的包里面去。-r是表示增加文件的意思。</p>
+    </blockquote>
+  </li>
+  <li>tar -uf all.tar logo.gif
+    <blockquote>
+      <p>这条命令是更新原来tar包all.tar中logo.gif文件，-u是表示更新文件的意思。</p>
+    </blockquote>
+  </li>
+  <li>tar -tf all.tar
+    <blockquote>
+      <p>这条命令是列出all.tar包中所有文件，-t是列出文件的意思</p>
+    </blockquote>
+  </li>
+  <li>tar -xf all.tar
+    <blockquote>
+      <p>这条命令是解出all.tar包中所有文件，-t是解开的意思</p>
+    </blockquote>
+  </li>
+</ul>
+
+<h4 id="压缩">压缩</h4>
+<ul>
+  <li>tar -cvf jpg.tar *.jpg //将目录里所有jpg文件打包成tar.jpg</li>
+  <li>tar -czf jpg.tar.gz *.jpg   //将目录里所有jpg文件打包成jpg.tar后，并且将其用gzip压缩，生成一个gzip压缩过的包，命名为jpg.tar.gz</li>
+  <li>tar -cjf jpg.tar.bz2 *.jpg //将目录里所有jpg文件打包成jpg.tar后，并且将其用bzip2压缩，生成一个bzip2压缩过的包，命名为jpg.tar.bz2</li>
+  <li>tar -cZf jpg.tar.Z *.jpg   //将目录里所有jpg文件打包成jpg.tar后，并且将其用compress压缩，生成一个umcompress压缩过的包，命名为jpg.tar.Z</li>
+  <li>rar a jpg.rar *.jpg //rar格式的压缩，需要先下载rar for linux</li>
+  <li>zip jpg.zip *.jpg //zip格式的压缩，需要先下载zip for linux</li>
+</ul>
+
+<h4 id="解压">解压</h4>
+<ul>
+  <li>tar -xvf file.tar //解压 tar包</li>
+  <li>tar -xzvf file.tar.gz //解压tar.gz</li>
+  <li>tar -xjvf file.tar.bz2   //解压 tar.bz2</li>
+  <li>tar -xZvf file.tar.Z   //解压tar.Z</li>
+  <li>unrar e file.rar //解压rar</li>
+  <li>unzip file.zip //解压zip</li>
+</ul>
+
+<p>解压jdk到指定文件夹：</p>
+<blockquote>
+  <p>tar -xzvf jdk-8u131-linux-x64.tar.gz -C /usr/local/java</p>
+</blockquote>
+
+<h3 id="统计代码行数">统计代码行数</h3>
+<ul>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td>1.find ./ -name *.cpp</td>
+          <td>xargs wc -l</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li>2.find ./ -name *.cpp | xargs wc -l | sort -n
+    <h3 id="常用shell">常用shell</h3>
+  </li>
+  <li>环境变量添加 1.echo export PATH=$(pwd):$PATH</li>
+  <li>进制xx服务开机启动:update-rc disable xx</li>
+</ul>
+
+  </div>
+  
+</div>
+<footer class="footer">
+  <span>Copyright © 2021 memetao</span>
+  <a href="/static/xml/rss.xml">RSS订阅</a>
+  <span>Theme By</span>
+  <a href="https://github.com/TMaize/tmaize-blog">TMaize</a>
+</footer>
+<div id="to-top">
+  <span></span>
+  <span></span>
+</div>
+<script type="text/javascript" src="/static/js/blog.js?t=20210516002110"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20210516002110"></script>
+<!-- 腾讯MTA移动分析 -->
+<script>
+  var _mtac = {performanceMonitor: 1, senseQuery: 1}
+  ;(function() {
+    if (window.location.hostname == '127.0.0.1') {
+      return
+    }
+    var mta = document.createElement('script')
+    mta.src = '//pingjs.qq.com/h5/stats.js?v2.0.4'
+    mta.setAttribute('name', 'MTAH5')
+    mta.setAttribute('sid', '500581966')
+    mta.setAttribute('cid', '500581972')
+    var s = document.getElementsByTagName('script')[0]
+    s.parentNode.insertBefore(mta, s)
+  })()
+</script>
+
+<!-- 百度自动推送 -->
+<script>
+  ;(function () {
+    if (window.location.hostname == '127.0.0.1') {
+      return
+    }
+    var bp = document.createElement('script')
+    var curProtocol = window.location.protocol.split(':')[0]
+    if (curProtocol === 'https') {
+      bp.src = 'https://zz.bdstatic.com/linksubmit/push.js'
+    } else {
+      bp.src = 'http://push.zhanzhang.baidu.com/push.js'
+    }
+    var s = document.getElementsByTagName('script')[0]
+    s.parentNode.insertBefore(bp, s)
+  })()
+</script>
+
+<!-- MathJax数学公式支持 -->
+<style>
+  .has-jax {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-color: transparent !important;
+    line-height: normal !important;
+    word-break: normal !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .has-jax * {
+    outline: 0;
+  }
+</style>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    showProcessingMessages: false,
+    messageStyle: "none",
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'a']
+    },
+    "HTML-CSS": {
+      showMathMenu: false
+    }
+  });
+  // 父级元素添加类名，便于css控制
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax();
+    var i = 0;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script
+  type="text/javascript"
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+></script>
+
+
+</body>
+</html>

@@ -1,5 +1,5 @@
 ---
-layout: post
+layout: mypost
 title:  "webrtc带宽预测中的Probe（探测）模块"
 date:   2019-08-12 09:13:17 +0800
 categories: network program 
@@ -25,7 +25,7 @@ webrtc中有一个用来在起始阶段（或周期性）迅速探测到当前�
 Probe的原理简单说起来就是这样的：发送端以一定的速度发送数据包，同时记录这些数据包的发送时间、序列号（全局唯一）、探测组的id.
 
 接收端每过一段时间（50-150ms）会反馈数据包的到达时间，就像这样：
-![probeExample](../material/WebrtcProbe/1.png)
+![probeExample](1.png)
 
 s_t表示发送时间、r_t标识接受时间，这样我们就知道了发送速度、接收速度:
 

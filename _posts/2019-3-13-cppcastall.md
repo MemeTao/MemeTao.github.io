@@ -1,10 +1,9 @@
 ---
-layout: post
+layout: mypost
 title:  "总结c++中的cast"
 date:   2019-3-11 12:13:17 +0800
 categories: c++ 
 location: HangZhou,China 
-description:  
 ---
 ---
 
