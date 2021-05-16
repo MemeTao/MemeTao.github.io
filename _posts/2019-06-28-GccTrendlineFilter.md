@@ -2,7 +2,7 @@
 layout: mypost
 title:  "Google拥塞控制算法--TrendingLine滤波器"
 date:   2019-06-28 10:13:17 +0800
-categories: network,gcc,udp
+categories: webrtc
 location: HangZhou,China 
 description:  
 ---

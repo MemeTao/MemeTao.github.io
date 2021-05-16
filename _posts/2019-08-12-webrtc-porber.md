@@ -2,7 +2,7 @@
 layout: mypost
 title:  "webrtc带宽预测中的Probe（探测）模块"
 date:   2019-08-12 09:13:17 +0800
-categories: network program 
+categories: webrtc
 location: HangZhou,China 
 description:  
 ---
