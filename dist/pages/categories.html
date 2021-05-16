@@ -14,13 +14,13 @@
   <meta name="author" content="memetao" />
   <meta name="description" content="memetao的成长轨迹"/>
   <meta name="keywords" content="memetao, blog"/>
-  <link rel="stylesheet" href="/static/css/common.css?t=20210516115901">
-  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20210516115901">
-  <link rel="stylesheet" href="/static/css/page.css?t=20210516115901">
+  <link rel="stylesheet" href="/static/css/common.css?t=20210516182817">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20210516182817">
+  <link rel="stylesheet" href="/static/css/page.css?t=20210516182817">
   <script>
     window.blog = {
       baseurl:"",
-      buildAt:"20210516115901",
+      buildAt:"20210516182817",
       darkTheme: false,
       setDarkTheme: function (dark) {
         this.darkTheme = Boolean(dark);
@@ -55,19 +55,14 @@
   <div class="list-category">
     <h2>所有分类</h2>
     <div>
-      <a href="javascript:document.getElementById('algorithm').scrollIntoView()">algorithm</a>
+      <a href="javascript:document.getElementById('算法').scrollIntoView()">算法</a>
       <a href="javascript:document.getElementById('linux').scrollIntoView()">linux</a>
       <a href="javascript:document.getElementById('c++').scrollIntoView()">c++</a>
-      <a href="javascript:document.getElementById('network,gcc,udp').scrollIntoView()">network,gcc,udp</a>
-      <a href="javascript:document.getElementById('network').scrollIntoView()">network</a>
-      <a href="javascript:document.getElementById('program').scrollIntoView()">program</a>
-      <a href="javascript:document.getElementById('assembly').scrollIntoView()">assembly</a>
-      <a href="javascript:document.getElementById('Linux').scrollIntoView()">Linux</a>
       <a href="javascript:document.getElementById('webrtc').scrollIntoView()">webrtc</a>
     </div>
   </div>
   <div class="list-post">
-    <h2 id="algorithm">algorithm</h2>
+    <h2 id="算法">算法</h2>
     <ul>
       <li>
         <span class="date">2017/04/12</span>
@@ -80,6 +75,18 @@
   <div class="list-post">
     <h2 id="linux">linux</h2>
     <ul>
+      <li>
+        <span class="date">2021/04/07</span>
+        <div class="title">
+          <a href="/posts/2021/04/07/leaVSmov.html" class="hover-underline">lea和mov指令的真正区别</a>
+        </div>
+      </li>
+      <li>
+        <span class="date">2020/12/12</span>
+        <div class="title">
+          <a href="/posts/2020/12/12/x84-assembly.html" class="hover-underline">X86汇编笔记</a>
+        </div>
+      </li>
       <li>
         <span class="date">2017/04/12</span>
         <div class="title">
@@ -118,67 +125,24 @@
     </ul>
   </div>
   <div class="list-post">
-    <h2 id="network,gcc,udp">network,gcc,udp</h2>
-    <ul>
-      <li>
-        <span class="date">2019/06/28</span>
-        <div class="title">
-          <a href="/posts/2019/06/28/GccTrendlineFilter.html" class="hover-underline">Google拥塞控制算法--TrendingLine滤波器</a>
-        </div>
-      </li>
-    </ul>
-  </div>
-  <div class="list-post">
-    <h2 id="network">network</h2>
-    <ul>
-      <li>
-        <span class="date">2019/08/12</span>
-        <div class="title">
-          <a href="/posts/2019/08/12/webrtc-porber.html" class="hover-underline">webrtc带宽预测中的Probe（探测）模块</a>
-        </div>
-      </li>
-    </ul>
-  </div>
-  <div class="list-post">
-    <h2 id="program">program</h2>
-    <ul>
-      <li>
-        <span class="date">2019/08/12</span>
-        <div class="title">
-          <a href="/posts/2019/08/12/webrtc-porber.html" class="hover-underline">webrtc带宽预测中的Probe（探测）模块</a>
-        </div>
-      </li>
-    </ul>
-  </div>
-  <div class="list-post">
-    <h2 id="assembly">assembly</h2>
-    <ul>
-      <li>
-        <span class="date">2020/12/12</span>
-        <div class="title">
-          <a href="/posts/2020/12/12/x84-assembly.html" class="hover-underline">X86汇编笔记</a>
-        </div>
-      </li>
-    </ul>
-  </div>
-  <div class="list-post">
-    <h2 id="Linux">Linux</h2>
-    <ul>
-      <li>
-        <span class="date">2021/04/07</span>
-        <div class="title">
-          <a href="/posts/2021/04/07/leaVSmov.html" class="hover-underline">lea和mov指令的真正区别</a>
-        </div>
-      </li>
-    </ul>
-  </div>
-  <div class="list-post">
     <h2 id="webrtc">webrtc</h2>
     <ul>
       <li>
         <span class="date">2021/05/14</span>
         <div class="title">
-          <a href="/posts/2021/05/14/webrtc-jitter-buffer.html" class="hover-underline">webrtc接收端jitter公式推导</a>
+          <a href="/posts/2021/05/14/webrtc-jitter-buffer.html" class="hover-underline">webrtc接收端jitter估计器原理推导</a>
+        </div>
+      </li>
+      <li>
+        <span class="date">2019/08/12</span>
+        <div class="title">
+          <a href="/posts/2019/08/12/webrtc-porber.html" class="hover-underline">webrtc带宽预测中的Probe（探测）模块</a>
+        </div>
+      </li>
+      <li>
+        <span class="date">2019/06/28</span>
+        <div class="title">
+          <a href="/posts/2019/06/28/GccTrendlineFilter.html" class="hover-underline">Google拥塞控制算法--TrendingLine滤波器</a>
         </div>
       </li>
     </ul>
@@ -195,8 +159,8 @@
   <span></span>
   <span></span>
 </div>
-<script type="text/javascript" src="/static/js/blog.js?t=20210516115901"></script>
-<script type="text/javascript" src="/static/js/search.js?t=20210516115901"></script>
+<script type="text/javascript" src="/static/js/blog.js?t=20210516182817"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20210516182817"></script>
 <!-- 腾讯MTA移动分析 -->
 <script>
   var _mtac = {performanceMonitor: 1, senseQuery: 1}

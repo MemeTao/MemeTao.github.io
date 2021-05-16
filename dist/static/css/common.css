@@ -18,7 +18,7 @@ html {
   font-family: Consolas, 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', 'WenQuanYi Micro Hei', sans-serif;
 }
 body {
-  max-width: 680px;
+  max-width: 720x;
   padding: 0 14px;
   margin: 0 auto;
 }
@@ -111,8 +111,8 @@ input:-webkit-autofill {
   justify-content: space-between;
 }
 .header .logo {
-  width: 40px;
-  height: 40px;
+  width: 80px;
+  height: 80px;
   cursor: pointer;
   border-radius: 50%;
   flex-shrink: 0;
@@ -133,7 +133,7 @@ input:-webkit-autofill {
   user-select: auto;
 }
 .footer {
-  padding: 15px 0;
+  padding: 150px 0;
   font-size: 14px;
 }
 .footer a {
