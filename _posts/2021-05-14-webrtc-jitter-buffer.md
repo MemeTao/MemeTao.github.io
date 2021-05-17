@@ -84,7 +84,7 @@ $ P_k = (I-KC)E[e_k*e^t_k] (I-KC)^t+KE[v_k * v^t_k]K^t $
 
 注意， 上式中的 $e_k$代表的是估计误差, 将 $E[e_k * e^t_k]记作\overline{P}_k$ 从而:
 
-$P_k = (\overline{P}_k - KC\overline{P}_k)(I-C^tK^T) + kRK^t , R = E[e_k * e^t_k] $
+$P_k = (\overline{P}_k - KC\overline{P}_k)(I-C^tK^T) + KRK^t , R = E[v_k * v^t_k] $
 
 我们要让误差最小, 就是要让导数为0（且二次导小于0）, 矩阵的求导过程略:
 
@@ -151,7 +151,7 @@ $$
 下面引入一条卡尔曼滤波中的公式，先验的误差协方差矩阵(证明略，还没学会):
 
 $$ P_k = AP_{k-1}A^T + Q  $$ 
-$$ Q = E[v_k * v^t_k], 测量误差的协方差矩阵$$
+$$ Q = E[w_k * w^t_k], 过程噪声的协方差矩阵$$
 
 A就是系统的转换矩阵, 那么就有:
 
@@ -244,10 +244,18 @@ $$ P_{k+1} = (I-KH)P_k $$
                     kalmanGain[1] * deltaFSBytes * t01;
 ```
 
-至此，一波卡尔曼滤波结束。
+至此，一轮卡尔曼滤波结束.
+
+### end
 
 本文详细证明了卡尔曼滤波算法公式中的**卡尔曼增益系数**，以及说明了**系统转换方程**、**测量方程**。
 
 对于**先验误差公式** 以及 **误差协方差的更新公式** 未给出证明。
 
 并且未对webrtc中如何**deltaF**、**noise** 进行说明(比较简单)。
+
+参考链接:
+
+* https://zhuanlan.zhihu.com/p/33899560
+* https://www.cnblogs.com/heguanyou/p/7502909.html
+* https://zhuanlan.zhihu.com/p/165570020
