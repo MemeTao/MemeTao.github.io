@@ -14,15 +14,15 @@
   <meta name="author" content="memetao" />
   <meta name="description" content="X86汇编笔记"/>
   <meta name="keywords" content="memetao,linux"/>
-  <link rel="stylesheet" href="/static/css/common.css?t=20210518162711">
-  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20210518162711">
-  <link rel="stylesheet" href="/static/css/post.css?t=20210518162711">
-  <link rel="stylesheet" href="/static/css/code-dark.css?t=20210518162711">
-  <link rel="stylesheet" href="/static/css/code-light.css?t=20210518162711">
+  <link rel="stylesheet" href="/static/css/common.css?t=20210518162854">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20210518162854">
+  <link rel="stylesheet" href="/static/css/post.css?t=20210518162854">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20210518162854">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20210518162854">
   <script>
     window.blog = {
       baseurl:"",
-      buildAt:"20210518162711",
+      buildAt:"20210518162854",
       darkTheme: false,
       setDarkTheme: function (dark) {
         this.darkTheme = Boolean(dark);
@@ -85,49 +85,59 @@
 <h3 id="常用指令">常用指令</h3>
 
 <ul>
-  <li>movsb | movsw
-```shell
-DS:SI –&gt; ES:DI
-DF = 0 low-&gt;high
-DF = 1 high-&gt;low</li>
+  <li>movsb | movsw</li>
 </ul>
 
-<p>instruction ‘cld’ can clear df</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
-* div
-A / B. A是被除数, B是为除数.
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>DS:SI <span class="nt">--</span><span class="o">&gt;</span> ES:DI
+DF <span class="o">=</span> 0 low-&gt;high
+DF <span class="o">=</span> 1 high-&gt;low
 
-被除数A默认存在AX中, 或者AX和DX中(DX存高x位)
+instruction <span class="s1">'cld'</span> can clear <span class="nb">df</span>
+</code></pre></div></div>
 
-如果除数是8位，那么除法的结果AL保存商，AH保存余数.
+<ul>
+  <li>div
+A / B. A是被除数, B是为除数.</li>
+</ul>
 
-如果除数16位，那么除法的结果 AX保存商，DX保存余数。
+<p>被除数A默认存在AX中, 或者AX和DX中(DX存高x位)</p>
 
-* cli &amp;&amp; sti 清除和设置IF(中断标志位)
+<p>如果除数是8位，那么除法的结果AL保存商，AH保存余数.</p>
 
-* repe/repne 相等(ZF==0)/不相等的时候重复
+<p>如果除数16位，那么除法的结果 AX保存商，DX保存余数。</p>
 
-* scasb(w|d) 两个对比数分别为 EAX / AX / AL 和 DS:EDI, 并且将edi-+1（2|4)
+<ul>
+  <li>
+    <p>cli &amp;&amp; sti 清除和设置IF(中断标志位)</p>
+  </li>
+  <li>
+    <p>repe/repne 相等(ZF==0)/不相等的时候重复</p>
+  </li>
+  <li>
+    <p>scasb(w|d) 两个对比数分别为 EAX / AX / AL 和 DS:EDI, 并且将edi-+1（2|4)</p>
+  </li>
+</ul>
 
-### ret
-* ret 弹栈到IP寄存器 
-* retf 弹栈到IP,再弹栈到CS
-* iret 弹栈到IP,再弹栈到CS,再弹栈到FLAGS
+<h3 id="ret">ret</h3>
+<ul>
+  <li>ret 弹栈到IP寄存器</li>
+  <li>retf 弹栈到IP,再弹栈到CS</li>
+  <li>iret 弹栈到IP,再弹栈到CS,再弹栈到FLAGS</li>
+</ul>
 
-### call 指令
+<h3 id="call-指令">call 指令</h3>
 
-call 指令有三种形式:
+<p>call 指令有三种形式:</p>
 
-第一种是16位相对近调用, 近调用的意思是被调用的目标过程位于当前代码段内,而非另一个不同的代码段,所以只需要得到偏移地址即可.
+<p>第一种是16位相对近调用, 近调用的意思是被调用的目标过程位于当前代码段内,而非另一个不同的代码段,所以只需要得到偏移地址即可.</p>
 
-16位相对近调用是三字节指令, 操作码为0xE8. 在指令执行阶段, 处理器看到操作码0xE8, 就知道它应当调用一个过程. 于是,它用指令指针寄存器IP的当前内容加上指令中的操作数, 再加上3, 得到一个新的偏移地址. 接着将IP的原有内容压入栈. 最后,用刚才的偏移地址取代IP原油的内容. 这直接导致处理器的执行流程转移到目标位置处.
+<p>16位相对近调用是三字节指令, 操作码为0xE8. 在指令执行阶段, 处理器看到操作码0xE8, 就知道它应当调用一个过程. 于是,它用指令指针寄存器IP的当前内容加上指令中的操作数, 再加上3, 得到一个新的偏移地址. 接着将IP的原有内容压入栈. 最后,用刚才的偏移地址取代IP原油的内容. 这直接导致处理器的执行流程转移到目标位置处.</p>
 
-第二种是16位间接绝对近调用, 这种调用也是近调用, 只能调用当前代码段内的过程, 指令中的操作数不是偏移量, 而是被调用过程的真实偏移地址, 故称绝对地址. 这个地址不是直接出现在指令中,而是由16位的通用寄存器或者16位的内存单元简介给出. 
+<p>第二种是16位间接绝对近调用, 这种调用也是近调用, 只能调用当前代码段内的过程, 指令中的操作数不是偏移量, 而是被调用过程的真实偏移地址, 故称绝对地址. 这个地址不是直接出现在指令中,而是由16位的通用寄存器或者16位的内存单元简介给出.</p>
 
-第三种是16位直接绝对远调用, 调用另一个代码段内的过程. 
-比如: 
-```shell
-call 0x20000:0x0030
+<p>第三种是16位直接绝对远调用, 调用另一个代码段内的过程. 
+比如:</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>call 0x20000:0x0030
 </code></pre></div></div>
 
 <p>如果被调用过程处于当前代码段, 也没关系.</p>
@@ -177,8 +187,8 @@ call far <span class="o">[</span>bx]
   <span></span>
   <span></span>
 </div>
-<script type="text/javascript" src="/static/js/blog.js?t=20210518162711"></script>
-<script type="text/javascript" src="/static/js/search.js?t=20210518162711"></script>
+<script type="text/javascript" src="/static/js/blog.js?t=20210518162854"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20210518162854"></script>
 <!-- 腾讯MTA移动分析 -->
 <script>
   var _mtac = {performanceMonitor: 1, senseQuery: 1}
