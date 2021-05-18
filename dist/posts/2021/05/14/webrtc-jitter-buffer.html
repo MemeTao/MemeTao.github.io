@@ -14,15 +14,15 @@
   <meta name="author" content="memetao" />
   <meta name="description" content="webrtc接收端jitter估计器原理推导"/>
   <meta name="keywords" content="memetao,webrtc"/>
-  <link rel="stylesheet" href="/static/css/common.css?t=20210516182817">
-  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20210516182817">
-  <link rel="stylesheet" href="/static/css/post.css?t=20210516182817">
-  <link rel="stylesheet" href="/static/css/code-dark.css?t=20210516182817">
-  <link rel="stylesheet" href="/static/css/code-light.css?t=20210516182817">
+  <link rel="stylesheet" href="/static/css/common.css?t=20210518154039">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20210518154039">
+  <link rel="stylesheet" href="/static/css/post.css?t=20210518154039">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20210518154039">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20210518154039">
   <script>
     window.blog = {
       baseurl:"",
-      buildAt:"20210516182817",
+      buildAt:"20210518154039",
       darkTheme: false,
       setDarkTheme: function (dark) {
         this.darkTheme = Boolean(dark);
@@ -82,7 +82,7 @@
 <p>文字表示为:</p>
 
 <blockquote>
-  <p>当前的估计值 = 上一次的估计值 + 系数 * (当前的测试量 - 上一次的估计值) $$</p>
+  <p>当前的估计值 = 上一次的估计值 + 系数 * (当前的测试量 - 上一次的估计值)</p>
 </blockquote>
 
 <p>假设要考虑上一次的估计误差和本次的测量误差, 一个很直观的想法就是:</p>
@@ -143,7 +143,7 @@ $e_n = x_n - \overline{x}_n $</p>
 
 <p>注意， 上式中的 $e_k$代表的是估计误差, 将 $E[e_k * e^t_k]记作\overline{P}_k$ 从而:</p>
 
-<p>$P_k = (\overline{P}_k - KC\overline{P}_k)(I-C^tK^T) + kRK^t , R = E[e_k * e^t_k] $</p>
+<p>$P_k = (\overline{P}_k - KC\overline{P}_k)(I-C^tK^T) + KRK^t , R = E[v_k * v^t_k] $</p>
 
 <p>我们要让误差最小, 就是要让导数为0（且二次导小于0）, 矩阵的求导过程略:</p>
 
@@ -209,7 +209,7 @@ R_{k_1}&amp;&amp;D_{k-1} <br />
 <p>下面引入一条卡尔曼滤波中的公式，先验的误差协方差矩阵(证明略，还没学会):</p>
 
 <p><script type="math/tex">P_k = AP_{k-1}A^T + Q</script> 
-<script type="math/tex">Q = E[v_k * v^t_k], 测量误差的协方差矩阵</script></p>
+<script type="math/tex">Q = E[w_k * w^t_k], 过程噪声的协方差矩阵</script></p>
 
 <p>A就是系统的转换矩阵, 那么就有:</p>
 
@@ -296,13 +296,23 @@ C =
                     kalmanGain[1] * deltaFSBytes * t01;
 </code></pre>
 
-<p>至此，一波卡尔曼滤波结束。</p>
+<p>至此，一轮卡尔曼滤波结束.</p>
+
+<h3 id="end">end</h3>
 
 <p>本文详细证明了卡尔曼滤波算法公式中的<strong>卡尔曼增益系数</strong>，以及说明了<strong>系统转换方程</strong>、<strong>测量方程</strong>。</p>
 
 <p>对于<strong>先验误差公式</strong> 以及 <strong>误差协方差的更新公式</strong> 未给出证明。</p>
 
 <p>并且未对webrtc中如何<strong>deltaF</strong>、<strong>noise</strong> 进行说明(比较简单)。</p>
+
+<p>参考链接:</p>
+
+<ul>
+  <li>https://zhuanlan.zhihu.com/p/33899560</li>
+  <li>https://www.cnblogs.com/heguanyou/p/7502909.html</li>
+  <li>https://zhuanlan.zhihu.com/p/165570020</li>
+</ul>
 
   </div>
   
@@ -317,8 +327,8 @@ C =
   <span></span>
   <span></span>
 </div>
-<script type="text/javascript" src="/static/js/blog.js?t=20210516182817"></script>
-<script type="text/javascript" src="/static/js/search.js?t=20210516182817"></script>
+<script type="text/javascript" src="/static/js/blog.js?t=20210518154039"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20210518154039"></script>
 <!-- 腾讯MTA移动分析 -->
 <script>
   var _mtac = {performanceMonitor: 1, senseQuery: 1}

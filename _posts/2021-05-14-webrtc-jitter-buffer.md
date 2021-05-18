@@ -41,74 +41,79 @@ $$ G = \frac {估计误差}{估计误差+测量误差} $$
 
 $x_{n+1} = Ax_n + Bu_k + w_k$, $w_k$ 表示过程噪声
 
-$y_n = Cx_n + v_k$, $v_k$ 表示测量误差
+$y_n = Cx_n + v_k, v_k$ 表示测量误差
 
-那么，从数据融合的角度看，对于状态的估计其实就是：
+那么，从数据融合的角度看，对于状态的估计其实就是:
 
-$\overline{x}_{n+1} = \overline{x}^{calc}_{n} + G(\overline{x}^{mess}_n - \overline{x}^{calc}_n)$
+$$
+\overline{x}_{n+1} = \overline{x}^{calc}_{n} + G(\overline{x}^{mess}_n - \overline{x}^{calc}_n)
+$$
 
 进一步， 对G做转换:
 
-$ G = KC $
+$$ G = KC $$
 
 我们称K是可以将测量值转换为真实值的卡尔曼增益, 从而有:
 
-$\overline{x}_{n+1} = \overline{x}^{mess}_{calc} + K(y_k - C\overline{x}^{calc}_n)$
+$$\overline{x}_{n+1} = \overline{x}^{mess}_{calc} + K(y_k - C\overline{x}^{calc}_n)$$
 
 那么，误差就可以表示为:
-$e_n = x_n - \overline{x}_n $ 
+$$e_n = x_n - \overline{x}_n $$
 
-$ = x_n - \overline{x}^{calc}_n - K(Cx_n + v_k) + KC\overline{x}^{calc}_n $
+$$ = x_n - \overline{x}^{calc}_n - K(Cx_n + v_k) + KC\overline{x}^{calc}_n $$
 
-$ = (I - KC)x_n - (I - KC)\overline{x}^{calc}_n - Kv_n $
+$$ = (I - KC)x_n - (I - KC)\overline{x}^{calc}_n - Kv_n $$
 
-$ = (I -KC)(x_n - \overline{x}^{calc}_n) - Kv_n$
+$$ = (I -KC)(x_n - \overline{x}^{calc}_n) - Kv_n$$
 
 上述中的I代表单位矩阵，如果是1阶就是1， 二阶则是2X2的单位矩阵
 
-需要假设这个误差满足正太分布: $e\sim N(0, P_k)$ 
+需要假设这个误差满足正太分布: 
 
-$P_k$ 就是随机变量的方差，对于多维随机变量来说就是指协方差矩阵的迹（对角线元素之和），可以表示为:(证明略) 
+$$e\sim N(0, P_k)$$
 
-$P_k = E[e_k * e^t_k]$, ($e^t$ 表示矩阵的转置) 
+$P_k$ 就是随机变量的方差，对于多维随机变量来说就是指协方差矩阵,可以表示为:
 
-带入各式:
+$$P_k = E[e_k * e^t_k], (e^t 表示矩阵的转置)(证明略) $$ 
 
-$P_k = E{(I-KC)(x_k - x^{calc}_k) - Kv_k}{(I-KC)(x_k-x^{calc}_k)-Kv_k}^T $
+代入各式:
 
-将乘积展开，同时引入估计误差: $e_k = x_k - x^{calc}_k$
+$$P_k = E{(I-KC)(x_k - x^{calc}_k) - Kv_k}{(I-KC)(x_k-x^{calc}_k)-Kv_k}^T $$
 
-最终:
+将乘积展开，同时引入估计误差
 
-$ P_k = (I-KC)E[e_k*e^t_k] (I-KC)^t+KE[v_k * v^t_k]K^t $
+$$e_k = x_k - x^{calc}_{k},则有 $$
+
+$$ P_k = (I-KC)E[e_k*e^t_k] (I-KC)^t+KE[v_k * v^t_k]K^t $$
 
 注意， 上式中的 $e_k$代表的是估计误差, 将 $E[e_k * e^t_k]记作\overline{P}_k$ 从而:
 
-$P_k = (\overline{P}_k - KC\overline{P}_k)(I-C^tK^T) + KRK^t , R = E[v_k * v^t_k] $
+$$P_k = (\overline{P}_k - KC\overline{P}_k)(I-C^tK^T) + KRK^t , R = E[v_k * v^t_k] $$
 
 我们要让误差最小, 就是要让导数为0（且二次导小于0）, 矩阵的求导过程略:
 
-$ \frac{dP_k} {dK} = K(CP_kC^t + R) - P_kC^t = 0 $
+$$ \frac{dP_k} {dK} = K(CP_kC^t + R) - P_kC^t = 0 $$
 
-$ K = \frac{P_kC^t}{CP_kC^t + R} $
+$$ K = \frac{P_kC^t}{CP_kC^t + R} $$
 
 ### 信道速率 + 排队时延的估计
 
 webrtc认为帧的抖动被认为是帧大小的变化引起的:
 
-$ delay = Rate_{channel} * Delta_{frame} + Noise $, 即信道速率 * 帧大小的变化 + 噪声
+$$ delay = Rate_{channel} * Delta_{frame} + Noise , 即信道速率 * 帧大小的变化 + 噪声 $$
 
 webrtc 使用卡尔曼滤波去估计信道速率和排队延迟, 从而进一步确定jitter
 
 首先，建立数学模型，这是个二元系统，信道速率(R) + 排队延迟(D)。
 
-从模型上说，这两个值当然是不变的，也即:
+从模型上说，这两个值当然是不变的，也即
 
-$ R_k = 1 * R_{k-1} + 0 $
+$$ R_k = 1 * R_{k-1} + 0 $$
 
-$ D_k = 1 * D_{k-1} + 0 $
+$$ D_k = 1 * D_{k-1} + 0 $$
 
-系统的状态转换方程用矩阵可以表示为:
+系统的状态转换方程用矩阵可以表示为
+
 $$
 \begin{bmatrix}
     R\\
