@@ -1,7 +1,7 @@
 ---
 layout: mypost
 title:  "RTC在云游戏场景下的架构思考"
-date:   2022-1-030 08:13:17 +0800
+date:   2022-01-30 08:13:17 +0800
 categories: rtc
 location: ShangHai,China 
 ---
