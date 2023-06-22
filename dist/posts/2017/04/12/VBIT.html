@@ -14,15 +14,15 @@
   <meta name="author" content="memetao" />
   <meta name="description" content="维特比算法的实现"/>
   <meta name="keywords" content="memetao,算法"/>
-  <link rel="stylesheet" href="/static/css/common.css?t=20210518154039">
-  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20210518154039">
-  <link rel="stylesheet" href="/static/css/post.css?t=20210518154039">
-  <link rel="stylesheet" href="/static/css/code-dark.css?t=20210518154039">
-  <link rel="stylesheet" href="/static/css/code-light.css?t=20210518154039">
+  <link rel="stylesheet" href="/static/css/common.css?t=20230622202044">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20230622202044">
+  <link rel="stylesheet" href="/static/css/post.css?t=20230622202044">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20230622202044">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20230622202044">
   <script>
     window.blog = {
       baseurl:"",
-      buildAt:"20210518154039",
+      buildAt:"20230622202044",
       darkTheme: false,
       setDarkTheme: function (dark) {
         this.darkTheme = Boolean(dark);
@@ -62,7 +62,7 @@
     <hr />
 <p>前几天做通信原理的实验，发现网上关于维特比算法的解释太理论化，我结合代码通俗话的解释一下。如果看了以下代码您还是不能理解维特比纠错算法的真实目的，请务必联系我！</p>
 
-<p>首先，我问大家一个问题，如下：
+<p>首先：
 <img src="route_guess.png" alt="路径猜测" />
   A，B，C代表三个地点，三条实线代表路径。假设张三现在要去A、B、C的其中一个地方，由于淘宝上买了一个劣质的指南针，方向出了偏差，虚线是他走过的路，我们不知道到底偏了多少。我们以上帝视觉<strong>猜测</strong>张三的目的，显然：<strong>看上去张三的目的地好像是B</strong>。如果我们信赖这个指南针(偏的并不离谱),那么我们的结论也许就是对的。</p>
 
@@ -110,12 +110,12 @@
 <p>我们先随机产生一个和M序列等长度的01码，我们把这个序列认为是密码子，也就是说接收方如果想要结算它接收到的信息，必须依靠这个密码子。</p>
 
 <h4 id="加密">加密</h4>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>secret = randint(1,length(mseq));
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>secret = randint(1,length(mseq));
 </code></pre></div></div>
 
 <p>加密函数就简单点，直接异或吧。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mseq = bitxor(mseq,secret);
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mseq = bitxor(mseq,secret);
 </code></pre></div></div>
 
 <p>我们现在再来看一下差异。</p>
@@ -154,7 +154,7 @@
 
 <p>假设信号序列在传输过程中出错了，导致了某些位由原来的1-&gt;0,0-&gt;1，我们就令第3、4位吧。</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>convolution(3) = ~convolution(3);
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>convolution(3) = ~convolution(3);
 convolution(4) = ~convolution(4);
 </code></pre></div></div>
 
@@ -162,7 +162,7 @@ convolution(4) = ~convolution(4);
 
 <h3 id="第四步接收差错纠正">第四步：接收、差错纠正</h3>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>recevive = convolution;
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>recevive = convolution;
 decode_out = decode(recevive);
 </code></pre></div></div>
 
@@ -172,7 +172,7 @@ decode_out = decode(recevive);
 
 <p>维特比算法的原理呢，如果您看不懂，结合下面的代码来看会有事半功倍的效果！</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>%MemeTao 2017.4.16 
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>%MemeTao 2017.4.16 
 %维特比算法 仅支持(3,1,3)卷积码 
 %PS:请在调用前保证序列长度 &gt;= 3*3   为什么? 这不是常识么？！
 function [out] = receive(vector)
@@ -289,7 +289,7 @@ end
 
 <p>我认为这个您是可以自己接触的，出于人道主义：</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>function hanmingDis = input(src,cur)
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>function hanmingDis = input(src,cur)
 len_src = length(src);
 len_cur = length(cur);
 if(len_src ~= len_cur)
@@ -319,7 +319,7 @@ hanmingDis = dis;
   
 </div>
 <footer class="footer">
-  <span>Copyright © 2021 memetao</span>
+  <span>Copyright © 2023 memetao</span>
   <a href="/static/xml/rss.xml">RSS订阅</a>
   <span>Theme By</span>
   <a href="https://github.com/TMaize/tmaize-blog">TMaize</a>
@@ -328,8 +328,8 @@ hanmingDis = dis;
   <span></span>
   <span></span>
 </div>
-<script type="text/javascript" src="/static/js/blog.js?t=20210518154039"></script>
-<script type="text/javascript" src="/static/js/search.js?t=20210518154039"></script>
+<script type="text/javascript" src="/static/js/blog.js?t=20230622202044"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20230622202044"></script>
 <!-- 腾讯MTA移动分析 -->
 <script>
   var _mtac = {performanceMonitor: 1, senseQuery: 1}

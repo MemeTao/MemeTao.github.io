@@ -1,5 +1,5 @@
 .list-post > h2 {
-  font-size: 25px;
+  font-size: 18px;
   font-weight: bold;
   padding: 12px 0;
 }
@@ -14,7 +14,7 @@
 }
 .list-post li .date {
   color: #666666;
-  font-size: 15px;
+  font-size: 16px;
   flex-shrink: 0;
   margin-right: 10px;
 }
@@ -27,7 +27,7 @@
   text-overflow: ellipsis;
 }
 .list-post li .title a {
-  font-size: 20px;
+  font-size: 16px;
 }
 .list-post li .categories {
   flex-shrink: 0;
@@ -35,12 +35,12 @@
   margin-left: 10px;
 }
 .list-post li .categories a {
-  font-size: 15px;
+  font-size: 14px;
   color: #666666;
   margin-left: 8px;
 }
 .list-category h2 {
-  font-size: 15px;
+  font-size: 16px;
   font-weight: bold;
   padding: 12px 0;
 }
@@ -50,13 +50,13 @@
 .list-category div a {
   margin: 4px 6px;
   white-space: nowrap;
-  font-size: 15px;
+  font-size: 16px;
   display: inline-block;
   border-bottom: 1px solid #333333;
 }
 .page-search #search-input {
   text-align: center;
-  font-size: 14px;
+  font-size: 16px;
   border-bottom: 2px solid #eaeaea;
   width: 100%;
   padding: 10px 0;
@@ -66,7 +66,7 @@
   padding: 12px 0;
 }
 .page-search h1 span {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: bold;
   vertical-align: middle;
 }
@@ -79,7 +79,7 @@
 }
 .page-search .list-search li {
   list-style: disc;
-  margin-left: 15px;
+  margin-left: 16px;
   margin-bottom: 20px;
 }
 .page-search .list-search a {
@@ -89,14 +89,14 @@
 .page-search .list-search .title {
   display: inline-block;
   word-break: break-all;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: bold;
   padding-bottom: 1px;
   border-bottom: 1px solid #999;
 }
 .page-search .list-search .content {
   display: block;
-  font-size: 14px;
+  font-size: 16px;
   color: #5a5a5a;
   word-break: break-all;
   padding: 10px 0;
@@ -114,7 +114,7 @@
     padding: 6px 0;
   }
   .list-post li .title a {
-    font-size: 14px;
+    font-size: 16px;
   }
   .list-post .categories {
     display: none;
@@ -123,6 +123,6 @@
     padding: 10px 0;
   }
   .list-category div a {
-    font-size: 14px;
+    font-size: 16px;
   }
 }

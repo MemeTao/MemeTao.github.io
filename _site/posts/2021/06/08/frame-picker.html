@@ -14,15 +14,15 @@
   <meta name="author" content="memetao" />
   <meta name="description" content="流媒体-抽帧"/>
   <meta name="keywords" content="memetao,webrtc"/>
-  <link rel="stylesheet" href="/static/css/common.css?t=20210608170747">
-  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20210608170747">
-  <link rel="stylesheet" href="/static/css/post.css?t=20210608170747">
-  <link rel="stylesheet" href="/static/css/code-dark.css?t=20210608170747">
-  <link rel="stylesheet" href="/static/css/code-light.css?t=20210608170747">
+  <link rel="stylesheet" href="/static/css/common.css?t=20230622201748">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20230622201748">
+  <link rel="stylesheet" href="/static/css/post.css?t=20230622201748">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20230622201748">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20230622201748">
   <script>
     window.blog = {
       baseurl:"",
-      buildAt:"20210608170747",
+      buildAt:"20230622201748",
       darkTheme: false,
       setDarkTheme: function (dark) {
         this.darkTheme = Boolean(dark);
@@ -156,9 +156,9 @@
 
 <p>最终的:</p>
 
-<script type="math/tex; mode=display">fps = min({n1, \frac{n2 * 1000}{250}})</script>
+\[fps = max({n1, \frac{n2 * 1000}{250}})\]
 
-<p>但是这种做法会导致第一个周期后半段的输出不足4帧, 并且仍旧会有小卡顿, 好处的代码简单.</p>
+<p>但是这种做法会导致第一个周期后半段的输出不足4帧, 并且仍旧会有小卡顿.</p>
 
 <p>其它方法:</p>
 
@@ -170,7 +170,7 @@
   
 </div>
 <footer class="footer">
-  <span>Copyright © 2021 memetao</span>
+  <span>Copyright © 2023 memetao</span>
   <a href="/static/xml/rss.xml">RSS订阅</a>
   <span>Theme By</span>
   <a href="https://github.com/TMaize/tmaize-blog">TMaize</a>
@@ -179,8 +179,8 @@
   <span></span>
   <span></span>
 </div>
-<script type="text/javascript" src="/static/js/blog.js?t=20210608170747"></script>
-<script type="text/javascript" src="/static/js/search.js?t=20210608170747"></script>
+<script type="text/javascript" src="/static/js/blog.js?t=20230622201748"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20230622201748"></script>
 <!-- 腾讯MTA移动分析 -->
 <script>
   var _mtac = {performanceMonitor: 1, senseQuery: 1}

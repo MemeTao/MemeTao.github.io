@@ -5,10 +5,73 @@
     <link></link>
     <description>memetao的成长轨迹</description>
     <language>zh-CN</language>
-    <pubDate>Tue, 18 May 2021 16:28:54 +0800</pubDate>
-    <lastBuildDate>Tue, 18 May 2021 16:28:54 +0800</lastBuildDate>
-    <generator>Jekyll v3.8.5</generator>
+    <pubDate>Thu, 22 Jun 2023 20:17:48 +0800</pubDate>
+    <lastBuildDate>Thu, 22 Jun 2023 20:17:48 +0800</lastBuildDate>
+    <generator>Jekyll v4.3.2</generator>
     <atom:link href="/static/xml/rss.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>D3D11 坐标变换</title>
+      <link>/posts/2023/06/22/d3d11-coordinates.html</link>
+      <description>WorldTransformation旋转缩放ViewTransformation</description>
+      <pubDate>Thu, 22 Jun 2023 10:13:17 +0800</pubDate>
+      <gui>/posts/2023/06/22/d3d11-coordinates.html</gui>
+    </item>
+    <item>
+      <title>D3D11画三角形</title>
+      <link>/posts/2023/06/17/d3d11.html</link>
+      <description>Vertex三角形的端点。D3D11中的顶点可以看成是三角形的端点坐标(x,y,z)以及这些点的属性。在D3D11中三角形是顺时针处理的。Primitives基元，3D环境中的一个元素,可以是三角形、线、点或者任何其他图形。D3DDE...</description>
+      <pubDate>Sat, 17 Jun 2023 11:13:17 +0800</pubDate>
+      <gui>/posts/2023/06/17/d3d11.html</gui>
+    </item>
+    <item>
+      <title>D3D11 渲染管线</title>
+      <link>/posts/2023/06/17/d3d11-pipeline.html</link>
+      <description>TheInputAssemblerStage管线的第一个阶段,用来收集数据,为后续做准备。FunctionDescriptionIASetVertexBuffersTellstheinput-assemblerwhichvertexb...</description>
+      <pubDate>Sat, 17 Jun 2023 10:13:17 +0800</pubDate>
+      <gui>/posts/2023/06/17/d3d11-pipeline.html</gui>
+    </item>
+    <item>
+      <title>士兵突击</title>
+      <link>/posts/2023/06/07/notes.html</link>
+      <description>士兵突击«conquestofparadise»人总是要分的，而且还会越分越远，想的你抓心挠肺的。可是咱也在长啊，个越来越高，能耐越来越大，总有一天你会发现，到时候你想见谁就见谁，从天南到海北也就一抬腿的距离。报告，我是钢七连第四千九...</description>
+      <pubDate>Wed, 07 Jun 2023 11:13:17 +0800</pubDate>
+      <gui>/posts/2023/06/07/notes.html</gui>
+    </item>
+    <item>
+      <title>QT 学习笔记-布局管理</title>
+      <link>/posts/2023/05/21/QtLayout.html</link>
+      <description>QT的Widget尺寸策略QSizePolicy::Fixed只能使用sizeHint的大小,任何操作都不会改变控件大小QSizePolicy::MinimumsizeHint为最小大小,控件可以被拉伸QSizePolicy::Max...</description>
+      <pubDate>Sun, 21 May 2023 09:10:17 +0800</pubDate>
+      <gui>/posts/2023/05/21/QtLayout.html</gui>
+    </item>
+    <item>
+      <title>RTC在云游戏场景下的架构思考</title>
+      <link>/posts/2022/01/30/rtc-architect.html</link>
+      <description>架构设计我一直认为在完全陌生的场景是没法做到”预判设计”的，每次写代码都是需要先动手、后调整，所以说架构师一定是工作多年、经验十分丰富的工程师才能担当的岗位。我工作才三年半，断然是没有这个能力的。但是在”webrtc的应用”这个领域，...</description>
+      <pubDate>Sun, 30 Jan 2022 08:13:17 +0800</pubDate>
+      <gui>/posts/2022/01/30/rtc-architect.html</gui>
+    </item>
+    <item>
+      <title>bpf filter code 解释</title>
+      <link>/posts/2021/10/06/bpf-filter.html</link>
+      <description>背景在linux下编写网络包过滤程序的时候，希望内核只投递指定规则的报文。概要主要是记录如何分析bpffilter的规则码。tcpdump生成bpfcodetcpdump-iloipandudpanddstport65500-d如下:...</description>
+      <pubDate>Wed, 06 Oct 2021 13:13:17 +0800</pubDate>
+      <gui>/posts/2021/10/06/bpf-filter.html</gui>
+    </item>
+    <item>
+      <title>伪可靠udp-三次握手</title>
+      <link>/posts/2021/06/25/moru-three-handshake.html</link>
+      <description>协议为了方便描述,给本协议起个名字,暂且叫做moru(modernreliableudp).moru需要支持的功能应该是如下这个样子:1.建立连接和断开连接是可靠的2.面向报文3.支持不可靠,半可靠和完全可靠三次方式(报文收发)4.支...</description>
+      <pubDate>Fri, 25 Jun 2021 13:13:17 +0800</pubDate>
+      <gui>/posts/2021/06/25/moru-three-handshake.html</gui>
+    </item>
+    <item>
+      <title>流媒体-抽帧</title>
+      <link>/posts/2021/06/08/frame-picker.html</link>
+      <description>抽帧分为fps过高抽帧和实际编码码率过高抽帧,这里先讨论fps过高引起的抽帧.需求视频输入是0-60帧,基于某些原因需要精确控制输出fps的值.模型如下:视频帧输入——-&amp;gt;抽帧——–&amp;gt;输出到编码器比如,输入fps=60,目...</description>
+      <pubDate>Tue, 08 Jun 2021 12:13:17 +0800</pubDate>
+      <gui>/posts/2021/06/08/frame-picker.html</gui>
+    </item>
     <item>
       <title>webrtc接收端jitter估计器原理推导</title>
       <link>/posts/2021/05/14/webrtc-jitter-buffer.html</link>
@@ -82,7 +145,7 @@
     <item>
       <title>维特比算法的实现</title>
       <link>/posts/2017/04/12/VBIT.html</link>
-      <description>前几天做通信原理的实验，发现网上关于维特比算法的解释太理论化，我结合代码通俗话的解释一下。如果看了以下代码您还是不能理解维特比纠错算法的真实目的，请务必联系我！首先，我问大家一个问题，如下：A，B，C代表三个地点，三条实线代表路径。假...</description>
+      <description>前几天做通信原理的实验，发现网上关于维特比算法的解释太理论化，我结合代码通俗话的解释一下。如果看了以下代码您还是不能理解维特比纠错算法的真实目的，请务必联系我！首先：A，B，C代表三个地点，三条实线代表路径。假设张三现在要去A、B、C...</description>
       <pubDate>Wed, 12 Apr 2017 17:13:17 +0800</pubDate>
       <gui>/posts/2017/04/12/VBIT.html</gui>
     </item>

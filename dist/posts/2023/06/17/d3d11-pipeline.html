@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>D3D11 渲染管线-memetao</title>
+  <meta charset="utf-8" />
+  <meta http-equiv="content-language" content="zh-CN" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="supported-color-schemes" content="light dark">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="applicable-device" content="pc,mobile">
+  <meta name="google-site-verification" content="ckhUaoa05QCmWoE1FafzTBcqYI4yBOy-UJKopXDS18M" />
+  <meta name="author" content="memetao" />
+  <meta name="description" content="D3D11 渲染管线"/>
+  <meta name="keywords" content="memetao,graphics"/>
+  <link rel="stylesheet" href="/static/css/common.css?t=20230622202044">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20230622202044">
+  <link rel="stylesheet" href="/static/css/post.css?t=20230622202044">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20230622202044">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20230622202044">
+  <script>
+    window.blog = {
+      baseurl:"",
+      buildAt:"20230622202044",
+      darkTheme: false,
+      setDarkTheme: function (dark) {
+        this.darkTheme = Boolean(dark);
+        document.documentElement.className = this.darkTheme ? 'dark': '';
+        document.querySelector('meta[name=theme-color]').setAttribute('content', this.darkTheme ? '#2D2E32': '#FFFFFF');
+      }
+    }
+    if (sessionStorage.darkTheme !== undefined) {
+      blog.setDarkTheme(sessionStorage.darkTheme === 'true'); // 记忆值，单个窗口内有效
+    } else {
+      blog.setDarkTheme(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches); // 跟随系统
+    }
+    if (window.matchMedia) {
+      var media = window.matchMedia('(prefers-color-scheme: dark)');
+      media.addListener(function (ev) {
+        blog.setDarkTheme(ev.currentTarget.matches);
+        sessionStorage.removeItem('darkTheme');
+      });
+    }
+  </script>
+</head>
+<body ondragstart="return false;">
+<header class="header">
+  <img class="logo" src="/static/img/logo.jpg" alt="logo"/>
+  <nav class="menu">
+    <a href="/" class="hover-underline">首页</a>
+    <a href="/pages/categories.html" class="hover-underline">归类</a>
+    <a href="/pages/about.html" class="hover-underline">关于</a>
+    </nav>
+</header>
+<div class="page page-post">
+  <h1 class="title" id="D3D11 渲染管线">D3D11 渲染管线</h1>
+  
+  <div class="subtitle">memetao 于 2023-06-17 发布</div>
+  
+  <div class="post">
+    <hr />
+
+<h3 id="the-input-assembler-stage">The Input Assembler Stage</h3>
+
+<p>管线的第一个阶段, 用来收集数据, 为后续做准备。</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Function</th>
+      <th>Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>IASetVertexBuffers</td>
+      <td>Tells the input-assembler which vertex buffer to read from.</td>
+    </tr>
+    <tr>
+      <td>IASetIndexBuffer</td>
+      <td>This is a new one, and will be covered in the Moving to 3D tutorial.</td>
+    </tr>
+    <tr>
+      <td>IASetInputLayout</td>
+      <td>Tells the input-assembler the expected layout of vertex data in each vertex.</td>
+    </tr>
+    <tr>
+      <td>IASetPrimitiveTopology</td>
+      <td>Tells the input-assembler what type of primitive (such as triangle-strip, line-list, etc.)</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="vertex-processing">Vertex Processing</h3>
+
+<p>当输入装配阶段完成后, 随之6个阶段:</p>
+
+<ul>
+  <li>Vertex Shader Stage</li>
+  <li>Hull Shader Stage</li>
+  <li>Tessellator Stage</li>
+  <li>Domain Shader Stage</li>
+  <li>Geometry Shader Stage</li>
+  <li>Stream Output Stage</li>
+</ul>
+
+<p>只有 Vertex Shader Stage是必须的, 其他都是可选。</p>
+
+<h3 id="pixel-processing">Pixel Processing</h3>
+
+<ul>
+  <li>Rasterizer Stage</li>
+  <li>Pixel Shader Stage</li>
+</ul>
+
+<p>光栅化是个固定的流程, 只有Pixel Shader阶段是可以编程的。</p>
+
+<h3 id="output-merger-stage">Output-Merger Stage</h3>
+
+<p>通过像素着色器生成的像素片段会被移送至渲染管线的输出合并阶段。在这个阶段中，一些像素片段需要经过模板测试和深度测试来确定是否能留下，然后必要的时候还需要与绑定的缓冲区对应像素片段进行混合操作，可以实现透明等效果。</p>
+
+<h2 id="顶点处理过程">顶点处理过程</h2>
+
+<p>顶点着色器是管线的第二阶段，能够修改单个顶点的属性。 它通常用于将 3D 坐标转换为屏幕坐标，但也可以更改其他属性。</p>
+
+<p>着色器是一个”函数”, 对每一个顶点都会执行一遍(GPU是并行计算的, 不用担心性能), 随后执行这三个阶段:</p>
+
+<ul>
+  <li>Hull Shader Stage</li>
+  <li>Tessellator Stage</li>
+  <li>Domain Shader Stage</li>
+</ul>
+
+<h2 id="geometry-shader-stage">Geometry Shader Stage</h2>
+
+<p>这是一个可选阶段, 和顶点着色器不同的是, 它不针对顶点而是”Primitives”(三角形)。</p>
+
+<p>输入一个三角形, 输出一个三角形。</p>
+
+<h2 id="stream-output-stage">Stream Output Stage</h2>
+
+<p>略</p>
+
+<h2 id="像素处理过程">像素处理过程</h2>
+
+<blockquote>
+  <blockquote>
+    <p>Once a primitive’s vertices have been placed in screen coordinates, the GPU then renders the pixels. First, it runs the vertices through the rasterizer stage, which determines what pixels are going to be rendered. Second, it runs each pixel through a pixel shader, which allows you to alter the color and depth (distance from the screen) of each pixel.</p>
+  </blockquote>
+</blockquote>
+
+<h3 id="rasterizer-stage">Rasterizer Stage</h3>
+
+<p>光栅化阶段决定使用哪些顶点去绘制”Pirmitive”</p>
+
+<p><img src="raster.jpg" alt="raster" /></p>
+
+<p>使用下面的代码告诉”Raster”使用backbuffer上的哪个范围内的Pixels</p>
+<pre><code class="language-C++">    // Set the viewport
+    D3D11_VIEWPORT viewport;
+    ZeroMemory(&amp;viewport, sizeof(D3D11_VIEWPORT));
+
+    viewport.TopLeftX = 0;
+    viewport.TopLeftY = 0;
+    viewport.Width = width * 1.0f;
+    viewport.Height = height * 1.0f;
+
+    d3d11_ctx_-&gt;RSSetViewports(1, &amp;viewport);
+</code></pre>
+
+<h3 id="pixel-shader">Pixel Shader</h3>
+
+<p>着色器是一个”函数”, 对每一个像素都会执行一遍(GPU是并行计算的, 不用担心性能)。</p>
+
+<blockquote>
+  <blockquote>
+    <p>The rasterizer stage plays an important part in the pixel shader’s inputs. It’s job is to give information specific to that pixel.</p>
+  </blockquote>
+</blockquote>
+
+<p><img src="pixel_shader.jpg" alt="pixle_shader" /></p>
+
+<p>注: “颜色减半” 这个操作使用顶点着色器更快，这里只是做个示例。</p>
+
+<p>PixelShader不能改变”坐标”!</p>
+
+
+  </div>
+  
+</div>
+<footer class="footer">
+  <span>Copyright © 2023 memetao</span>
+  <a href="/static/xml/rss.xml">RSS订阅</a>
+  <span>Theme By</span>
+  <a href="https://github.com/TMaize/tmaize-blog">TMaize</a>
+</footer>
+<div id="to-top">
+  <span></span>
+  <span></span>
+</div>
+<script type="text/javascript" src="/static/js/blog.js?t=20230622202044"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20230622202044"></script>
+<!-- 腾讯MTA移动分析 -->
+<script>
+  var _mtac = {performanceMonitor: 1, senseQuery: 1}
+  ;(function() {
+    if (window.location.hostname == '127.0.0.1') {
+      return
+    }
+    var mta = document.createElement('script')
+    mta.src = '//pingjs.qq.com/h5/stats.js?v2.0.4'
+    mta.setAttribute('name', 'MTAH5')
+    mta.setAttribute('sid', '500581966')
+    mta.setAttribute('cid', '500581972')
+    var s = document.getElementsByTagName('script')[0]
+    s.parentNode.insertBefore(mta, s)
+  })()
+</script>
+
+<!-- 百度自动推送 -->
+<script>
+  ;(function () {
+    if (window.location.hostname == '127.0.0.1') {
+      return
+    }
+    var bp = document.createElement('script')
+    var curProtocol = window.location.protocol.split(':')[0]
+    if (curProtocol === 'https') {
+      bp.src = 'https://zz.bdstatic.com/linksubmit/push.js'
+    } else {
+      bp.src = 'http://push.zhanzhang.baidu.com/push.js'
+    }
+    var s = document.getElementsByTagName('script')[0]
+    s.parentNode.insertBefore(bp, s)
+  })()
+</script>
+
+<!-- MathJax数学公式支持 -->
+<style>
+  .has-jax {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-color: transparent !important;
+    line-height: normal !important;
+    word-break: normal !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .has-jax * {
+    outline: 0;
+  }
+</style>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    showProcessingMessages: false,
+    messageStyle: "none",
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'a']
+    },
+    "HTML-CSS": {
+      showMathMenu: false
+    }
+  });
+  // 父级元素添加类名，便于css控制
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax();
+    var i = 0;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script
+  type="text/javascript"
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+></script>
+
+
+</body>
+</html>

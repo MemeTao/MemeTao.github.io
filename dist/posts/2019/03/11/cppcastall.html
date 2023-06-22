@@ -14,15 +14,15 @@
   <meta name="author" content="memetao" />
   <meta name="description" content="总结c++中的cast"/>
   <meta name="keywords" content="memetao,c++"/>
-  <link rel="stylesheet" href="/static/css/common.css?t=20210518154039">
-  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20210518154039">
-  <link rel="stylesheet" href="/static/css/post.css?t=20210518154039">
-  <link rel="stylesheet" href="/static/css/code-dark.css?t=20210518154039">
-  <link rel="stylesheet" href="/static/css/code-light.css?t=20210518154039">
+  <link rel="stylesheet" href="/static/css/common.css?t=20230622202044">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20230622202044">
+  <link rel="stylesheet" href="/static/css/post.css?t=20230622202044">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20230622202044">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20230622202044">
   <script>
     window.blog = {
       baseurl:"",
-      buildAt:"20210518154039",
+      buildAt:"20230622202044",
       darkTheme: false,
       setDarkTheme: function (dark) {
         this.darkTheme = Boolean(dark);
@@ -139,7 +139,7 @@ C c;
 printf("%p, %p, %p", &amp;c, reinterpret_cast&lt;B*&gt;(&amp;c), static_cast &lt;B*&gt;(&amp;c));
 </code></pre>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt;前两个的输出值是相同的，最后一个则会在原基础上偏移4个字节，这是因为static_cast计算了父子类指针转换的偏移量，并将之转换到正确的地址（c里面有m_a,m_b，转换为B*指针后指到m_b处），而reinterpret_cast却不会做这一层转换。因此, 你需要谨慎使用 reinterpret_cast。
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&gt;前两个的输出值是相同的，最后一个则会在原基础上偏移4个字节，这是因为static_cast计算了父子类指针转换的偏移量，并将之转换到正确的地址（c里面有m_a,m_b，转换为B*指针后指到m_b处），而reinterpret_cast却不会做这一层转换。因此, 你需要谨慎使用 reinterpret_cast。
 </code></pre></div></div>
 
 <h3 id="static_pointer_cast">static_pointer_cast</h3>
@@ -188,7 +188,7 @@ std::shared_ptr&lt;T&gt; reinterpret_pointer_cast( const std::shared_ptr&lt;U&gt
   
 </div>
 <footer class="footer">
-  <span>Copyright © 2021 memetao</span>
+  <span>Copyright © 2023 memetao</span>
   <a href="/static/xml/rss.xml">RSS订阅</a>
   <span>Theme By</span>
   <a href="https://github.com/TMaize/tmaize-blog">TMaize</a>
@@ -197,8 +197,8 @@ std::shared_ptr&lt;T&gt; reinterpret_pointer_cast( const std::shared_ptr&lt;U&gt
   <span></span>
   <span></span>
 </div>
-<script type="text/javascript" src="/static/js/blog.js?t=20210518154039"></script>
-<script type="text/javascript" src="/static/js/search.js?t=20210518154039"></script>
+<script type="text/javascript" src="/static/js/blog.js?t=20230622202044"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20230622202044"></script>
 <!-- 腾讯MTA移动分析 -->
 <script>
   var _mtac = {performanceMonitor: 1, senseQuery: 1}

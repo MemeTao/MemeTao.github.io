@@ -14,15 +14,15 @@
   <meta name="author" content="memetao" />
   <meta name="description" content="X86汇编笔记"/>
   <meta name="keywords" content="memetao,linux"/>
-  <link rel="stylesheet" href="/static/css/common.css?t=20210518154039">
-  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20210518154039">
-  <link rel="stylesheet" href="/static/css/post.css?t=20210518154039">
-  <link rel="stylesheet" href="/static/css/code-dark.css?t=20210518154039">
-  <link rel="stylesheet" href="/static/css/code-light.css?t=20210518154039">
+  <link rel="stylesheet" href="/static/css/common.css?t=20230622202044">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20230622202044">
+  <link rel="stylesheet" href="/static/css/post.css?t=20230622202044">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20230622202044">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20230622202044">
   <script>
     window.blog = {
       baseurl:"",
-      buildAt:"20210518154039",
+      buildAt:"20230622202044",
       darkTheme: false,
       setDarkTheme: function (dark) {
         this.darkTheme = Boolean(dark);
@@ -85,49 +85,59 @@
 <h3 id="常用指令">常用指令</h3>
 
 <ul>
-  <li>movsb | movsw
-```shell
-DS:SI –&gt; ES:DI
-DF = 0 low-&gt;high
-DF = 1 high-&gt;low</li>
+  <li>movsb | movsw</li>
 </ul>
 
-<p>instruction ‘cld’ can clear df</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
-* div
-A / B. A是被除数, B是为除数.
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>DS:SI <span class="nt">--</span><span class="o">&gt;</span> ES:DI
+DF <span class="o">=</span> 0 low-&gt;high
+DF <span class="o">=</span> 1 high-&gt;low
 
-被除数A默认存在AX中, 或者AX和DX中(DX存高x位)
+instruction <span class="s1">'cld'</span> can clear <span class="nb">df</span>
+</code></pre></div></div>
 
-如果除数是8位，那么除法的结果AL保存商，AH保存余数.
+<ul>
+  <li>div
+A / B. A是被除数, B是为除数.</li>
+</ul>
 
-如果除数16位，那么除法的结果 AX保存商，DX保存余数。
+<p>被除数A默认存在AX中, 或者AX和DX中(DX存高x位)</p>
 
-* cli &amp;&amp; sti 清除和设置IF(中断标志位)
+<p>如果除数是8位，那么除法的结果AL保存商，AH保存余数.</p>
 
-* repe/repne 相等(ZF==0)/不相等的时候重复
+<p>如果除数16位，那么除法的结果 AX保存商，DX保存余数。</p>
 
-* scasb(w|d) 两个对比数分别为 EAX / AX / AL 和 DS:EDI, 并且将edi-+1（2|4)
+<ul>
+  <li>
+    <p>cli &amp;&amp; sti 清除和设置IF(中断标志位)</p>
+  </li>
+  <li>
+    <p>repe/repne 相等(ZF==0)/不相等的时候重复</p>
+  </li>
+  <li>
+    <p>scasb(w|d) 两个对比数分别为 EAX / AX / AL 和 DS:EDI, 并且将edi-+1（2|4)</p>
+  </li>
+</ul>
 
-### ret
-* ret 弹栈到IP寄存器 
-* retf 弹栈到IP,再弹栈到CS
-* iret 弹栈到IP,再弹栈到CS,再弹栈到FLAGS
+<h3 id="ret">ret</h3>
+<ul>
+  <li>ret 弹栈到IP寄存器</li>
+  <li>retf 弹栈到IP,再弹栈到CS</li>
+  <li>iret 弹栈到IP,再弹栈到CS,再弹栈到FLAGS</li>
+</ul>
 
-### call 指令
+<h3 id="call-指令">call 指令</h3>
 
-call 指令有三种形式:
+<p>call 指令有三种形式:</p>
 
-第一种是16位相对近调用, 近调用的意思是被调用的目标过程位于当前代码段内,而非另一个不同的代码段,所以只需要得到偏移地址即可.
+<p>第一种是16位相对近调用, 近调用的意思是被调用的目标过程位于当前代码段内,而非另一个不同的代码段,所以只需要得到偏移地址即可.</p>
 
-16位相对近调用是三字节指令, 操作码为0xE8. 在指令执行阶段, 处理器看到操作码0xE8, 就知道它应当调用一个过程. 于是,它用指令指针寄存器IP的当前内容加上指令中的操作数, 再加上3, 得到一个新的偏移地址. 接着将IP的原有内容压入栈. 最后,用刚才的偏移地址取代IP原油的内容. 这直接导致处理器的执行流程转移到目标位置处.
+<p>16位相对近调用是三字节指令, 操作码为0xE8. 在指令执行阶段, 处理器看到操作码0xE8, 就知道它应当调用一个过程. 于是,它用指令指针寄存器IP的当前内容加上指令中的操作数, 再加上3, 得到一个新的偏移地址. 接着将IP的原有内容压入栈. 最后,用刚才的偏移地址取代IP原油的内容. 这直接导致处理器的执行流程转移到目标位置处.</p>
 
-第二种是16位间接绝对近调用, 这种调用也是近调用, 只能调用当前代码段内的过程, 指令中的操作数不是偏移量, 而是被调用过程的真实偏移地址, 故称绝对地址. 这个地址不是直接出现在指令中,而是由16位的通用寄存器或者16位的内存单元简介给出. 
+<p>第二种是16位间接绝对近调用, 这种调用也是近调用, 只能调用当前代码段内的过程, 指令中的操作数不是偏移量, 而是被调用过程的真实偏移地址, 故称绝对地址. 这个地址不是直接出现在指令中,而是由16位的通用寄存器或者16位的内存单元简介给出.</p>
 
-第三种是16位直接绝对远调用, 调用另一个代码段内的过程. 
-比如: 
-```shell
-call 0x20000:0x0030
+<p>第三种是16位直接绝对远调用, 调用另一个代码段内的过程. 
+比如:</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>call 0x20000:0x0030
 </code></pre></div></div>
 
 <p>如果被调用过程处于当前代码段, 也没关系.</p>
@@ -143,7 +153,7 @@ call far <span class="o">[</span>bx]
 
 <p>实模式下,处理器要求中断向量表需要存放在物理地址0x00000-&gt;0x003ff,同1k的空间内,共256个中断,每个中断向量4个字节.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0x00000 ... -&gt; ....0x003ff
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0x00000 ... -&gt; ....0x003ff
 ---------------------------------------------
 偏移地址(2字节) | 段地址(2字节)    | 偏移地址..
 ---------------------------------------------
@@ -164,11 +174,210 @@ call far <span class="o">[</span>bx]
   <li>=: 只写</li>
 </ul>
 
+<h3 id="函数调用寄存器约定">函数调用寄存器约定</h3>
+
+<ul>
+  <li>rax - temporary register; when we call a syscal, rax must contain syscall number</li>
+  <li>rdi - used to pass 1st argument to functions</li>
+  <li>rsi - pointer used to pass 2nd argument to functions</li>
+  <li>rdx - used to pass 3rd argument to functions</li>
+  <li>rcx - fourth argument</li>
+  <li>r8 - fifth argument</li>
+  <li>r9 - sixth</li>
+  <li>stack - over sixth</li>
+</ul>
+
+<h2 id="待整理">待整理</h2>
+
+<h3 id="栈">栈</h3>
+
+<ul>
+  <li>RBP is the base pointer register. It points to the base of the current stack frame.</li>
+  <li>RSP is the stack pointer, which points to the top of current stack frame.</li>
+</ul>
+
+<p>two operators:</p>
+
+<ul>
+  <li>push argument - increments stack pointer (RSP) and stores argument in location pointed by stack pointer</li>
+  <li>pop argument - copied data to argument from location pointed by stack pointer</li>
+</ul>
+
+<h3 id="段">段</h3>
+
+<ul>
+  <li>data - section is used for declaring initialized data or constants</li>
+  <li>bss - section is used for declaring non initialized variables</li>
+  <li>text - section is used for code</li>
+</ul>
+
+<p>以sys_write为例:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>size_t sys_write<span class="o">(</span>unsigned int fd, const char <span class="k">*</span> buf, size_t count<span class="o">)</span><span class="p">;</span>
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>section .data
+    msg db      <span class="s2">"hello, world!"</span> <span class="p">;</span> db代表声明单字节类型的
+
+section .text
+    global _start
+_start:
+    mov     rax, 1 <span class="p">;</span> sys_write调用号
+    mov     rdi, 1 <span class="p">;</span> stdcout
+    mov     rsi, msg
+    mov     rdx, 13
+    syscall
+    mov    rax, 60
+    mov    rdi, 0
+    syscall
+</code></pre></div></div>
+
+<h3 id="简单程序示例">简单程序示例</h3>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">section</span> <span class="nv">.data</span>
+    <span class="c1">; Define constants</span>
+    <span class="nl">num1:</span>   <span class="nf">equ</span> <span class="mi">100</span>
+    <span class="nl">num2:</span>   <span class="nf">equ</span> <span class="mi">50</span>
+    <span class="c1">; initialize message</span>
+    <span class="nl">msg:</span>    <span class="kd">db</span> <span class="s">"correct"</span>
+
+<span class="nf">section</span> <span class="nv">.text</span>
+
+    <span class="nf">global</span> <span class="nv">_start</span>
+
+<span class="c1">;; entry point</span>
+<span class="nl">_start:</span>
+    <span class="c1">; set num1's value to rax</span>
+    <span class="nf">mov</span> <span class="nb">rax</span><span class="p">,</span> <span class="nv">num1</span>
+    <span class="c1">; set num2's value to rbx</span>
+    <span class="nf">mov</span> <span class="nb">rbx</span><span class="p">,</span> <span class="nv">num2</span>
+    <span class="c1">; get sum of rax and rbx, and store it's value in rax</span>
+    <span class="nf">add</span> <span class="nb">rax</span><span class="p">,</span> <span class="nb">rbx</span>
+    <span class="c1">; compare rax and 150</span>
+    <span class="nf">cmp</span> <span class="nb">rax</span><span class="p">,</span> <span class="mi">150</span>
+    <span class="c1">; go to .exit label if rax and 150 are not equal</span>
+    <span class="nf">jne</span> <span class="nv">.exit</span>
+    <span class="c1">; go to .rightSum label if rax and 150 are equal</span>
+    <span class="nf">jmp</span> <span class="nv">.rightSum</span>
+
+<span class="c1">; Print message that sum is correct</span>
+<span class="nl">.rightSum:</span>
+    <span class="c1">;; write syscall</span>
+    <span class="nf">mov</span>     <span class="nb">rax</span><span class="p">,</span> <span class="mi">1</span>
+    <span class="c1">;; file descritor, standard output</span>
+    <span class="nf">mov</span>     <span class="nb">rdi</span><span class="p">,</span> <span class="mi">1</span>
+    <span class="c1">;; message address</span>
+    <span class="nf">mov</span>     <span class="nb">rsi</span><span class="p">,</span> <span class="nv">msg</span>
+    <span class="c1">;; length of message</span>
+    <span class="nf">mov</span>     <span class="nb">rdx</span><span class="p">,</span> <span class="mi">8</span>
+    <span class="c1">;; call write syscall</span>
+    <span class="nf">syscall</span>
+    <span class="c1">; exit from program</span>
+    <span class="nf">jmp</span> <span class="nv">.exit</span>
+
+<span class="c1">; exit procedure</span>
+
+    <span class="c1">; exit syscall</span>
+    <span class="nf">mov</span>    <span class="nb">rax</span><span class="p">,</span> <span class="mi">60</span>
+    <span class="c1">; exit code</span>
+    <span class="nf">mov</span>    <span class="nb">rdi</span><span class="p">,</span> <span class="mi">0</span>
+    <span class="c1">; call exit syscall</span>
+    <span class="nf">syscall</span>
+</code></pre></div></div>
+
+<h3 id="声明">声明</h3>
+
+<p>initialized:</p>
+<ul>
+  <li>equ(equate) similar to C’s define</li>
+  <li>db define and allocate a byte,</li>
+  <li>dw,dd,dt,do,dy and dz</li>
+</ul>
+
+<p>non initialized variables:</p>
+<ul>
+  <li>RESB, RESW, RESD, RESQ, REST, RESO, RESY and RESZ</li>
+</ul>
+
+<h3 id="简单程序示例-1">简单程序示例</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>%macro PRINT 1
+    pusha
+    pushf
+    jmp %%astr
+%%str db %1, 0
+%%strln equ <span class="nv">$-</span>%%str
+%%astr: _syscall_write %%str, %%strln
+popf
+popa
+%endmacro
+
+%macro _syscall_write 2
+	mov rax, 1
+        mov rdi, 1
+        mov rsi, %%str
+        mov rdx, %%strln
+        syscall
+%endmacro
+</code></pre></div></div>
+
+<h2 id="att-语法">AT&amp;T 语法</h2>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.data
+    // initialized data definition
+.text
+    .global _start
+
+_start:
+    // main routine
+</code></pre></div></div>
+
+<h3 id="data-definition">data definition</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>.section .data
+    // 1 byte
+    var1: .byte 10
+    // 2 byte
+    var2: .word 10
+    // 4 byte
+    var3: .int 10
+    // 8 byte
+    var4: .quad 10
+    // 16 byte
+    var5: .octa 10
+
+    // assembles each string <span class="o">(</span>with no automatic trailing zero byte<span class="o">)</span> into consecutive addresses
+    str1: .asci <span class="s2">"Hello world"</span>
+    // just like .ascii, but each string is followed by a zero byte
+    str2: .asciz <span class="s2">"Hello world"</span>
+    // Copy the characters <span class="k">in </span>str to the object file
+    str3: .string <span class="s2">"Hello world"</span>
+</code></pre></div></div>
+
+<h3 id="oprands-order">oprands order</h3>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="p">;</span>move <span class="nb">source</span>, destination
+    movw <span class="nv">$10</span>, %ax
+</code></pre></div></div>
+
+<p>GNU assembler has 6 postfixes for operations:</p>
+
+<ul>
+  <li>b - 1 byte operands</li>
+  <li>w - 2 bytes operands</li>
+  <li>l - 4 bytes operands</li>
+  <li>q - 8 bytes operands</li>
+  <li>t - 10 bytes operands</li>
+  <li>o - 16 bytes operands</li>
+</ul>
+
+<p>This rule is ot only mov instruction, but also for all another like addl, xorb, cmpw and etc…</p>
+
   </div>
   
 </div>
 <footer class="footer">
-  <span>Copyright © 2021 memetao</span>
+  <span>Copyright © 2023 memetao</span>
   <a href="/static/xml/rss.xml">RSS订阅</a>
   <span>Theme By</span>
   <a href="https://github.com/TMaize/tmaize-blog">TMaize</a>
@@ -177,8 +386,8 @@ call far <span class="o">[</span>bx]
   <span></span>
   <span></span>
 </div>
-<script type="text/javascript" src="/static/js/blog.js?t=20210518154039"></script>
-<script type="text/javascript" src="/static/js/search.js?t=20210518154039"></script>
+<script type="text/javascript" src="/static/js/blog.js?t=20230622202044"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20230622202044"></script>
 <!-- 腾讯MTA移动分析 -->
 <script>
   var _mtac = {performanceMonitor: 1, senseQuery: 1}
