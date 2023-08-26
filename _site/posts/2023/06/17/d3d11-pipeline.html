@@ -14,15 +14,15 @@
   <meta name="author" content="memetao" />
   <meta name="description" content="D3D11 渲染管线"/>
   <meta name="keywords" content="memetao,graphics"/>
-  <link rel="stylesheet" href="/static/css/common.css?t=20230622201748">
-  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20230622201748">
-  <link rel="stylesheet" href="/static/css/post.css?t=20230622201748">
-  <link rel="stylesheet" href="/static/css/code-dark.css?t=20230622201748">
-  <link rel="stylesheet" href="/static/css/code-light.css?t=20230622201748">
+  <link rel="stylesheet" href="/static/css/common.css?t=20230826223517">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20230826223517">
+  <link rel="stylesheet" href="/static/css/post.css?t=20230826223517">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20230826223517">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20230826223517">
   <script>
     window.blog = {
       baseurl:"",
-      buildAt:"20230622201748",
+      buildAt:"20230826223517",
       darkTheme: false,
       setDarkTheme: function (dark) {
         this.darkTheme = Boolean(dark);
@@ -185,6 +185,10 @@
 
 <p>PixelShader不能改变”坐标”!</p>
 
+<h3 id="输出合并阶段">输出合并阶段</h3>
+
+<p>当像素片段由像素着色器生成之后，它们会被传送到渲染管线的输出合并（output
+merger，简称OM）阶段。在该阶段中，某些像素片段会被丢弃（例如，未能通过深度测试或模板测试）。未丢弃的像素片段会被写入后台缓冲区。混合（blending）工作是在该阶段中完成的，一个像素可以与后台缓冲区中的当前像素进行混合，并以混合后的值作为该像素的最终颜色。某些特殊效果，比如透明度，就是通过混合来实现的；我们会在第9章专门讲解混合。</p>
 
   </div>
   
@@ -199,8 +203,8 @@
   <span></span>
   <span></span>
 </div>
-<script type="text/javascript" src="/static/js/blog.js?t=20230622201748"></script>
-<script type="text/javascript" src="/static/js/search.js?t=20230622201748"></script>
+<script type="text/javascript" src="/static/js/blog.js?t=20230826223517"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20230826223517"></script>
 <!-- 腾讯MTA移动分析 -->
 <script>
   var _mtac = {performanceMonitor: 1, senseQuery: 1}

@@ -14,15 +14,15 @@
   <meta name="author" content="memetao" />
   <meta name="description" content="D3D11 坐标变换"/>
   <meta name="keywords" content="memetao,graphics"/>
-  <link rel="stylesheet" href="/static/css/common.css?t=20230622201748">
-  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20230622201748">
-  <link rel="stylesheet" href="/static/css/post.css?t=20230622201748">
-  <link rel="stylesheet" href="/static/css/code-dark.css?t=20230622201748">
-  <link rel="stylesheet" href="/static/css/code-light.css?t=20230622201748">
+  <link rel="stylesheet" href="/static/css/common.css?t=20230826223517">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20230826223517">
+  <link rel="stylesheet" href="/static/css/post.css?t=20230826223517">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20230826223517">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20230826223517">
   <script>
     window.blog = {
       baseurl:"",
-      buildAt:"20230622201748",
+      buildAt:"20230826223517",
       darkTheme: false,
       setDarkTheme: function (dark) {
         this.darkTheme = Boolean(dark);
@@ -73,6 +73,22 @@
 
 <h2 id="view-transformation">View Transformation</h2>
 
+<p>世界坐标下的摄像机位置:</p>
+
+<p><img src="viewTransformation1.jpg" alt="view1" /></p>
+
+<p>根据摄像机位置转换坐标:</p>
+
+<p><img src="viewTransformation2.jpg" alt="view1" /></p>
+
+<h2 id="projection-transformation">Projection Transformation</h2>
+
+<p>从摄像机视野转变为屏幕视野:</p>
+
+<p><img src="screenTransformation.jpg" alt="view1" /></p>
+
+<p>以上的转换都是针对顶点坐标而言!</p>
+
   </div>
   
 </div>
@@ -86,8 +102,8 @@
   <span></span>
   <span></span>
 </div>
-<script type="text/javascript" src="/static/js/blog.js?t=20230622201748"></script>
-<script type="text/javascript" src="/static/js/search.js?t=20230622201748"></script>
+<script type="text/javascript" src="/static/js/blog.js?t=20230826223517"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20230826223517"></script>
 <!-- 腾讯MTA移动分析 -->
 <script>
   var _mtac = {performanceMonitor: 1, senseQuery: 1}

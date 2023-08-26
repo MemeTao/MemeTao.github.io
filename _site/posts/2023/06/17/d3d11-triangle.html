@@ -14,15 +14,15 @@
   <meta name="author" content="memetao" />
   <meta name="description" content="D3D11画三角形"/>
   <meta name="keywords" content="memetao,graphics"/>
-  <link rel="stylesheet" href="/static/css/common.css?t=20230622201748">
-  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20230622201748">
-  <link rel="stylesheet" href="/static/css/post.css?t=20230622201748">
-  <link rel="stylesheet" href="/static/css/code-dark.css?t=20230622201748">
-  <link rel="stylesheet" href="/static/css/code-light.css?t=20230622201748">
+  <link rel="stylesheet" href="/static/css/common.css?t=20230826223517">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20230826223517">
+  <link rel="stylesheet" href="/static/css/post.css?t=20230826223517">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20230826223517">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20230826223517">
   <script>
     window.blog = {
       baseurl:"",
-      buildAt:"20230622201748",
+      buildAt:"20230826223517",
       darkTheme: false,
       setDarkTheme: function (dark) {
         this.darkTheme = Boolean(dark);
@@ -106,28 +106,30 @@
 </ul>
 
 <ol>
-  <li>CPU部分
-```C++
-struct VERTEX {
- DirectX::XMFLOAT3 pos;
- DirectX::XMFLOAT4 Color;
-}; // a struct to define a vertex</li>
+  <li>CPU部分</li>
 </ol>
 
-<p>// create a triangle using the VERTEX struct
+<pre><code class="language-C++">struct VERTEX {
+    DirectX::XMFLOAT3 pos;
+    DirectX::XMFLOAT4 Color;
+}; // a struct to define a vertex
+
+// create a triangle using the VERTEX struct
 VERTEX OurVertices[] = {
     {DirectX::XMFLOAT3{0.0f, 0.5f, 0.0f}, DirectX::XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f)},
     {DirectX::XMFLOAT3{0.45f, -0.5, 0.0f}, DirectX::XMFLOAT4(0.0f, 1.0f, 0.0f, 1.0f)},
     {DirectX::XMFLOAT3{-0.45f, -0.5f, 0.0f}, DirectX::XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f)}};
-D3D11<em>BUFFER_DESC bd;
+D3D11_BUFFER_DESC bd;
 ID3D11Buffer* pVBuffer = nullptr;
-d3d11_dev</em>-&gt;CreateBuffer(&amp;bd, NULL, &amp;pVBuffer); // create the buffer</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>通过上述代码, 我们创建了一个 buffer(就是一个数据块), 那么GPU如果解析这个数据块呢?
+d3d11_dev_-&gt;CreateBuffer(&amp;bd, NULL, &amp;pVBuffer); // create the buffer
+</code></pre>
+<p>通过上述代码, 我们创建了一个 buffer(就是一个数据块), 那么GPU如果解析这个数据块呢?</p>
 
-2. GPU部分
+<ol>
+  <li>GPU部分</li>
+</ol>
 
-```C++
-void init() {
+<pre><code class="language-C++">void init() {
     // 告诉GPU, 输入数据应该如何解析
     const D3D11_INPUT_ELEMENT_DESC input_desc[2] = {
         {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
@@ -139,21 +141,17 @@ void init() {
                                         blob-&gt;GetBufferPointer(), blob-&gt;GetBufferSize(), &amp;layout);
     d3d11_ctx_-&gt;IASetInputLayout(layout);
 }
-|  Semantic | Values  |
-|  ----     | ----  |
-| POSITION  | float, float, float - or - DirectX::XMFLOAT3 |
-| POSITIONT | float, float, float - or - DirectX::XMFLOAT3 |
-|   COLOR   | float, float, float, float - or - DirectX::XMFLOAT4|
-|   PSIZE   | float|
 
+</code></pre>
 
-</code></pre></div></div>
 <pre><code class="language-C++">void render() {
     const float clear[4] = {0.f, 0.2f, 0.4f, 1.f};
     d3d11_ctx_-&gt;ClearRenderTargetView(render_target_view_, clear);
 
-    // XXX: 为什么每一帧都要绑定
-    d3d11_ctx_-&gt;OMSetRenderTargets(1, &amp;render_view_, nullptr);
+    // 为什么每一帧都要绑定: see remark
+    // https://learn.microsoft.com/en-us/windows/win32/api/d3d11/nf-d3d11-id3d11devicecontext-omsetrendertargets
+    d3d11_ctx_-&gt;OMSetRenderTargets(1, render_view_.GetAddressOf(), nullptr);
+    // 这里不能直接&amp;render_view_, 会导致render_view_=nullptr
 
     // 使用哪些"Vertex"
     UINT stride = sizeof(VERTEX);
@@ -170,8 +168,6 @@ void init() {
     swapchain_-&gt;Present(0, 0);
 }
 </code></pre>
-
-<p>效果如下：</p>
 
 <p><img src="triangle.png" alt="triangle" /></p>
 
@@ -194,8 +190,8 @@ void init() {
   <span></span>
   <span></span>
 </div>
-<script type="text/javascript" src="/static/js/blog.js?t=20230622201748"></script>
-<script type="text/javascript" src="/static/js/search.js?t=20230622201748"></script>
+<script type="text/javascript" src="/static/js/blog.js?t=20230826223517"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20230826223517"></script>
 <!-- 腾讯MTA移动分析 -->
 <script>
   var _mtac = {performanceMonitor: 1, senseQuery: 1}

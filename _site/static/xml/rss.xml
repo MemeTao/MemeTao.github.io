@@ -5,23 +5,37 @@
     <link></link>
     <description>memetao的成长轨迹</description>
     <language>zh-CN</language>
-    <pubDate>Thu, 22 Jun 2023 20:17:48 +0800</pubDate>
-    <lastBuildDate>Thu, 22 Jun 2023 20:17:48 +0800</lastBuildDate>
+    <pubDate>Sat, 26 Aug 2023 22:35:17 +0800</pubDate>
+    <lastBuildDate>Sat, 26 Aug 2023 22:35:17 +0800</lastBuildDate>
     <generator>Jekyll v4.3.2</generator>
     <atom:link href="/static/xml/rss.xml" rel="self" type="application/rss+xml" />
     <item>
+      <title>D3D11 HLSL语法</title>
+      <link>/posts/2023/08/26/d3d11-hlsl.html</link>
+      <description>VertexShadlerD3D11_INPUT_ELEMENT_DESCinput_desc[]={//我们知道DXGI_FORMAT_R32G32B32_FLOAT是12字节的{&quot;POSITION&quot;,0,DXGI_FORMAT_R...</description>
+      <pubDate>Sat, 26 Aug 2023 10:13:17 +0800</pubDate>
+      <gui>/posts/2023/08/26/d3d11-hlsl.html</gui>
+    </item>
+    <item>
       <title>D3D11 坐标变换</title>
       <link>/posts/2023/06/22/d3d11-coordinates.html</link>
-      <description>WorldTransformation旋转缩放ViewTransformation</description>
+      <description>WorldTransformation旋转缩放ViewTransformation世界坐标下的摄像机位置:根据摄像机位置转换坐标:ProjectionTransformation从摄像机视野转变为屏幕视野:以上的转换都是针对顶点坐标而言!</description>
       <pubDate>Thu, 22 Jun 2023 10:13:17 +0800</pubDate>
       <gui>/posts/2023/06/22/d3d11-coordinates.html</gui>
     </item>
     <item>
+      <title>C++ 犄角旮旯</title>
+      <link>/posts/2023/06/17/CPLUSPLUS.html</link>
+      <description>神魔问题我真是服了噢,C++面试现在怎么是这个样子的，问的都是一些”神魔”的问题。构造函数可以调用虚函数么可以,但是没有意义。进入基类就是调用的基类函数,进入子类就是子类的函数析构函数可以调用虚函数么可以,同上。多继承的”缩型”问题多...</description>
+      <pubDate>Sat, 17 Jun 2023 11:13:17 +0800</pubDate>
+      <gui>/posts/2023/06/17/CPLUSPLUS.html</gui>
+    </item>
+    <item>
       <title>D3D11画三角形</title>
-      <link>/posts/2023/06/17/d3d11.html</link>
+      <link>/posts/2023/06/17/d3d11-triangle.html</link>
       <description>Vertex三角形的端点。D3D11中的顶点可以看成是三角形的端点坐标(x,y,z)以及这些点的属性。在D3D11中三角形是顺时针处理的。Primitives基元，3D环境中的一个元素,可以是三角形、线、点或者任何其他图形。D3DDE...</description>
       <pubDate>Sat, 17 Jun 2023 11:13:17 +0800</pubDate>
-      <gui>/posts/2023/06/17/d3d11.html</gui>
+      <gui>/posts/2023/06/17/d3d11-triangle.html</gui>
     </item>
     <item>
       <title>D3D11 渲染管线</title>
@@ -32,10 +46,10 @@
     </item>
     <item>
       <title>士兵突击</title>
-      <link>/posts/2023/06/07/notes.html</link>
+      <link>/posts/2023/06/07/thoughts.html</link>
       <description>士兵突击«conquestofparadise»人总是要分的，而且还会越分越远，想的你抓心挠肺的。可是咱也在长啊，个越来越高，能耐越来越大，总有一天你会发现，到时候你想见谁就见谁，从天南到海北也就一抬腿的距离。报告，我是钢七连第四千九...</description>
       <pubDate>Wed, 07 Jun 2023 11:13:17 +0800</pubDate>
-      <gui>/posts/2023/06/07/notes.html</gui>
+      <gui>/posts/2023/06/07/thoughts.html</gui>
     </item>
     <item>
       <title>QT 学习笔记-布局管理</title>
@@ -45,25 +59,11 @@
       <gui>/posts/2023/05/21/QtLayout.html</gui>
     </item>
     <item>
-      <title>RTC在云游戏场景下的架构思考</title>
-      <link>/posts/2022/01/30/rtc-architect.html</link>
-      <description>架构设计我一直认为在完全陌生的场景是没法做到”预判设计”的，每次写代码都是需要先动手、后调整，所以说架构师一定是工作多年、经验十分丰富的工程师才能担当的岗位。我工作才三年半，断然是没有这个能力的。但是在”webrtc的应用”这个领域，...</description>
-      <pubDate>Sun, 30 Jan 2022 08:13:17 +0800</pubDate>
-      <gui>/posts/2022/01/30/rtc-architect.html</gui>
-    </item>
-    <item>
       <title>bpf filter code 解释</title>
       <link>/posts/2021/10/06/bpf-filter.html</link>
       <description>背景在linux下编写网络包过滤程序的时候，希望内核只投递指定规则的报文。概要主要是记录如何分析bpffilter的规则码。tcpdump生成bpfcodetcpdump-iloipandudpanddstport65500-d如下:...</description>
       <pubDate>Wed, 06 Oct 2021 13:13:17 +0800</pubDate>
       <gui>/posts/2021/10/06/bpf-filter.html</gui>
-    </item>
-    <item>
-      <title>伪可靠udp-三次握手</title>
-      <link>/posts/2021/06/25/moru-three-handshake.html</link>
-      <description>协议为了方便描述,给本协议起个名字,暂且叫做moru(modernreliableudp).moru需要支持的功能应该是如下这个样子:1.建立连接和断开连接是可靠的2.面向报文3.支持不可靠,半可靠和完全可靠三次方式(报文收发)4.支...</description>
-      <pubDate>Fri, 25 Jun 2021 13:13:17 +0800</pubDate>
-      <gui>/posts/2021/06/25/moru-three-handshake.html</gui>
     </item>
     <item>
       <title>流媒体-抽帧</title>
@@ -80,7 +80,7 @@
       <gui>/posts/2021/05/14/webrtc-jitter-buffer.html</gui>
     </item>
     <item>
-      <title>lea和mov指令的真正区别</title>
+      <title>lea和mov指令的区别</title>
       <link>/posts/2021/04/07/leaVSmov.html</link>
       <description>lea指令lea指令的解释是:loadeffectiveaddress.网上有很多解释,比如知乎高赞汇编语言中mov和lea的区别有哪些？:lea是“loadeffectiveaddress”的缩写，简单的说，lea指令可以用来将一个...</description>
       <pubDate>Wed, 07 Apr 2021 08:13:17 +0800</pubDate>
@@ -134,20 +134,6 @@
       <description>c++中的函数指针(假定在64位机器上)我们知道指针的大小恒定的,跟机器位数有关,32位机下,指针是4字节大小,64位机下指针是8字节大小.但是在C++中,有一个比较特殊的地方是C++的类成员函数指针,它的大小是普通指针的2倍.先看一...</description>
       <pubDate>Thu, 12 Jul 2018 17:13:17 +0800</pubDate>
       <gui>/posts/2018/07/12/theSizeOfMemeberFunctionPointer.html</gui>
-    </item>
-    <item>
-      <title>linux操作记录</title>
-      <link>/posts/2017/04/12/linuxOperation.html</link>
-      <description>安装与卸载apt-getinstallxxx#安装xxxapt-getremovexxx#卸载xxxapt-getupdate#更新软件信息数据库apt-getupgrade#进行系统升级apt-cachesearch#搜索软件包文件...</description>
-      <pubDate>Wed, 12 Apr 2017 17:13:17 +0800</pubDate>
-      <gui>/posts/2017/04/12/linuxOperation.html</gui>
-    </item>
-    <item>
-      <title>维特比算法的实现</title>
-      <link>/posts/2017/04/12/VBIT.html</link>
-      <description>前几天做通信原理的实验，发现网上关于维特比算法的解释太理论化，我结合代码通俗话的解释一下。如果看了以下代码您还是不能理解维特比纠错算法的真实目的，请务必联系我！首先：A，B，C代表三个地点，三条实线代表路径。假设张三现在要去A、B、C...</description>
-      <pubDate>Wed, 12 Apr 2017 17:13:17 +0800</pubDate>
-      <gui>/posts/2017/04/12/VBIT.html</gui>
     </item>
   </channel>
 </rss>
