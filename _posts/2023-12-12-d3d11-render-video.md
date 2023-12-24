@@ -1,7 +1,7 @@
 ---
 layout: mypost
-title:  "D3D11 渲染时评"
-date:   2023-06-22 10:13:17 +0800
+title:  "D3D11 渲染视频"
+date:   2023-12-22 10:13:17 +0800
 categories: graphics
 location: HangZhou,China
 description:
