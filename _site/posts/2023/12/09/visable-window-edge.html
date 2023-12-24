@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>bpf filter code 解释-memetao</title>
+  <title>windows透明边缘-memetao</title>
   <meta charset="utf-8" />
   <meta http-equiv="content-language" content="zh-CN" />
   <meta name="theme-color" content="#ffffff" />
@@ -12,8 +12,8 @@
   <meta name="applicable-device" content="pc,mobile">
   <meta name="google-site-verification" content="ckhUaoa05QCmWoE1FafzTBcqYI4yBOy-UJKopXDS18M" />
   <meta name="author" content="memetao" />
-  <meta name="description" content="bpf filter code 解释"/>
-  <meta name="keywords" content="memetao,network"/>
+  <meta name="description" content="windows透明边缘"/>
+  <meta name="keywords" content="memetao,graphics"/>
   <link rel="stylesheet" href="/static/css/common.css?t=20231224111525">
   <link rel="stylesheet" href="/static/css/theme-dark.css?t=20231224111525">
   <link rel="stylesheet" href="/static/css/post.css?t=20231224111525">
@@ -54,62 +54,61 @@
     </nav>
 </header>
 <div class="page page-post">
-  <h1 class="title" id="bpf filter code 解释">bpf filter code 解释</h1>
+  <h1 class="title" id="windows透明边缘">windows透明边缘</h1>
   
-  <div class="subtitle">memetao 于 2021-10-06 发布</div>
+  <div class="subtitle">memetao 于 2023-12-09 发布</div>
   
   <div class="post">
     <hr />
 
-<h3 id="背景">背景</h3>
+<h2 id="现象">现象</h2>
 
-<p>在linux下编写网络包过滤程序的时候，希望内核只投递指定规则的报文。</p>
+<p>win8之后操作系统会给窗口设置左、右、下三个方向上的”透明边缘”:</p>
 
-<h3 id="概要">概要</h3>
+<p><img src="1.png" alt="edge" /></p>
 
-<p>主要是记录如何分析bpf filter的规则码。</p>
+<p>当我们调用getclientRect函数时, 系统返回的窗口区域包含”透明边缘’, 并且Bitblt函数也会把这部分区域包含进去。</p>
 
-<h3 id="tcpdump-生成bpf-code">tcpdump 生成bpf code</h3>
+<h2 id="解决办法">解决办法</h2>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tcpdump <span class="nt">-i</span> lo ip and udp and dst port 65500 <span class="nt">-d</span> 
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  if (rtc::rtc_win::GetVersion() &gt;= rtc::rtc_win::Version::VERSION_WIN8 ||
+      is_maximized) {
+    // Only apply this cropping to windows with a resize border (otherwise,
+    // it'd clip the edges of captured pop-up windows without this border).
+    LONG style = GetWindowLong(window, GWL_STYLE);
+    if (style &amp; WS_THICKFRAME || style &amp; DS_MODALFRAME) {
+      int width = GetSystemMetrics(SM_CXSIZEFRAME);
+      int bottom_height = GetSystemMetrics(SM_CYSIZEFRAME);
+      const int visible_border_height = GetSystemMetrics(SM_CYBORDER);
+      int top_height = visible_border_height;
+
+      // If requested, avoid cropping the visible window border. This is used
+      // for pop-up windows to include their border, but not for the outermost
+      // window (where a partially-transparent border may expose the
+      // background a bit).
+      if (avoid_cropping_border) {
+        width = std::max(0, width - GetSystemMetrics(SM_CXBORDER));
+        bottom_height = std::max(0, bottom_height - visible_border_height);
+        top_height = 0;
+      }
+      cropped_rect-&gt;Extend(-width, -top_height, -width, -bottom_height);
+    }
+  }
+
 </code></pre></div></div>
-<p>如下:</p>
 
-<pre><code class="language-asm">(000) ldh      [12]                             # 加载第12字节的word
-(001) jeq      #0x800           jt 2	jf 10   # 判断是否是ipv4, 分别跳转到2 或 10
-(002) ldb      [23]                             # 加载23字节
-(003) jeq      #0x11            jt 4	jf 10   # 判断是否是udp(17), 分别跳转
-(004) ldh      [20]                             # 加载第20字节的word
-(005) jset     #0x1fff          jt 10	jf 6    # 分析是否出现了 frament(分包)
-(006) ldxb     4*([14]&amp;0xf)                     # 计算ip头部长度
-(007) ldh      [x + 16]                         # 取ip后的第16字节(word), udp源端口
-(008) jeq      #0xffdc          jt 9	jf 10   # 判断源端口是否是65500
-(009) ret      #262144                          # match
-(010) ret      #0                               # discard
-</code></pre>
-<p>通过 -dd 参数产生具体的struct sock_filter结构的数据:</p>
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tcpdump <span class="nt">-i</span> lo ip and udp and dst port 65500 <span class="nt">-dd</span>
+<p>上面这段代码会误判部分窗口(vs2022\vscode\wechat)，再通过下面的<a href="https://stackoverflow.com/questions/34139450/getwindowrect-returns-a-size-including-invisible-borders/34143777#34143777">方式</a>规避:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    RECT frame;
+    auto hr = DwmGetWindowAttribute(window, DWMWA_EXTENDED_FRAME_BOUNDS, &amp;frame,
+                                    sizeof(RECT));
+    if (hr == S_OK) {
+      // it/s means the window has no transparent borders;
+      if (frame.left == window_rect.left()) {
+        return true;
+      }
+    }
 </code></pre></div></div>
-
-<h3 id="注意点">注意点</h3>
-
-<p>创建raw socket的时候需要指定收包是从数据链路层开始，还是从ip开始。</p>
-
-<p>使用上述的规则码的时候，必须是从数据链路层开始，即:</p>
-<blockquote>
-  <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>int fd = ::socket(PF_PACKET, SOCK_RAW , htons(ETH_P_IP));
-</code></pre></div>  </div>
-</blockquote>
-
-<p>如果</p>
-<blockquote>
-  <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>int fd = ::socket(PF_PACKET, SOCK_DGRAM , htons(ETH_P_IP));
-</code></pre></div>  </div>
-</blockquote>
-
-<p>那么就需要自行修改这个规则码，将所有的”地址” 减去 14（一般来说是以太网，以太网帧头部长14字节）.</p>
-
-<p>知道了上述规则后，就具备了修改code的能力。</p>
 
   </div>
   

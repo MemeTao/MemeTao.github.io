@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>bpf filter code 解释-memetao</title>
+  <title>DirectX 版本历史-memetao</title>
   <meta charset="utf-8" />
   <meta http-equiv="content-language" content="zh-CN" />
   <meta name="theme-color" content="#ffffff" />
@@ -12,8 +12,8 @@
   <meta name="applicable-device" content="pc,mobile">
   <meta name="google-site-verification" content="ckhUaoa05QCmWoE1FafzTBcqYI4yBOy-UJKopXDS18M" />
   <meta name="author" content="memetao" />
-  <meta name="description" content="bpf filter code 解释"/>
-  <meta name="keywords" content="memetao,network"/>
+  <meta name="description" content="DirectX 版本历史"/>
+  <meta name="keywords" content="memetao,windows,d3d11,graphics"/>
   <link rel="stylesheet" href="/static/css/common.css?t=20231224111525">
   <link rel="stylesheet" href="/static/css/theme-dark.css?t=20231224111525">
   <link rel="stylesheet" href="/static/css/post.css?t=20231224111525">
@@ -54,62 +54,81 @@
     </nav>
 </header>
 <div class="page page-post">
-  <h1 class="title" id="bpf filter code 解释">bpf filter code 解释</h1>
+  <h1 class="title" id="DirectX 版本历史">DirectX 版本历史</h1>
   
-  <div class="subtitle">memetao 于 2021-10-06 发布</div>
+  <div class="subtitle">memetao 于 2021-09-04 发布</div>
   
   <div class="post">
     <hr />
 
-<h3 id="背景">背景</h3>
+<h3 id="d3d的历史">D3D的历史</h3>
 
-<p>在linux下编写网络包过滤程序的时候，希望内核只投递指定规则的报文。</p>
+<p><a href="https://zh.wikipedia.org/zh-hans/Direct3D">维基百科</a></p>
 
-<h3 id="概要">概要</h3>
+<p>几个重点:</p>
 
-<p>主要是记录如何分析bpf filter的规则码。</p>
+<ul>
+  <li>Direct3D(简称D3D)是DirectX的一部分</li>
+  <li>D3D和GDI是同层组件</li>
+  <li>Direct 3.0被认为是DirectX的第一套完整版本</li>
+  <li>Direct3D 6.0，1998年秋微软推出，引进多重贴图（multitxture）以及stencil buffer</li>
+  <li>Direct3D 8.0引进了可编程Pipeline</li>
+  <li>Direct3D 8.0支援处理顶点的Vertex Shader，以及处理像素的Pixel Shader。使Direct3D的技术正式超越劲敌OpenGL。与DirectDraw编程介面合并并改名为DirectX Graphics。</li>
+  <li>Direct3D 9.0使用HLSL编写Vertex Shader和Pixel Shader</li>
+  <li>Windows Vista推出DirectX的两种新类型：Direct3D 9Ex和Direct3D 10</li>
+</ul>
 
-<h3 id="tcpdump-生成bpf-code">tcpdump 生成bpf code</h3>
+<h3 id="dxgi">DXGI</h3>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tcpdump <span class="nt">-i</span> lo ip and udp and dst port 65500 <span class="nt">-d</span> 
-</code></pre></div></div>
-<p>如下:</p>
+<p>全称是”Microsoft DirectX Graphics Infrastructure”。</p>
 
-<pre><code class="language-asm">(000) ldh      [12]                             # 加载第12字节的word
-(001) jeq      #0x800           jt 2	jf 10   # 判断是否是ipv4, 分别跳转到2 或 10
-(002) ldb      [23]                             # 加载23字节
-(003) jeq      #0x11            jt 4	jf 10   # 判断是否是udp(17), 分别跳转
-(004) ldh      [20]                             # 加载第20字节的word
-(005) jset     #0x1fff          jt 10	jf 6    # 分析是否出现了 frament(分包)
-(006) ldxb     4*([14]&amp;0xf)                     # 计算ip头部长度
-(007) ldh      [x + 16]                         # 取ip后的第16字节(word), udp源端口
-(008) jeq      #0xffdc          jt 9	jf 10   # 判断源端口是否是65500
-(009) ret      #262144                          # match
-(010) ret      #0                               # discard
-</code></pre>
-<p>通过 -dd 参数产生具体的struct sock_filter结构的数据:</p>
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tcpdump <span class="nt">-i</span> lo ip and udp and dst port 65500 <span class="nt">-dd</span>
-</code></pre></div></div>
+<p>什么时候推出的: 好像win7 sp1就有了, 无从考证。</p>
 
-<h3 id="注意点">注意点</h3>
-
-<p>创建raw socket的时候需要指定收包是从数据链路层开始，还是从ip开始。</p>
-
-<p>使用上述的规则码的时候，必须是从数据链路层开始，即:</p>
+<p>DXGI是干嘛的:</p>
 <blockquote>
-  <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>int fd = ::socket(PF_PACKET, SOCK_RAW , htons(ETH_P_IP));
-</code></pre></div>  </div>
+  <blockquote>
+    <p>举个例子，在以前图形子系统都归D3D，结果D3D8/D3D9分别有一套代码用来管理swap chain。在Vista+里，图形API越来越多，D3D9/D3D10/D3D11/D3D12，都来一套swap chain太没意义了。于是重构成所有API可以共享一份swap chain的代码，这就放在DXGI。除此之外，窗口全屏化之类的事情也都归DXGI了，你可以认为屏幕输出的部分都归DXGI。后来DXGI又加了一些底层的功能，用来跟DWM打交道，比如拷贝混合后的屏幕，设备旋转，跨屏幕窗口。。。还有些未公开的，我就不说了。(作者：叛逆者, 链接：https://www.zhihu.com/question/36501678/answer/67786884)</p>
+  </blockquote>
 </blockquote>
 
-<p>如果</p>
+<p>####DxgiFactory</p>
+
+<p>不同windows版本能够创建的DxgiFactory版本不一样:</p>
+
+<ul>
+  <li>DxgiFactory, windows</li>
+  <li>DxgiFactory1, Windows 7</li>
+  <li>DxgiFactory2, windows 8 或者 win7上天机了win8的update(win7 sp?)</li>
+</ul>
+
 <blockquote>
-  <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>int fd = ::socket(PF_PACKET, SOCK_DGRAM , htons(ETH_P_IP));
-</code></pre></div>  </div>
+  <blockquote>
+    <p>Do not mix the use of DXGI 1.0 (IDXGIFactory) and DXGI 1.1 (IDXGIFactory1) in an application. Use IDXGIFactory or IDXGIFactory1, but not both in an application.</p>
+  </blockquote>
 </blockquote>
 
-<p>那么就需要自行修改这个规则码，将所有的”地址” 减去 14（一般来说是以太网，以太网帧头部长14字节）.</p>
+<p>因此, 程序中使用D3D的时候需要确保代码是统一的。比如，使用统一的封装来创建DxgiFactory。</p>
 
-<p>知道了上述规则后，就具备了修改code的能力。</p>
+<p>OBS使用CreateDXGIFactory1来创建factory, 然后在这基础上继续往上枚举(需要相关功能的时候)。</p>
+
+<h3 id="wddm">WDDM</h3>
+
+<p><a href="https://learn.microsoft.com/zh-cn/windows-hardware/drivers/display/windows-vista-display-driver-model-design-guide">WDDM是一个体系结构</a></p>
+
+<p>Direct3D 9Ex和Direct3D 10均构建于WDDM之上,只有透过WDDM才能在Vista上使用Direct3D。</p>
+
+<p>图形硬件供应商必须提供用户模式显示驱动程序和显示微型端口驱动程序 (也称为内核模式显示驱动程序或 KMD) 。</p>
+
+<ul>
+  <li>用户模式显示驱动程序是 Direct3D 运行时加载 (DLL) 的动态链接库。</li>
+  <li>显示微型端口驱动程序与 DirectX 图形内核子系统通信。</li>
+</ul>
+
+<p><a href="https://learn.microsoft.com/zh-cn/windows-hardware/drivers/display/what-s-new-for-windows-7-display-drivers--wddm-1-1-">WDDM 版本内容</a></p>
+
+<h3 id="window模式和exclusive模式">Window模式和Exclusive模式</h3>
+
+<p>windowed模式下，必须使用back buffer。在Exclusive模式下，Direct3D直接呼叫显示卡驱动程式，而不通过GDI。</p>
 
   </div>
   

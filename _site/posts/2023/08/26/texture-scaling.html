@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>bpf filter code 解释-memetao</title>
+  <title>D3D11 缩放texture-memetao</title>
   <meta charset="utf-8" />
   <meta http-equiv="content-language" content="zh-CN" />
   <meta name="theme-color" content="#ffffff" />
@@ -12,8 +12,8 @@
   <meta name="applicable-device" content="pc,mobile">
   <meta name="google-site-verification" content="ckhUaoa05QCmWoE1FafzTBcqYI4yBOy-UJKopXDS18M" />
   <meta name="author" content="memetao" />
-  <meta name="description" content="bpf filter code 解释"/>
-  <meta name="keywords" content="memetao,network"/>
+  <meta name="description" content="D3D11 缩放texture"/>
+  <meta name="keywords" content="memetao,graphics"/>
   <link rel="stylesheet" href="/static/css/common.css?t=20231224111525">
   <link rel="stylesheet" href="/static/css/theme-dark.css?t=20231224111525">
   <link rel="stylesheet" href="/static/css/post.css?t=20231224111525">
@@ -54,62 +54,117 @@
     </nav>
 </header>
 <div class="page page-post">
-  <h1 class="title" id="bpf filter code 解释">bpf filter code 解释</h1>
+  <h1 class="title" id="D3D11 缩放texture">D3D11 缩放texture</h1>
   
-  <div class="subtitle">memetao 于 2021-10-06 发布</div>
+  <div class="subtitle">memetao 于 2023-08-26 发布</div>
   
   <div class="post">
     <hr />
 
-<h3 id="背景">背景</h3>
+<h3 id="定义输入格式">定义输入格式</h3>
 
-<p>在linux下编写网络包过滤程序的时候，希望内核只投递指定规则的报文。</p>
+<pre><code class="language-C++">struct VERTEX {
+    DirectX::XMFLOAT3 pos;
+    DirectX::XMFLOAT2 tex;
+    static const D3D11_INPUT_ELEMENT_DESC input_desc[2];
+}; // a struct to define a vertex
 
-<h3 id="概要">概要</h3>
-
-<p>主要是记录如何分析bpf filter的规则码。</p>
-
-<h3 id="tcpdump-生成bpf-code">tcpdump 生成bpf code</h3>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tcpdump <span class="nt">-i</span> lo ip and udp and dst port 65500 <span class="nt">-d</span> 
-</code></pre></div></div>
-<p>如下:</p>
-
-<pre><code class="language-asm">(000) ldh      [12]                             # 加载第12字节的word
-(001) jeq      #0x800           jt 2	jf 10   # 判断是否是ipv4, 分别跳转到2 或 10
-(002) ldb      [23]                             # 加载23字节
-(003) jeq      #0x11            jt 4	jf 10   # 判断是否是udp(17), 分别跳转
-(004) ldh      [20]                             # 加载第20字节的word
-(005) jset     #0x1fff          jt 10	jf 6    # 分析是否出现了 frament(分包)
-(006) ldxb     4*([14]&amp;0xf)                     # 计算ip头部长度
-(007) ldh      [x + 16]                         # 取ip后的第16字节(word), udp源端口
-(008) jeq      #0xffdc          jt 9	jf 10   # 判断源端口是否是65500
-(009) ret      #262144                          # match
-(010) ret      #0                               # discard
+const D3D11_INPUT_ELEMENT_DESC VERTEX::input_desc[2] = {
+    {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+    {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0},
+};
 </code></pre>
-<p>通过 -dd 参数产生具体的struct sock_filter结构的数据:</p>
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tcpdump <span class="nt">-i</span> lo ip and udp and dst port 65500 <span class="nt">-dd</span>
-</code></pre></div></div>
+<p>注意, 顶点pos使用的是3D坐标系, tex使用的是纹理坐标系, 他们俩没有任何关系。 由于我们添加了纹理坐标, 所以每个顶点都有了自己的2D纹理坐标（即建立了3D-&gt;2D的映射关系, 仅此而已）</p>
 
-<h3 id="注意点">注意点</h3>
+<h3 id="设置4个顶点">设置4个顶点</h3>
 
-<p>创建raw socket的时候需要指定收包是从数据链路层开始，还是从ip开始。</p>
+<p>分别是 左上角、右上角、左下角、右下角。</p>
 
-<p>使用上述的规则码的时候，必须是从数据链路层开始，即:</p>
+<pre><code class="language-C++">VERTEX OurVertices[] = {
+    {DirectX::XMFLOAT3{-1.0f, 1.f, 0.0f}, DirectX::XMFLOAT2(0.f,0.f)},
+    {DirectX::XMFLOAT3{1.f, 1.f, 0.0f}, DirectX::XMFLOAT2(0.0f, 1.f)},
+    {DirectX::XMFLOAT3{-1.f, 0.f, 0.0f}, DirectX::XMFLOAT2(0.0f, -1.f)},
+    {DirectX::XMFLOAT3{1.f, 0.f, 0.0f}, DirectX::XMFLOAT2(1.f,1.f)}};
+</code></pre>
+
+<p>shader中定义输入、输出:</p>
+
+<pre><code class="language-HLSL">struct VInput{
+    float4 pos : POSITION;
+    float2 tex : TEXCOORD;
+};
+struct VOut {
+    float4 pos : SV_POSITION;
+    float2 tex : TEXCOORD;
+};
+</code></pre>
+
+<h3 id="设置samplerstate和shaderreource">设置SamplerState和ShaderReource</h3>
+<pre><code class="language-C++">    D3D11_SAMPLER_DESC sd;
+    sd.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+    sd.MaxAnisotropy = 8;
+    sd.AddressU = D3D11_TEXTURE_ADDRESS_BORDER;
+    sd.AddressV = D3D11_TEXTURE_ADDRESS_BORDER;
+    sd.AddressW = D3D11_TEXTURE_ADDRESS_BORDER;
+    sd.BorderColor[0] = 1.0f; // set the border color to white
+    sd.BorderColor[1] = 1.0f;
+    sd.BorderColor[2] = 1.0f;
+    sd.BorderColor[3] = 1.0f;
+    sd.MinLOD = 0.0f;
+    sd.MaxLOD = FLT_MAX;
+    sd.MipLODBias = 2.0f;
+    auto hr = d3d11_dev_-&gt;CreateSamplerState(&amp;sd, &amp;sampler_state_);
+    if (FAILED(hr)) {
+        return false;
+    }
+    return true;
+    //...
+    // tell the GPU which texture to use
+    devcon-&gt;PSSetShaderResources(0, 1, texture.GetAddressOf());
+</code></pre>
+
+<p>在shader中这样使用它们:</p>
+
+<pre><code class="language-HLSL">    Texture2D tex : register(t0);
+    SamplerState sampl : register(s0);
+</code></pre>
+
+<h3 id="完整shader">完整Shader</h3>
+
+<p>我们的目标很简单: 将texture1中的(x,y)填上texture2中的(x<em>scaling, y</em>scaling)的像素, 由于我们使用的SV_POSITION (齐次裁剪空间中的坐标值, -1&lt;-&gt;1的范围), 因此”缩放”工作已经自动完成了</p>
+<pre><code class="language-HLSL">Texture2D texture1 : register(t0);
+SamplerState sampler1 : register(s0);
+
+struct VInput {
+    float4 pos : POSITION;
+    float2 tex : TEXCOORD;
+};
+
+struct VOut {
+    float4 pos : SV_POSITION;
+    float2 tex : TEXCOORD;
+};
+
+VOut VShader(VInput input) {
+    VOut output;
+    output.pos = input.pos;
+    output.tex = input.tex;
+    return output;
+}
+
+float4 PShader(VOut input)
+    : SV_TARGET {
+    return texture1.Sample(sampler1, input.tex);
+}
+</code></pre>
+
+<p>注: 可以使用以下命令验证shader有没有手误</p>
+
 <blockquote>
-  <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>int fd = ::socket(PF_PACKET, SOCK_RAW , htons(ETH_P_IP));
-</code></pre></div>  </div>
+  <blockquote>
+    <p>fxc.exe   /T fx_4_0 /Fo “output.fxo” “shaders.shader”</p>
+  </blockquote>
 </blockquote>
-
-<p>如果</p>
-<blockquote>
-  <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>int fd = ::socket(PF_PACKET, SOCK_DGRAM , htons(ETH_P_IP));
-</code></pre></div>  </div>
-</blockquote>
-
-<p>那么就需要自行修改这个规则码，将所有的”地址” 减去 14（一般来说是以太网，以太网帧头部长14字节）.</p>
-
-<p>知道了上述规则后，就具备了修改code的能力。</p>
 
   </div>
   

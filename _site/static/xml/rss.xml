@@ -5,12 +5,68 @@
     <link></link>
     <description>memetao的成长轨迹</description>
     <language>zh-CN</language>
-    <pubDate>Sat, 26 Aug 2023 22:35:17 +0800</pubDate>
-    <lastBuildDate>Sat, 26 Aug 2023 22:35:17 +0800</lastBuildDate>
+    <pubDate>Sun, 24 Dec 2023 11:15:25 +0800</pubDate>
+    <lastBuildDate>Sun, 24 Dec 2023 11:15:25 +0800</lastBuildDate>
     <generator>Jekyll v4.3.2</generator>
     <atom:link href="/static/xml/rss.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>D3D11 HLSL语法</title>
+      <title>D3D11 渲染视频</title>
+      <link>/posts/2023/12/24/d3d11-render-video.html</link>
+      <description>需求描述视频渲染通常会有如下功能:视频渲染支持旋转[90,180,270…任意角度]镜像[垂直,水平]Alpha通道[虚拟人]HDR(通常为10BIT)输入数据一个渲染器的输入源目前看上去会有两种:本地预览，来自摄像头、屏幕捕获远端H...</description>
+      <pubDate>Sun, 24 Dec 2023 10:13:17 +0800</pubDate>
+      <gui>/posts/2023/12/24/d3d11-render-video.html</gui>
+    </item>
+    <item>
+      <title>windows透明边缘</title>
+      <link>/posts/2023/12/09/visable-window-edge.html</link>
+      <description>现象win8之后操作系统会给窗口设置左、右、下三个方向上的”透明边缘”:当我们调用getclientRect函数时,系统返回的窗口区域包含”透明边缘’,并且Bitblt函数也会把这部分区域包含进去。解决办法if(rtc::rtc_wi...</description>
+      <pubDate>Sat, 09 Dec 2023 10:13:17 +0800</pubDate>
+      <gui>/posts/2023/12/09/visable-window-edge.html</gui>
+    </item>
+    <item>
+      <title>win7 Aero 效果</title>
+      <link>/posts/2023/08/26/Aero.html</link>
+      <description>Aero效果对窗口采集的影响DWM(Aero)关闭的情况下,PrintWindow与某些APP会有兼容性问题,导致采集区域内有验证的黑屏、闪屏问题,这时候应该使用Bitblt来规避(会有窗口重叠问题)。DWM开启的情况下,Bitblt...</description>
+      <pubDate>Sat, 26 Aug 2023 10:13:17 +0800</pubDate>
+      <gui>/posts/2023/08/26/Aero.html</gui>
+    </item>
+    <item>
+      <title>D3D11 透明渲染</title>
+      <link>/posts/2023/08/26/d3d11-alpha.html</link>
+      <description>ColorBlendingColorBlending发生在PixelShader的下一个阶段:OutputMergerStage.默认情况下,混合功能时被关闭的。方程Color=SrcColor*SrcBlend+DestColor*...</description>
+      <pubDate>Sat, 26 Aug 2023 10:13:17 +0800</pubDate>
+      <gui>/posts/2023/08/26/d3d11-alpha.html</gui>
+    </item>
+    <item>
+      <title>D3D11 裁剪texture</title>
+      <link>/posts/2023/08/26/texture-clip.html</link>
+      <description>定义输入格式structVERTEX{DirectX::XMFLOAT3pos;DirectX::XMFLOAT2tex;staticconstD3D11_INPUT_ELEMENT_DESCinput_desc[2];};//ast...</description>
+      <pubDate>Sat, 26 Aug 2023 10:13:17 +0800</pubDate>
+      <gui>/posts/2023/08/26/texture-clip.html</gui>
+    </item>
+    <item>
+      <title>D3D11 缩放texture</title>
+      <link>/posts/2023/08/26/texture-scaling.html</link>
+      <description>定义输入格式structVERTEX{DirectX::XMFLOAT3pos;DirectX::XMFLOAT2tex;staticconstD3D11_INPUT_ELEMENT_DESCinput_desc[2];};//ast...</description>
+      <pubDate>Sat, 26 Aug 2023 10:13:17 +0800</pubDate>
+      <gui>/posts/2023/08/26/texture-scaling.html</gui>
+    </item>
+    <item>
+      <title>D3D11 NV12和RGB的转换</title>
+      <link>/posts/2023/08/26/d3d11-rgb2nv12.html</link>
+      <description>computeshader?</description>
+      <pubDate>Sat, 26 Aug 2023 10:13:17 +0800</pubDate>
+      <gui>/posts/2023/08/26/d3d11-rgb2nv12.html</gui>
+    </item>
+    <item>
+      <title>D3D11 Buffer</title>
+      <link>/posts/2023/08/26/d3d11-buffer.html</link>
+      <description>VertexBuffer//C++structVERTEX{DirectX::XMFLOAT3pos;DirectX::XMFLOAT3Color;};//shaderReturnTypeVShader(float4position:...</description>
+      <pubDate>Sat, 26 Aug 2023 10:13:17 +0800</pubDate>
+      <gui>/posts/2023/08/26/d3d11-buffer.html</gui>
+    </item>
+    <item>
+      <title>D3D11 HLSL摘记</title>
       <link>/posts/2023/08/26/d3d11-hlsl.html</link>
       <description>VertexShadlerD3D11_INPUT_ELEMENT_DESCinput_desc[]={//我们知道DXGI_FORMAT_R32G32B32_FLOAT是12字节的{&quot;POSITION&quot;,0,DXGI_FORMAT_R...</description>
       <pubDate>Sat, 26 Aug 2023 10:13:17 +0800</pubDate>
@@ -64,6 +120,20 @@
       <description>背景在linux下编写网络包过滤程序的时候，希望内核只投递指定规则的报文。概要主要是记录如何分析bpffilter的规则码。tcpdump生成bpfcodetcpdump-iloipandudpanddstport65500-d如下:...</description>
       <pubDate>Wed, 06 Oct 2021 13:13:17 +0800</pubDate>
       <gui>/posts/2021/10/06/bpf-filter.html</gui>
+    </item>
+    <item>
+      <title>DirectX 版本历史</title>
+      <link>/posts/2021/09/04/directx.html</link>
+      <description>D3D的历史维基百科几个重点:Direct3D(简称D3D)是DirectX的一部分D3D和GDI是同层组件Direct3.0被认为是DirectX的第一套完整版本Direct3D6.0，1998年秋微软推出，引进多重贴图（multi...</description>
+      <pubDate>Sat, 04 Sep 2021 11:13:17 +0800</pubDate>
+      <gui>/posts/2021/09/04/directx.html</gui>
+    </item>
+    <item>
+      <title>windows技术栈摘记</title>
+      <link>/posts/2021/08/23/windows-interview.html</link>
+      <description>exe文件加载的过程https://blog.csdn.net/blacet/article/details/82255537https://www.cnblogs.com/tinaluo/p/13469325.htmlPE文件的格式...</description>
+      <pubDate>Mon, 23 Aug 2021 11:13:17 +0800</pubDate>
+      <gui>/posts/2021/08/23/windows-interview.html</gui>
     </item>
     <item>
       <title>流媒体-抽帧</title>

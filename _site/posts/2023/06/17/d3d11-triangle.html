@@ -14,15 +14,15 @@
   <meta name="author" content="memetao" />
   <meta name="description" content="D3D11画三角形"/>
   <meta name="keywords" content="memetao,graphics"/>
-  <link rel="stylesheet" href="/static/css/common.css?t=20230826223517">
-  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20230826223517">
-  <link rel="stylesheet" href="/static/css/post.css?t=20230826223517">
-  <link rel="stylesheet" href="/static/css/code-dark.css?t=20230826223517">
-  <link rel="stylesheet" href="/static/css/code-light.css?t=20230826223517">
+  <link rel="stylesheet" href="/static/css/common.css?t=20231224111525">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20231224111525">
+  <link rel="stylesheet" href="/static/css/post.css?t=20231224111525">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20231224111525">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20231224111525">
   <script>
     window.blog = {
       baseurl:"",
-      buildAt:"20230826223517",
+      buildAt:"20231224111525",
       darkTheme: false,
       setDarkTheme: function (dark) {
         this.darkTheme = Boolean(dark);
@@ -171,6 +171,70 @@ d3d11_dev_-&gt;CreateBuffer(&amp;bd, NULL, &amp;pVBuffer); // create the buffer
 
 <p><img src="triangle.png" alt="triangle" /></p>
 
+<h3 id="画一个3d的三角形-沿着y轴旋转">画一个3D的三角形 (沿着Y轴旋转)</h3>
+
+<ul>
+  <li>步骤1, 定义一个ConstantBuffer, 用来存储旋转矩阵:</li>
+</ul>
+
+<pre><code class="language-C++">
+struct ConstantBuffer {
+    DirectX::XMFLOAT4X4 matrix;
+};
+
+D3D11_BUFFER_DESC bd = {0};
+bd.ByteWidth = sizeof(ConstantBuffer);
+bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+bd.Usage = D3D11_USAGE_DEFAULT;
+hr = d3d11_dev_-&gt;CreateBuffer(&amp;bd, nullptr, &amp;const_buf_);
+if (FAILED(hr)) {
+    return false;
+}
+d3d11_ctx_-&gt;VSSetConstantBuffers(0, 1, const_buf_.GetAddressOf());
+
+// shader
+
+cbuffer ConstantBuffer {
+    float4x4 final_matrix;
+}
+VOut VShader(float4 position : POSITION, float4 color : COLOR) {
+    VOut output;
+
+    output.position = mul(final_matrix, position); //一个三阶矩阵 X 一维矩阵 = 一维矩阵 (就是最后的坐标)
+    output.color = color;
+
+    return output;
+}
+</code></pre>
+
+<ul>
+  <li>步骤2, 产生这个转换矩阵(坐标转换)</li>
+</ul>
+
+<pre><code class="language-C++">// 世界坐标转换矩阵(这里只是绕Y轴旋转)
+DirectX::XMMATRIX matrix_world = DirectX::XMMatrixRotationY(delta_angle);
+
+// 计算View Transformation
+DirectX::XMVECTOR vec_carmera = DirectX::XMVectorSet(0.f, 0.f, -5.f, 0);
+DirectX::XMVECTOR vec_lookat = DirectX::XMVectorSet(0, 0, 0, 0);
+DirectX::XMVECTOR vec_camara_up = DirectX::XMVectorSet(0, 1, 0, 0);
+DirectX::XMMATRIX matrix_view =
+    DirectX::XMMatrixLookAtLH(vec_carmera, vec_lookat, vec_camara_up);
+
+// 计算Projection Transformation
+DirectX::XMMATRIX matrix_projection =
+    DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(45), // the field of view
+                                        (FLOAT)width_ / (FLOAT)height_,  // aspect ratio
+                                        1,                               // the near view-plane
+                                        100);
+// 将矩阵数据传送给GPU
+DirectX::XMMATRIX final_matri = matrix_world * matrix_view * matrix_projection;
+d3d11_ctx_-&gt;UpdateSubresource(const_buf_.Get(), 0, 0, &amp;final_matri, 0, 0);
+
+// 三个顶点, 从0开始
+d3d11_ctx_-&gt;Draw(3, 0);
+</code></pre>
+
 <h3 id="注意事项">注意事项</h3>
 
 <ul>
@@ -190,8 +254,8 @@ d3d11_dev_-&gt;CreateBuffer(&amp;bd, NULL, &amp;pVBuffer); // create the buffer
   <span></span>
   <span></span>
 </div>
-<script type="text/javascript" src="/static/js/blog.js?t=20230826223517"></script>
-<script type="text/javascript" src="/static/js/search.js?t=20230826223517"></script>
+<script type="text/javascript" src="/static/js/blog.js?t=20231224111525"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20231224111525"></script>
 <!-- 腾讯MTA移动分析 -->
 <script>
   var _mtac = {performanceMonitor: 1, senseQuery: 1}

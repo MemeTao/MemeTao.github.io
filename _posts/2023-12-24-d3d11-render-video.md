@@ -1,10 +1,9 @@
 ---
 layout: mypost
-title:  "D3D11 渲染视频"
-date:   2023-12-24 10:13:17 +0800
+title:  D3D11 渲染视频
+date: 2023-12-24 10:13:17 +0800
 categories: graphics
 location: HangZhou,China
-description:
 ---
 ---
 
@@ -35,14 +34,12 @@ struct VERTEX {
     DirectX::XMFLOAT3 pos;
     DirectX::XMFLOAT2 tex;
     static const D3D11_INPUT_ELEMENT_DESC input_desc[2];
-}; // a struct to define a vertex
+};
 
-// clang-format off
 const D3D11_INPUT_ELEMENT_DESC VERTEX::input_desc[2] = {
     {"SV_POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0},
     {"TEXCOORD",    0, DXGI_FORMAT_R32G32_FLOAT,    0, 12,  D3D11_INPUT_PER_VERTEX_DATA, 0},
 };
-
 
 static const DirectX::XMVECTORF32 points[4] = {
     {{{0, 0, 0, 0}}},

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>D3D11 HLSL语法-memetao</title>
+  <title>D3D11 HLSL摘记-memetao</title>
   <meta charset="utf-8" />
   <meta http-equiv="content-language" content="zh-CN" />
   <meta name="theme-color" content="#ffffff" />
@@ -12,17 +12,17 @@
   <meta name="applicable-device" content="pc,mobile">
   <meta name="google-site-verification" content="ckhUaoa05QCmWoE1FafzTBcqYI4yBOy-UJKopXDS18M" />
   <meta name="author" content="memetao" />
-  <meta name="description" content="D3D11 HLSL语法"/>
+  <meta name="description" content="D3D11 HLSL摘记"/>
   <meta name="keywords" content="memetao,graphics"/>
-  <link rel="stylesheet" href="/static/css/common.css?t=20230826223517">
-  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20230826223517">
-  <link rel="stylesheet" href="/static/css/post.css?t=20230826223517">
-  <link rel="stylesheet" href="/static/css/code-dark.css?t=20230826223517">
-  <link rel="stylesheet" href="/static/css/code-light.css?t=20230826223517">
+  <link rel="stylesheet" href="/static/css/common.css?t=20231224111525">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20231224111525">
+  <link rel="stylesheet" href="/static/css/post.css?t=20231224111525">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20231224111525">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20231224111525">
   <script>
     window.blog = {
       baseurl:"",
-      buildAt:"20230826223517",
+      buildAt:"20231224111525",
       darkTheme: false,
       setDarkTheme: function (dark) {
         this.darkTheme = Boolean(dark);
@@ -54,7 +54,7 @@
     </nav>
 </header>
 <div class="page page-post">
-  <h1 class="title" id="D3D11 HLSL语法">D3D11 HLSL语法</h1>
+  <h1 class="title" id="D3D11 HLSL摘记">D3D11 HLSL摘记</h1>
   
   <div class="subtitle">memetao 于 2023-08-26 发布</div>
   
@@ -114,7 +114,15 @@ IASetVertexBuffers(vertex_buf_);
   </tbody>
 </table>
 
-<div class="language-hlsl highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 为什么是float4, 而不是float3？搞不懂</span>
+<div class="language-hlsl highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="c1">// 为什么是float4, 而不是float3？搞不懂</span>
+<span class="c1">// 实测float3也可以work</span>
+<span class="k">struct</span> <span class="n">VOut</span> <span class="p">{</span>
+    <span class="kt">float4</span> <span class="n">position</span> <span class="o">:</span> <span class="nb">SV_POSITION</span><span class="p">;</span>
+    <span class="kt">float4</span> <span class="n">color</span> <span class="o">:</span> <span class="nb">COLOR</span><span class="p">;</span>
+<span class="p">};</span>
+
+
 <span class="n">VOut</span> <span class="nf">VShader</span><span class="p">(</span><span class="kt">float4</span> <span class="n">position</span> <span class="o">:</span> <span class="nb">POSITION</span><span class="p">,</span> <span class="kt">float4</span> <span class="n">color</span> <span class="o">:</span> <span class="nb">COLOR</span><span class="p">)</span> 
 <span class="p">{</span>
     <span class="n">VOut</span> <span class="n">output</span><span class="p">;</span>
@@ -123,13 +131,32 @@ IASetVertexBuffers(vertex_buf_);
     <span class="k">return</span> <span class="n">output</span><span class="p">;</span>
 <span class="p">}</span>
 
-
-<span class="kt">float4</span> <span class="n">PShader</span><span class="p">(</span><span class="kt">float4</span> <span class="n">position</span> <span class="o">:</span> <span class="nb">SV_POSITION</span><span class="p">,</span> <span class="err">#使用的是</span><span class="n">normailized</span><span class="err">坐标</span> 
-    <span class="kt">float4</span> <span class="n">color</span><span class="o">:</span> <span class="nb">COLOR</span><span class="p">)</span><span class="o">:</span> <span class="n">SV_TARGET</span> <span class="err">#返回值是给输出合并阶段的用的</span><span class="p">,</span> <span class="err">输出到</span><span class="n">render</span> <span class="n">Target</span><span class="err">上</span>
+<span class="c1">// 使用的是normailized坐标, 返回值是给输出合并阶段的用的, 输出到render Target上</span>
+<span class="kt">float4</span> <span class="nf">PShader</span><span class="p">(</span><span class="kt">float4</span> <span class="n">position</span> <span class="o">:</span> <span class="nb">SV_POSITION</span><span class="p">,</span> 
+    <span class="kt">float4</span> <span class="n">color</span><span class="o">:</span> <span class="nb">COLOR</span><span class="p">)</span><span class="o">:</span> <span class="n">SV_TARGET</span> 
 <span class="p">{</span>
     <span class="k">return</span> <span class="n">color</span><span class="p">;</span>
 <span class="p">}</span>
 </code></pre></div></div>
+
+<h3 id="为什么是float4">为什么是float4?</h3>
+
+<p>顶点声明中的默认纹理坐标:</p>
+<blockquote>
+  <blockquote>
+    <p>提供给像素着色器的纹理坐标必须具有四个分量， (u、v、w、q) 。 如果缺少 u、v 或 w 组件，硬件或驱动程序必须向该组件提供默认值 0。 如果缺少 q 组件，硬件或驱动程序必须向该组件提供默认值 1。 因此，如果缺少所有组件，则默认值 (0，0，0，1) 。 例如，如果将 2D 纹理坐标发送到使用 3D 纹理坐标的像素着色器，则硬件或驱动程序会分别向第 3 和第 4 个分量提供默认值 0 和 1。</p>
+  </blockquote>
+</blockquote>
+
+<p>也就是说即使我们的input_layout里面说了是12字节, 但是驱动会默认对齐到16字节？</p>
+
+<h3 id="hlsl-结构对齐的问题">HLSL 结构对齐的问题</h3>
+
+<p>下面是常量缓冲区的对齐规则, 但是顶点缓冲区的对齐规则又是咋样的, 为什么大家都是写float4?</p>
+
+<p>see: https://www.cnblogs.com/X-Jun/p/9376474.html</p>
+
+<p>不知道用什么工具可以对GPU数据进行DEBUG呢？</p>
 
   </div>
   
@@ -144,8 +171,8 @@ IASetVertexBuffers(vertex_buf_);
   <span></span>
   <span></span>
 </div>
-<script type="text/javascript" src="/static/js/blog.js?t=20230826223517"></script>
-<script type="text/javascript" src="/static/js/search.js?t=20230826223517"></script>
+<script type="text/javascript" src="/static/js/blog.js?t=20231224111525"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20231224111525"></script>
 <!-- 腾讯MTA移动分析 -->
 <script>
   var _mtac = {performanceMonitor: 1, senseQuery: 1}

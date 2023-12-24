@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>bpf filter code 解释-memetao</title>
+  <title>windows技术栈摘记-memetao</title>
   <meta charset="utf-8" />
   <meta http-equiv="content-language" content="zh-CN" />
   <meta name="theme-color" content="#ffffff" />
@@ -12,8 +12,8 @@
   <meta name="applicable-device" content="pc,mobile">
   <meta name="google-site-verification" content="ckhUaoa05QCmWoE1FafzTBcqYI4yBOy-UJKopXDS18M" />
   <meta name="author" content="memetao" />
-  <meta name="description" content="bpf filter code 解释"/>
-  <meta name="keywords" content="memetao,network"/>
+  <meta name="description" content="windows技术栈摘记"/>
+  <meta name="keywords" content="memetao,windows"/>
   <link rel="stylesheet" href="/static/css/common.css?t=20231224111525">
   <link rel="stylesheet" href="/static/css/theme-dark.css?t=20231224111525">
   <link rel="stylesheet" href="/static/css/post.css?t=20231224111525">
@@ -54,62 +54,34 @@
     </nav>
 </header>
 <div class="page page-post">
-  <h1 class="title" id="bpf filter code 解释">bpf filter code 解释</h1>
+  <h1 class="title" id="windows技术栈摘记">windows技术栈摘记</h1>
   
-  <div class="subtitle">memetao 于 2021-10-06 发布</div>
+  <div class="subtitle">memetao 于 2021-08-23 发布</div>
   
   <div class="post">
     <hr />
 
-<h3 id="背景">背景</h3>
+<h3 id="exe-文件加载的过程">exe 文件加载的过程</h3>
 
-<p>在linux下编写网络包过滤程序的时候，希望内核只投递指定规则的报文。</p>
+<ul>
+  <li>https://blog.csdn.net/blacet/article/details/82255537</li>
+  <li>https://www.cnblogs.com/tinaluo/p/13469325.html</li>
+</ul>
 
-<h3 id="概要">概要</h3>
+<h3 id="pe-文件的格式">PE 文件的格式’</h3>
 
-<p>主要是记录如何分析bpf filter的规则码。</p>
+<p>好难、好复杂</p>
 
-<h3 id="tcpdump-生成bpf-code">tcpdump 生成bpf code</h3>
+<ul>
+  <li>https://www.cnblogs.com/cyx-b/p/13485664.html</li>
+  <li>https://blog.csdn.net/freeking101/article/details/102752048?utm_medium=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-3.channel_param&amp;depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromMachineLearnPai2-3.channel_param</li>
+</ul>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tcpdump <span class="nt">-i</span> lo ip and udp and dst port 65500 <span class="nt">-d</span> 
-</code></pre></div></div>
-<p>如下:</p>
+<h3 id="动态链接库的原理">动态链接库的原理</h3>
 
-<pre><code class="language-asm">(000) ldh      [12]                             # 加载第12字节的word
-(001) jeq      #0x800           jt 2	jf 10   # 判断是否是ipv4, 分别跳转到2 或 10
-(002) ldb      [23]                             # 加载23字节
-(003) jeq      #0x11            jt 4	jf 10   # 判断是否是udp(17), 分别跳转
-(004) ldh      [20]                             # 加载第20字节的word
-(005) jset     #0x1fff          jt 10	jf 6    # 分析是否出现了 frament(分包)
-(006) ldxb     4*([14]&amp;0xf)                     # 计算ip头部长度
-(007) ldh      [x + 16]                         # 取ip后的第16字节(word), udp源端口
-(008) jeq      #0xffdc          jt 9	jf 10   # 判断源端口是否是65500
-(009) ret      #262144                          # match
-(010) ret      #0                               # discard
-</code></pre>
-<p>通过 -dd 参数产生具体的struct sock_filter结构的数据:</p>
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tcpdump <span class="nt">-i</span> lo ip and udp and dst port 65500 <span class="nt">-dd</span>
-</code></pre></div></div>
-
-<h3 id="注意点">注意点</h3>
-
-<p>创建raw socket的时候需要指定收包是从数据链路层开始，还是从ip开始。</p>
-
-<p>使用上述的规则码的时候，必须是从数据链路层开始，即:</p>
-<blockquote>
-  <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>int fd = ::socket(PF_PACKET, SOCK_RAW , htons(ETH_P_IP));
-</code></pre></div>  </div>
-</blockquote>
-
-<p>如果</p>
-<blockquote>
-  <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>int fd = ::socket(PF_PACKET, SOCK_DGRAM , htons(ETH_P_IP));
-</code></pre></div>  </div>
-</blockquote>
-
-<p>那么就需要自行修改这个规则码，将所有的”地址” 减去 14（一般来说是以太网，以太网帧头部长14字节）.</p>
-
-<p>知道了上述规则后，就具备了修改code的能力。</p>
+<ul>
+  <li>https://zhuanlan.zhihu.com/p/557501309</li>
+</ul>
 
   </div>
   

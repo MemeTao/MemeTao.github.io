@@ -14,15 +14,15 @@
   <meta name="author" content="memetao" />
   <meta name="description" content="C++ 犄角旮旯"/>
   <meta name="keywords" content="memetao,C++"/>
-  <link rel="stylesheet" href="/static/css/common.css?t=20230826223517">
-  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20230826223517">
-  <link rel="stylesheet" href="/static/css/post.css?t=20230826223517">
-  <link rel="stylesheet" href="/static/css/code-dark.css?t=20230826223517">
-  <link rel="stylesheet" href="/static/css/code-light.css?t=20230826223517">
+  <link rel="stylesheet" href="/static/css/common.css?t=20231224111525">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20231224111525">
+  <link rel="stylesheet" href="/static/css/post.css?t=20231224111525">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20231224111525">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20231224111525">
   <script>
     window.blog = {
       baseurl:"",
-      buildAt:"20230826223517",
+      buildAt:"20231224111525",
       darkTheme: false,
       setDarkTheme: function (dark) {
         this.darkTheme = Boolean(dark);
@@ -81,7 +81,49 @@
 <h3 id="volatile-真正的作用">volatile 真正的作用</h3>
 <p>https://zhuanlan.zhihu.com/p/33074506</p>
 
-<p>###</p>
+<h3 id="多继承">多继承</h3>
+
+<p>地址的关系:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">A</span> <span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mh">0x01</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="k">class</span> <span class="nc">B</span> <span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="mh">0x02</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="k">class</span> <span class="nc">C</span> <span class="o">:</span> <span class="k">public</span> <span class="n">A</span><span class="p">,</span> <span class="k">public</span> <span class="n">B</span> <span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="kt">int</span> <span class="n">c</span> <span class="o">=</span> <span class="mh">0x03</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="n">C</span> <span class="n">c</span><span class="p">;</span>
+<span class="n">A</span><span class="o">*</span> <span class="n">p_a</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">c</span><span class="p">;</span>    <span class="c1">// p_a 指向起始地址</span>
+<span class="n">B</span><span class="o">*</span> <span class="n">p_b</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">c</span><span class="p">;</span>    <span class="c1">// p_b 指向p_a + sizoef(int)</span>
+
+<span class="n">A</span><span class="o">*</span> <span class="n">pa</span> <span class="o">=</span> <span class="k">new</span> <span class="n">C</span><span class="p">;</span>
+<span class="n">B</span><span class="o">*</span> <span class="n">pb</span> <span class="o">=</span> <span class="k">new</span> <span class="n">C</span><span class="p">;</span>  <span class="c1">// 地址所指向的内容是一样的</span>
+
+</code></pre></div></div>
+
+<p>虚函数与虚函数表(重要):</p>
+
+<ul>
+  <li>https://blog.csdn.net/qq_36359022/article/details/81870219</li>
+</ul>
+
+<h3 id="左值和右值">左值和右值</h3>
+
+<p>不是很严谨的来说，左值指的是既能够出现在等号左边也能出现在等号右边的变量(或表达式)，右值指的则是只能出现在等号右边的变量(或表达式)。举例来说我们定义的变量 a 就是一个左值，而malloc返回的就是一个右值。或者左值就是在程序中能够寻值的东西，右值就是一个具体的真实的值或者对象，没法取到它的地址的东西(不完全准确)，因此没法对右值进行赋值，但是右值并非是不可修改的，比如自己定义的class, 可以通过它的成员函数来修改右值。</p>
+
+<p>归纳一下就是：</p>
+<ul>
+  <li>可以取地址的，有名字的，非临时的就是左值。</li>
+  <li>不能取地址的，没有名字的，临时的，通常生命周期就在某个表达式之内的就是右值</li>
+</ul>
 
   </div>
   
@@ -96,8 +138,8 @@
   <span></span>
   <span></span>
 </div>
-<script type="text/javascript" src="/static/js/blog.js?t=20230826223517"></script>
-<script type="text/javascript" src="/static/js/search.js?t=20230826223517"></script>
+<script type="text/javascript" src="/static/js/blog.js?t=20231224111525"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20231224111525"></script>
 <!-- 腾讯MTA移动分析 -->
 <script>
   var _mtac = {performanceMonitor: 1, senseQuery: 1}

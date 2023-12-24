@@ -1,6 +1,6 @@
 ---
 layout: mypost
-title:  "windows透明边缘"
+title:  windows透明边缘
 date:   2023-12-09 10:13:17 +0800
 categories: graphics
 location: HangZhou,China
