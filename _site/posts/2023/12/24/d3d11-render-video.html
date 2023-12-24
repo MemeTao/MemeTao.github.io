@@ -14,15 +14,15 @@
   <meta name="author" content="memetao" />
   <meta name="description" content="D3D11 渲染视频"/>
   <meta name="keywords" content="memetao,graphics"/>
-  <link rel="stylesheet" href="/static/css/common.css?t=20231224111525">
-  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20231224111525">
-  <link rel="stylesheet" href="/static/css/post.css?t=20231224111525">
-  <link rel="stylesheet" href="/static/css/code-dark.css?t=20231224111525">
-  <link rel="stylesheet" href="/static/css/code-light.css?t=20231224111525">
+  <link rel="stylesheet" href="/static/css/common.css?t=20231224111751">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20231224111751">
+  <link rel="stylesheet" href="/static/css/post.css?t=20231224111751">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20231224111751">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20231224111751">
   <script>
     window.blog = {
       baseurl:"",
-      buildAt:"20231224111525",
+      buildAt:"20231224111751",
       darkTheme: false,
       setDarkTheme: function (dark) {
         this.darkTheme = Boolean(dark);
@@ -61,36 +61,16 @@
   <div class="post">
     <hr />
 
-<h3 id="需求描述">需求描述</h3>
+<h2 id="需求描述">需求描述</h2>
 
 <p>视频渲染通常会有如下功能:</p>
 
 <ul>
-  <li>
-    <ol>
-      <li>视频渲染</li>
-    </ol>
-  </li>
-  <li>
-    <ol>
-      <li>支持旋转 [90, 180, 270…任意角度]</li>
-    </ol>
-  </li>
-  <li>
-    <ol>
-      <li>镜像 [垂直, 水平]</li>
-    </ol>
-  </li>
-  <li>
-    <ol>
-      <li>Alpha通道 [虚拟人]</li>
-    </ol>
-  </li>
-  <li>
-    <ol>
-      <li>HDR (通常为10BIT)</li>
-    </ol>
-  </li>
+  <li>1 视频渲染</li>
+  <li>2 支持旋转 [90, 180, 270…任意角度]</li>
+  <li>3 镜像 [垂直, 水平]</li>
+  <li>4 Alpha通道 [虚拟人]</li>
+  <li>5 HDR (通常为10BIT)</li>
 </ul>
 
 <h2 id="输入数据">输入数据</h2>
@@ -303,8 +283,8 @@ static void renderVertices(SIZE src_dimension, RECT source_region, int rotation,
   <span></span>
   <span></span>
 </div>
-<script type="text/javascript" src="/static/js/blog.js?t=20231224111525"></script>
-<script type="text/javascript" src="/static/js/search.js?t=20231224111525"></script>
+<script type="text/javascript" src="/static/js/blog.js?t=20231224111751"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20231224111751"></script>
 <!-- 腾讯MTA移动分析 -->
 <script>
   var _mtac = {performanceMonitor: 1, senseQuery: 1}

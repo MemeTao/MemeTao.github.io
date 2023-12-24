@@ -5,14 +5,14 @@
     <link></link>
     <description>memetao的成长轨迹</description>
     <language>zh-CN</language>
-    <pubDate>Sun, 24 Dec 2023 11:15:25 +0800</pubDate>
-    <lastBuildDate>Sun, 24 Dec 2023 11:15:25 +0800</lastBuildDate>
+    <pubDate>Sun, 24 Dec 2023 11:17:51 +0800</pubDate>
+    <lastBuildDate>Sun, 24 Dec 2023 11:17:51 +0800</lastBuildDate>
     <generator>Jekyll v4.3.2</generator>
     <atom:link href="/static/xml/rss.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>D3D11 渲染视频</title>
       <link>/posts/2023/12/24/d3d11-render-video.html</link>
-      <description>需求描述视频渲染通常会有如下功能:视频渲染支持旋转[90,180,270…任意角度]镜像[垂直,水平]Alpha通道[虚拟人]HDR(通常为10BIT)输入数据一个渲染器的输入源目前看上去会有两种:本地预览，来自摄像头、屏幕捕获远端H...</description>
+      <description>需求描述视频渲染通常会有如下功能:1视频渲染2支持旋转[90,180,270…任意角度]3镜像[垂直,水平]4Alpha通道[虚拟人]5HDR(通常为10BIT)输入数据一个渲染器的输入源目前看上去会有两种:本地预览，来自摄像头、屏幕...</description>
       <pubDate>Sun, 24 Dec 2023 10:13:17 +0800</pubDate>
       <gui>/posts/2023/12/24/d3d11-render-video.html</gui>
     </item>
