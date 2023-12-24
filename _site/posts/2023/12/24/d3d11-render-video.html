@@ -14,15 +14,15 @@
   <meta name="author" content="memetao" />
   <meta name="description" content="D3D11 渲染视频"/>
   <meta name="keywords" content="memetao,graphics"/>
-  <link rel="stylesheet" href="/static/css/common.css?t=20231224111751">
-  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20231224111751">
-  <link rel="stylesheet" href="/static/css/post.css?t=20231224111751">
-  <link rel="stylesheet" href="/static/css/code-dark.css?t=20231224111751">
-  <link rel="stylesheet" href="/static/css/code-light.css?t=20231224111751">
+  <link rel="stylesheet" href="/static/css/common.css?t=20231224112352">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20231224112352">
+  <link rel="stylesheet" href="/static/css/post.css?t=20231224112352">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20231224112352">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20231224112352">
   <script>
     window.blog = {
       baseurl:"",
-      buildAt:"20231224111751",
+      buildAt:"20231224112352",
       darkTheme: false,
       setDarkTheme: function (dark) {
         this.darkTheme = Boolean(dark);
@@ -87,24 +87,24 @@
 
 <p>通常, 画面是一个矩形, 也就是需要4个顶点来描述。指定两个属性: 1. 顶点的位置 2. 要采样的像素坐标</p>
 
-<pre><code class="language-C++">struct VERTEX {
-    DirectX::XMFLOAT3 pos;
-    DirectX::XMFLOAT2 tex;
-    static const D3D11_INPUT_ELEMENT_DESC input_desc[2];
-};
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="nc">VERTEX</span> <span class="p">{</span>
+    <span class="n">DirectX</span><span class="o">::</span><span class="n">XMFLOAT3</span> <span class="n">pos</span><span class="p">;</span>
+    <span class="n">DirectX</span><span class="o">::</span><span class="n">XMFLOAT2</span> <span class="n">tex</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">const</span> <span class="n">D3D11_INPUT_ELEMENT_DESC</span> <span class="n">input_desc</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+<span class="p">};</span>
 
-const D3D11_INPUT_ELEMENT_DESC VERTEX::input_desc[2] = {
-    {"SV_POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0},
-    {"TEXCOORD",    0, DXGI_FORMAT_R32G32_FLOAT,    0, 12,  D3D11_INPUT_PER_VERTEX_DATA, 0},
-};
-
-static const DirectX::XMVECTORF32 points[4] = {
-    },
-    },
-    },
-    },
-};
-</code></pre>
+<span class="k">const</span> <span class="n">D3D11_INPUT_ELEMENT_DESC</span> <span class="n">VERTEX</span><span class="o">::</span><span class="n">input_desc</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="p">{</span><span class="s">"SV_POSITION"</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">DXGI_FORMAT_R32G32B32_FLOAT</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>  <span class="n">D3D11_INPUT_PER_VERTEX_DATA</span><span class="p">,</span> <span class="mi">0</span><span class="p">},</span>
+    <span class="p">{</span><span class="s">"TEXCOORD"</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span> <span class="n">DXGI_FORMAT_R32G32_FLOAT</span><span class="p">,</span>    <span class="mi">0</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span>  <span class="n">D3D11_INPUT_PER_VERTEX_DATA</span><span class="p">,</span> <span class="mi">0</span><span class="p">},</span>
+<span class="p">};</span>
+<span class="c1">//这里jekll不知道为什么会解析错误, 实际上需要多个花括号</span>
+<span class="k">static</span> <span class="k">const</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVECTORF32</span> <span class="n">points</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">},</span>
+    <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">},</span>
+    <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">},</span>
+    <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">},</span>
+<span class="p">};</span>
+</code></pre></div></div>
 
 <p><img src="0.png" alt="vertices" /></p>
 
@@ -124,18 +124,18 @@ static const DirectX::XMVECTORF32 points[4] = {
 
 <p>注意: 我们交换的是UV值.</p>
 
-<pre><code class="language-C++">enum class Mirror : uint8_t {
-    None = 0,
-    FlipHorizontally = 1,
-    FlipVertically = 2,
-    FlipBoth = FlipHorizontally | FlipVertically,
-};
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">enum</span> <span class="k">class</span> <span class="nc">Mirror</span> <span class="o">:</span> <span class="kt">uint8_t</span> <span class="p">{</span>
+    <span class="n">None</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="n">FlipHorizontally</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">FlipVertically</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">FlipBoth</span> <span class="o">=</span> <span class="n">FlipHorizontally</span> <span class="o">|</span> <span class="n">FlipVertically</span><span class="p">,</span>
+<span class="p">};</span>
 
-const uint8_t mirror = static_cast&lt;uint8_t&gt;(mirror_mode) &amp; 3u;
-for (size_t i = 0; i &lt;4 ;i ++) {
-    auto uv = points[i ^ mirror].uv;
-}
-</code></pre>
+<span class="k">const</span> <span class="kt">uint8_t</span> <span class="n">mirror</span> <span class="o">=</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">uint8_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">mirror_mode</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">3u</span><span class="p">;</span>
+<span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span><span class="mi">4</span> <span class="p">;</span><span class="n">i</span> <span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">auto</span> <span class="n">uv</span> <span class="o">=</span> <span class="n">points</span><span class="p">[</span><span class="n">i</span> <span class="o">^</span> <span class="n">mirror</span><span class="p">].</span><span class="n">uv</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
 
 <h3 id="旋转">旋转</h3>
 
@@ -147,9 +147,9 @@ for (size_t i = 0; i &lt;4 ;i ++) {
 
 <p>在平面坐标上，任意点P(x1,y1)，绕一个坐标点Q(x2,y2)逆时针旋转θ角度后,新的坐标设为(x, y)的计算公式：</p>
 
-<pre><code class="language-C++">x= (x1 - x2)*cos(θ) - (y1 - y2)*sin(θ) + x2 ;
-y= (x1 - x2)*sin(θ) + (y1 - y2)*cos(θ) + y2 ;
-</code></pre>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">x</span><span class="o">=</span> <span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x2</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="err">θ</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">y1</span> <span class="o">-</span> <span class="n">y2</span><span class="p">)</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="err">θ</span><span class="p">)</span> <span class="o">+</span> <span class="n">x2</span> <span class="p">;</span>
+<span class="n">y</span><span class="o">=</span> <span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x2</span><span class="p">)</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="err">θ</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">y1</span> <span class="o">-</span> <span class="n">y2</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="err">θ</span><span class="p">)</span> <span class="o">+</span> <span class="n">y2</span> <span class="p">;</span>
+</code></pre></div></div>
 
 <p>这个公式可以抽象成矩阵运算。</p>
 
@@ -161,9 +161,9 @@ y= (x1 - x2)*sin(θ) + (y1 - y2)*cos(θ) + y2 ;
 
 <p>在平面坐标上，任意点P(x1,y1)，以坐标点Q(x2,y2)缩放a倍之后,新的坐标设为(x, y)的计算公式：</p>
 
-<pre><code class="language-C++">x= (x1 - x2)*cos(θ) - (y1 - y2)*sin(θ) + x2 ;
-y= (x1 - x2)*sin(θ) + (y1 - y2)*cos(θ) + y2 ;
-</code></pre>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">x</span><span class="o">=</span> <span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x2</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="err">θ</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">y1</span> <span class="o">-</span> <span class="n">y2</span><span class="p">)</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="err">θ</span><span class="p">)</span> <span class="o">+</span> <span class="n">x2</span> <span class="p">;</span>
+<span class="n">y</span><span class="o">=</span> <span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x2</span><span class="p">)</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="err">θ</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">y1</span> <span class="o">-</span> <span class="n">y2</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="err">θ</span><span class="p">)</span> <span class="o">+</span> <span class="n">y2</span> <span class="p">;</span>
+</code></pre></div></div>
 
 <p>注意: 这个公式当中并没有要求P和Q的初始位置（任意位置都可以）</p>
 
@@ -173,19 +173,19 @@ y= (x1 - x2)*sin(θ) + (y1 - y2)*cos(θ) + y2 ;
 
 <p>裁剪就简单了, 计算出要裁剪的区域即可。</p>
 
-<pre><code class="language-C++">// 输入参数 SIZE src_dimension, RECT source_region
-const DirectX::XMVECTOR source = LoadRect(&amp;source_region);
-const DirectX::XMVECTOR source_size = DirectX::XMVectorSwizzle&lt;2, 3, 2, 3&gt;(source);
-const DirectX::XMVECTOR dest_size = LoadSize(dst_dimension);
-const DirectX::XMVECTOR inverse_source_size =
-    DirectX::XMVectorReciprocal(LoadSize(src_dimension));
-        const auto source_tex = DirectX::XMVectorMultiply(source, inverse_source_size);
-const auto source_size_tex = DirectX::XMVectorMultiply(source_size, inverse_source_size);
-   for (size_t i = 0; i &lt; 4; i++) {
-     auto P1 = DirectX::XMVectorMultiplyAdd(points[i], source_size, source);
-     // 点P1就是新的位置
-   }
-</code></pre>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 输入参数 SIZE src_dimension, RECT source_region</span>
+<span class="k">const</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVECTOR</span> <span class="n">source</span> <span class="o">=</span> <span class="n">LoadRect</span><span class="p">(</span><span class="o">&amp;</span><span class="n">source_region</span><span class="p">);</span>
+<span class="k">const</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVECTOR</span> <span class="n">source_size</span> <span class="o">=</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorSwizzle</span><span class="o">&lt;</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="o">&gt;</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
+<span class="k">const</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVECTOR</span> <span class="n">dest_size</span> <span class="o">=</span> <span class="n">LoadSize</span><span class="p">(</span><span class="n">dst_dimension</span><span class="p">);</span>
+<span class="k">const</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVECTOR</span> <span class="n">inverse_source_size</span> <span class="o">=</span>
+    <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorReciprocal</span><span class="p">(</span><span class="n">LoadSize</span><span class="p">(</span><span class="n">src_dimension</span><span class="p">));</span>
+        <span class="k">const</span> <span class="k">auto</span> <span class="n">source_tex</span> <span class="o">=</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorMultiply</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">inverse_source_size</span><span class="p">);</span>
+<span class="k">const</span> <span class="k">auto</span> <span class="n">source_size_tex</span> <span class="o">=</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorMultiply</span><span class="p">(</span><span class="n">source_size</span><span class="p">,</span> <span class="n">inverse_source_size</span><span class="p">);</span>
+   <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+     <span class="k">auto</span> <span class="n">P1</span> <span class="o">=</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorMultiplyAdd</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">source_size</span><span class="p">,</span> <span class="n">source</span><span class="p">);</span>
+     <span class="c1">// 点P1就是新的位置</span>
+   <span class="p">}</span>
+</code></pre></div></div>
 
 <h3 id="平移">平移</h3>
 
@@ -203,70 +203,70 @@ y= y + b;
 
 <p>最后, 以一个通用的函数结尾:</p>
 
-<pre><code class="language-C++">// 在src_dimension大小的图形中, 对source_region区域
-// * 旋转rotation
-// * 做镜像
-// * 缩放到dst_dimension
-// * 处理后的图像要以center点中心对称
-// 将处理的顶点存在vertices中
-static void renderVertices(SIZE src_dimension, RECT source_region, int rotation,
-                           Mirror mirror_mode, SIZE dst_dimension, POINT center,
-                           VERTEX* vertices) {
-    static const DirectX::XMVECTORF32 points[4] = {
-        },
-        },
-        },
-        },
-    };
-    const uint8_t mirror = static_cast&lt;uint8_t&gt;(mirror_mode) &amp; 3u;
-    const DirectX::XMVECTOR source = LoadRect(&amp;source_region);
-    const DirectX::XMVECTOR source_size = DirectX::XMVectorSwizzle&lt;2, 3, 2, 3&gt;(source);
-    const DirectX::XMVECTOR dest_size = LoadSize(dst_dimension);
-    const DirectX::XMVECTOR inverse_source_size =
-        DirectX::XMVectorReciprocal(LoadSize(src_dimension));
-    const DirectX::XMVECTOR P2 = LoadMiddlePoint(source);
-    const DirectX::XMVECTOR C = LoadPoint(center);
-    // texture coordinate format.
-    const auto source_tex = DirectX::XMVectorMultiply(source, inverse_source_size);
-    const auto source_size_tex = DirectX::XMVectorMultiply(source_size, inverse_source_size);
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 在src_dimension大小的图形中, 对source_region区域</span>
+<span class="c1">// * 旋转rotation</span>
+<span class="c1">// * 做镜像</span>
+<span class="c1">// * 缩放到dst_dimension</span>
+<span class="c1">// * 处理后的图像要以center点中心对称</span>
+<span class="c1">// 将处理的顶点存在vertices中</span>
+<span class="k">static</span> <span class="kt">void</span> <span class="nf">renderVertices</span><span class="p">(</span><span class="n">SIZE</span> <span class="n">src_dimension</span><span class="p">,</span> <span class="n">RECT</span> <span class="n">source_region</span><span class="p">,</span> <span class="kt">int</span> <span class="n">rotation</span><span class="p">,</span>
+                           <span class="n">Mirror</span> <span class="n">mirror_mode</span><span class="p">,</span> <span class="n">SIZE</span> <span class="n">dst_dimension</span><span class="p">,</span> <span class="n">POINT</span> <span class="n">center</span><span class="p">,</span>
+                           <span class="n">VERTEX</span><span class="o">*</span> <span class="n">vertices</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">static</span> <span class="k">const</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVECTORF32</span> <span class="n">points</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">},</span>
+        <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">},</span>
+    <span class="p">};</span>
+    <span class="k">const</span> <span class="kt">uint8_t</span> <span class="n">mirror</span> <span class="o">=</span> <span class="k">static_cast</span><span class="o">&lt;</span><span class="kt">uint8_t</span><span class="o">&gt;</span><span class="p">(</span><span class="n">mirror_mode</span><span class="p">)</span> <span class="o">&amp;</span> <span class="mi">3u</span><span class="p">;</span>
+    <span class="k">const</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVECTOR</span> <span class="n">source</span> <span class="o">=</span> <span class="n">LoadRect</span><span class="p">(</span><span class="o">&amp;</span><span class="n">source_region</span><span class="p">);</span>
+    <span class="k">const</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVECTOR</span> <span class="n">source_size</span> <span class="o">=</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorSwizzle</span><span class="o">&lt;</span><span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="o">&gt;</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
+    <span class="k">const</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVECTOR</span> <span class="n">dest_size</span> <span class="o">=</span> <span class="n">LoadSize</span><span class="p">(</span><span class="n">dst_dimension</span><span class="p">);</span>
+    <span class="k">const</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVECTOR</span> <span class="n">inverse_source_size</span> <span class="o">=</span>
+        <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorReciprocal</span><span class="p">(</span><span class="n">LoadSize</span><span class="p">(</span><span class="n">src_dimension</span><span class="p">));</span>
+    <span class="k">const</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVECTOR</span> <span class="n">P2</span> <span class="o">=</span> <span class="n">LoadMiddlePoint</span><span class="p">(</span><span class="n">source</span><span class="p">);</span>
+    <span class="k">const</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVECTOR</span> <span class="n">C</span> <span class="o">=</span> <span class="n">LoadPoint</span><span class="p">(</span><span class="n">center</span><span class="p">);</span>
+    <span class="c1">// texture coordinate format.</span>
+    <span class="k">const</span> <span class="k">auto</span> <span class="n">source_tex</span> <span class="o">=</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorMultiply</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">inverse_source_size</span><span class="p">);</span>
+    <span class="k">const</span> <span class="k">auto</span> <span class="n">source_size_tex</span> <span class="o">=</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorMultiply</span><span class="p">(</span><span class="n">source_size</span><span class="p">,</span> <span class="n">inverse_source_size</span><span class="p">);</span>
 
-    DirectX::XMVECTOR rotation_matrix1;
-    DirectX::XMVECTOR rotation_matrix2;
-    if (rotation != 0) {
-        float sin = 0.f, cos = 0.f;
-        DirectX::XMScalarSinCos(&amp;sin, &amp;cos, rotation / 360.f * DirectX::XM_2PI);
-        const auto sinV = DirectX::XMLoadFloat(&amp;sin);
-        const auto cosV = DirectX::XMLoadFloat(&amp;cos);
-        rotation_matrix1 = DirectX::XMVectorMergeXY(cosV, sinV);
-        rotation_matrix2 = DirectX::XMVectorMergeXY(DirectX::XMVectorNegate(sinV), cosV);
-    }
-    else {
-        rotation_matrix1 = DirectX::g_XMIdentityR0;
-        rotation_matrix2 = DirectX::g_XMIdentityR1;
-    }
-    const auto scale_matrix1 = DirectX::XMVectorDivide(dest_size, source_size);
-    const auto scale_matrix2 = DirectX::XMVectorSubtract(
-        DirectX::g_XMOne, DirectX::XMVectorDivide(dest_size, source_size));
-    const auto move =
-        DirectX::XMVectorPermute&lt;0, 1, 4, 5&gt;(DirectX::XMVectorSubtract(C, P2), DirectX::g_XMZero);
-    for (size_t i = 0; i &lt; 4; i++) {
-        auto P1 = DirectX::XMVectorMultiplyAdd(points[i], source_size, source);
-        P1 = DirectX::XMVectorAdd(DirectX::XMVectorMultiply(P2, scale_matrix2),
-                                  DirectX::XMVectorMultiply(P1, scale_matrix1));
+    <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVECTOR</span> <span class="n">rotation_matrix1</span><span class="p">;</span>
+    <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVECTOR</span> <span class="n">rotation_matrix2</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">rotation</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">float</span> <span class="n">sin</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">f</span><span class="p">,</span> <span class="n">cos</span> <span class="o">=</span> <span class="mf">0.</span><span class="n">f</span><span class="p">;</span>
+        <span class="n">DirectX</span><span class="o">::</span><span class="n">XMScalarSinCos</span><span class="p">(</span><span class="o">&amp;</span><span class="n">sin</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">cos</span><span class="p">,</span> <span class="n">rotation</span> <span class="o">/</span> <span class="mf">360.</span><span class="n">f</span> <span class="o">*</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XM_2PI</span><span class="p">);</span>
+        <span class="k">const</span> <span class="k">auto</span> <span class="n">sinV</span> <span class="o">=</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMLoadFloat</span><span class="p">(</span><span class="o">&amp;</span><span class="n">sin</span><span class="p">);</span>
+        <span class="k">const</span> <span class="k">auto</span> <span class="n">cosV</span> <span class="o">=</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMLoadFloat</span><span class="p">(</span><span class="o">&amp;</span><span class="n">cos</span><span class="p">);</span>
+        <span class="n">rotation_matrix1</span> <span class="o">=</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorMergeXY</span><span class="p">(</span><span class="n">cosV</span><span class="p">,</span> <span class="n">sinV</span><span class="p">);</span>
+        <span class="n">rotation_matrix2</span> <span class="o">=</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorMergeXY</span><span class="p">(</span><span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorNegate</span><span class="p">(</span><span class="n">sinV</span><span class="p">),</span> <span class="n">cosV</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">else</span> <span class="p">{</span>
+        <span class="n">rotation_matrix1</span> <span class="o">=</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">g_XMIdentityR0</span><span class="p">;</span>
+        <span class="n">rotation_matrix2</span> <span class="o">=</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">g_XMIdentityR1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">const</span> <span class="k">auto</span> <span class="n">scale_matrix1</span> <span class="o">=</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorDivide</span><span class="p">(</span><span class="n">dest_size</span><span class="p">,</span> <span class="n">source_size</span><span class="p">);</span>
+    <span class="k">const</span> <span class="k">auto</span> <span class="n">scale_matrix2</span> <span class="o">=</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorSubtract</span><span class="p">(</span>
+        <span class="n">DirectX</span><span class="o">::</span><span class="n">g_XMOne</span><span class="p">,</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorDivide</span><span class="p">(</span><span class="n">dest_size</span><span class="p">,</span> <span class="n">source_size</span><span class="p">));</span>
+    <span class="k">const</span> <span class="k">auto</span> <span class="n">move</span> <span class="o">=</span>
+        <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorPermute</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="o">&gt;</span><span class="p">(</span><span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorSubtract</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">P2</span><span class="p">),</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">g_XMZero</span><span class="p">);</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">size_t</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">4</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">auto</span> <span class="n">P1</span> <span class="o">=</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorMultiplyAdd</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">source_size</span><span class="p">,</span> <span class="n">source</span><span class="p">);</span>
+        <span class="n">P1</span> <span class="o">=</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorAdd</span><span class="p">(</span><span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorMultiply</span><span class="p">(</span><span class="n">P2</span><span class="p">,</span> <span class="n">scale_matrix2</span><span class="p">),</span>
+                                  <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorMultiply</span><span class="p">(</span><span class="n">P1</span><span class="p">,</span> <span class="n">scale_matrix1</span><span class="p">));</span>
 
-        const auto V1 = DirectX::XMVectorSubtract(P1, P2);
-        auto pos = DirectX::XMVectorMultiplyAdd(DirectX::XMVectorSplatX(V1), rotation_matrix1, P2);
-        pos = DirectX::XMVectorPermute&lt;0, 1, 7, 7&gt;(pos, DirectX::g_XMZero);
-        pos = DirectX::XMVectorMultiplyAdd(DirectX::XMVectorSplatY(V1), rotation_matrix2, pos);
-        pos = DirectX::XMVectorAdd(pos, move);
-        DirectX::XMStoreFloat4(reinterpret_cast&lt;DirectX::XMFLOAT4*&gt;(&amp;((VERTEX*)vertices)[i].pos),
-                               pos);
-        const auto uv =
-            DirectX::XMVectorMultiplyAdd(points[i ^ mirror], source_size_tex, source_tex);
-        DirectX::XMStoreFloat2(&amp;((VERTEX*)vertices)[i].tex, uv);
-    }
-}
-</code></pre>
+        <span class="k">const</span> <span class="k">auto</span> <span class="n">V1</span> <span class="o">=</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorSubtract</span><span class="p">(</span><span class="n">P1</span><span class="p">,</span> <span class="n">P2</span><span class="p">);</span>
+        <span class="k">auto</span> <span class="n">pos</span> <span class="o">=</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorMultiplyAdd</span><span class="p">(</span><span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorSplatX</span><span class="p">(</span><span class="n">V1</span><span class="p">),</span> <span class="n">rotation_matrix1</span><span class="p">,</span> <span class="n">P2</span><span class="p">);</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorPermute</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">7</span><span class="o">&gt;</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">g_XMZero</span><span class="p">);</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorMultiplyAdd</span><span class="p">(</span><span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorSplatY</span><span class="p">(</span><span class="n">V1</span><span class="p">),</span> <span class="n">rotation_matrix2</span><span class="p">,</span> <span class="n">pos</span><span class="p">);</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorAdd</span><span class="p">(</span><span class="n">pos</span><span class="p">,</span> <span class="n">move</span><span class="p">);</span>
+        <span class="n">DirectX</span><span class="o">::</span><span class="n">XMStoreFloat4</span><span class="p">(</span><span class="k">reinterpret_cast</span><span class="o">&lt;</span><span class="n">DirectX</span><span class="o">::</span><span class="n">XMFLOAT4</span><span class="o">*&gt;</span><span class="p">(</span><span class="o">&amp;</span><span class="p">((</span><span class="n">VERTEX</span><span class="o">*</span><span class="p">)</span><span class="n">vertices</span><span class="p">)[</span><span class="n">i</span><span class="p">].</span><span class="n">pos</span><span class="p">),</span>
+                               <span class="n">pos</span><span class="p">);</span>
+        <span class="k">const</span> <span class="k">auto</span> <span class="n">uv</span> <span class="o">=</span>
+            <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVectorMultiplyAdd</span><span class="p">(</span><span class="n">points</span><span class="p">[</span><span class="n">i</span> <span class="o">^</span> <span class="n">mirror</span><span class="p">],</span> <span class="n">source_size_tex</span><span class="p">,</span> <span class="n">source_tex</span><span class="p">);</span>
+        <span class="n">DirectX</span><span class="o">::</span><span class="n">XMStoreFloat2</span><span class="p">(</span><span class="o">&amp;</span><span class="p">((</span><span class="n">VERTEX</span><span class="o">*</span><span class="p">)</span><span class="n">vertices</span><span class="p">)[</span><span class="n">i</span><span class="p">].</span><span class="n">tex</span><span class="p">,</span> <span class="n">uv</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
 
 <p>最后一个for循环将平移、缩放、旋转、镜像结合在了一起, 我尽量写的清晰。</p>
 
@@ -283,8 +283,8 @@ static void renderVertices(SIZE src_dimension, RECT source_region, int rotation,
   <span></span>
   <span></span>
 </div>
-<script type="text/javascript" src="/static/js/blog.js?t=20231224111751"></script>
-<script type="text/javascript" src="/static/js/search.js?t=20231224111751"></script>
+<script type="text/javascript" src="/static/js/blog.js?t=20231224112352"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20231224112352"></script>
 <!-- 腾讯MTA移动分析 -->
 <script>
   var _mtac = {performanceMonitor: 1, senseQuery: 1}

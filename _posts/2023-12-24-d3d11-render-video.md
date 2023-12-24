@@ -29,7 +29,7 @@ location: HangZhou,China
 
 通常, 画面是一个矩形, 也就是需要4个顶点来描述。指定两个属性: 1. 顶点的位置 2. 要采样的像素坐标
 
-```C++
+```c++
 struct VERTEX {
     DirectX::XMFLOAT3 pos;
     DirectX::XMFLOAT2 tex;
@@ -40,12 +40,12 @@ const D3D11_INPUT_ELEMENT_DESC VERTEX::input_desc[2] = {
     {"SV_POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0,  D3D11_INPUT_PER_VERTEX_DATA, 0},
     {"TEXCOORD",    0, DXGI_FORMAT_R32G32_FLOAT,    0, 12,  D3D11_INPUT_PER_VERTEX_DATA, 0},
 };
-
+//这里jekll不知道为什么会解析错误, 实际上需要多个花括号
 static const DirectX::XMVECTORF32 points[4] = {
-    {{{0, 0, 0, 0}}},
-    {{{1, 0, 0, 0}}},
-    {{{0, 1, 0, 0}}},
-    {{{1, 1, 0, 0}}},
+    {0, 0, 0, 0},
+    {1, 0, 0, 0},
+    {0, 1, 0, 0},
+    {1, 1, 0, 0},
 };
 ```
 
@@ -66,7 +66,7 @@ static const DirectX::XMVECTORF32 points[4] = {
 
 注意: 我们交换的是UV值.
 
-```C++
+```c++
 enum class Mirror : uint8_t {
     None = 0,
     FlipHorizontally = 1,
@@ -90,7 +90,7 @@ for (size_t i = 0; i <4 ;i ++) {
 
 在平面坐标上，任意点P(x1,y1)，绕一个坐标点Q(x2,y2)逆时针旋转θ角度后,新的坐标设为(x, y)的计算公式：
 
-``` C++
+```c++
 x= (x1 - x2)*cos(θ) - (y1 - y2)*sin(θ) + x2 ;
 y= (x1 - x2)*sin(θ) + (y1 - y2)*cos(θ) + y2 ;
 ```
@@ -105,7 +105,7 @@ y= (x1 - x2)*sin(θ) + (y1 - y2)*cos(θ) + y2 ;
 
 在平面坐标上，任意点P(x1,y1)，以坐标点Q(x2,y2)缩放a倍之后,新的坐标设为(x, y)的计算公式：
 
-``` C++
+```c++
 x= (x1 - x2)*cos(θ) - (y1 - y2)*sin(θ) + x2 ;
 y= (x1 - x2)*sin(θ) + (y1 - y2)*cos(θ) + y2 ;
 ```
@@ -118,7 +118,7 @@ y= (x1 - x2)*sin(θ) + (y1 - y2)*cos(θ) + y2 ;
 
 裁剪就简单了, 计算出要裁剪的区域即可。
 
-```C++
+```c++
 // 输入参数 SIZE src_dimension, RECT source_region
 const DirectX::XMVECTOR source = LoadRect(&source_region);
 const DirectX::XMVECTOR source_size = DirectX::XMVectorSwizzle<2, 3, 2, 3>(source);
@@ -151,7 +151,7 @@ y= y + b;
 
 最后, 以一个通用的函数结尾:
 
-```C++
+```c++
 // 在src_dimension大小的图形中, 对source_region区域
 // * 旋转rotation
 // * 做镜像
@@ -161,11 +161,12 @@ y= y + b;
 static void renderVertices(SIZE src_dimension, RECT source_region, int rotation,
                            Mirror mirror_mode, SIZE dst_dimension, POINT center,
                            VERTEX* vertices) {
+     //这里jekll不知道为什么会解析错误, 实际上需要多个花括号
     static const DirectX::XMVECTORF32 points[4] = {
-        {{{0, 0, 0, 0}}},
-        {{{1, 0, 0, 0}}},
-        {{{0, 1, 0, 0}}},
-        {{{1, 1, 0, 0}}},
+        {0, 0, 0, 0},
+        {1, 0, 0, 0},
+        {0, 1, 0, 0},
+        {1, 1, 0, 0},
     };
     const uint8_t mirror = static_cast<uint8_t>(mirror_mode) & 3u;
     const DirectX::XMVECTOR source = LoadRect(&source_region);
