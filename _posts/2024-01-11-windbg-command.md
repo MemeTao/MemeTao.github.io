@@ -62,6 +62,11 @@ More info:              !heap -p -a 0x267e03d0fd8
 
 ## 内存泄露
 
+查看内存使用情况:
+* !address -summary
+
+查看堆详情:
+
 * !heap -s 查看堆详情
 
 图片
