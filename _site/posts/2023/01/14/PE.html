@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>windows PE 格式-memetao</title>
+  <meta charset="utf-8" />
+  <meta http-equiv="content-language" content="zh-CN" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="supported-color-schemes" content="light dark">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="applicable-device" content="pc,mobile">
+  <meta name="google-site-verification" content="ckhUaoa05QCmWoE1FafzTBcqYI4yBOy-UJKopXDS18M" />
+  <meta name="author" content="memetao" />
+  <meta name="description" content="windows PE 格式"/>
+  <meta name="keywords" content="memetao,os"/>
+  <link rel="stylesheet" href="/static/css/common.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/post.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20240731210702">
+  <script>
+    window.blog = {
+      baseurl:"",
+      buildAt:"20240731210702",
+      darkTheme: false,
+      setDarkTheme: function (dark) {
+        this.darkTheme = Boolean(dark);
+        document.documentElement.className = this.darkTheme ? 'dark': '';
+        document.querySelector('meta[name=theme-color]').setAttribute('content', this.darkTheme ? '#2D2E32': '#FFFFFF');
+      }
+    }
+    if (sessionStorage.darkTheme !== undefined) {
+      blog.setDarkTheme(sessionStorage.darkTheme === 'true'); // 记忆值，单个窗口内有效
+    } else {
+      blog.setDarkTheme(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches); // 跟随系统
+    }
+    if (window.matchMedia) {
+      var media = window.matchMedia('(prefers-color-scheme: dark)');
+      media.addListener(function (ev) {
+        blog.setDarkTheme(ev.currentTarget.matches);
+        sessionStorage.removeItem('darkTheme');
+      });
+    }
+  </script>
+</head>
+<body ondragstart="return false;">
+<header class="header">
+  <img class="logo" src="/static/img/logo.jpg" alt="logo"/>
+  <nav class="menu">
+    <a href="/" class="hover-underline">首页</a>
+    <a href="/pages/categories.html" class="hover-underline">归类</a>
+    <a href="/pages/about.html" class="hover-underline">关于</a>
+    </nav>
+</header>
+<div class="page page-post">
+  <h1 class="title" id="windows PE 格式">windows PE 格式</h1>
+  
+  <div class="subtitle">memetao 于 2023-01-14 发布</div>
+  
+  <div class="post">
+    <hr />
+
+<h2 id="pe">PE</h2>
+
+<p>PE (Portable Execute) 是可执行文件的一个总称,DLL,EXE等，专指32位可执行文件，64位的叫做PE+\PE32+,是一种扩展格式。</p>
+
+<p>文件结构如下所示: <img src="https://upload.wikimedia.org/wikipedia/commons/1/1b/Portable_Executable_32_bit_Structure_in_SVG_fixed.svg" alt="PE" /></p>
+
+<p>实在是复杂, 从上到下又分为 DOS头，NT头，节表以及具体的节，如下 <img src="https://0xrick.github.io/images/wininternals/pe2/1.png" alt="PE" />.</p>
+
+<ul>
+  <li>DOS 头, 64-bytes 长度 (又称MS-DOS Header)</li>
+  <li>DOS Stub, 一段MS-DOS 2.0的兼容性执行程序，会打印”This program cannot be run in DOS mode” （当跑在DOS环境下时）</li>
+</ul>
+
+<p>接下来是NT HEADER， 又分为好几个， 我们先用PE-bear打开一个exe瞧一眼
+<img src="pe-bear.png" alt="PE" /></p>
+
+<ul>
+  <li>PE signature, 4字节的签名表明这个文件时个PE文件</li>
+  <li>PE 文件头, A standard COFF File Header(啥意思)</li>
+  <li>可选头, 是NT头中最重要的部分, 有些PE是没有这个的, 比如Object。exe是肯定有得, 能够给OS Loader提供很多信息.</li>
+</ul>
+
+<p>接下来是SectionTable:</p>
+
+<blockquote>
+  <p>he section table follows the Optional Header immediately, it is an array of Image Section Headers, there’s a section header for every section in the PE file.
+Each header contains information about the section it refers to.</p>
+</blockquote>
+
+<p>Section:</p>
+
+<blockquote>
+  <p>Sections are where the actual contents of the file are stored, these include things like data and resources that the program uses, and also the actual code of the program, there are several sections each one with its own purpose.</p>
+</blockquote>
+
+<h2 id="dos-header">DOS HEADER</h2>
+
+<p>PE 文件中的前64字节, 在现代windows中已经不重要, 主要是”向后兼容(backward compatibility)”。</p>
+
+<p>有了这64字节, PE就能够在DOS环境下执行(没试过，难以置信)。</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">typedef</span> <span class="k">struct</span> <span class="n">_IMAGE_DOS_HEADER</span> <span class="p">{</span>      <span class="c1">// DOS .EXE header</span>
+    <span class="n">WORD</span>   <span class="n">e_magic</span><span class="p">;</span>                     <span class="c1">// Magic number</span>
+    <span class="n">WORD</span>   <span class="n">e_cblp</span><span class="p">;</span>                      <span class="c1">// Bytes on last page of file</span>
+    <span class="n">WORD</span>   <span class="n">e_cp</span><span class="p">;</span>                        <span class="c1">// Pages in file</span>
+    <span class="n">WORD</span>   <span class="n">e_crlc</span><span class="p">;</span>                      <span class="c1">// Relocations</span>
+    <span class="n">WORD</span>   <span class="n">e_cparhdr</span><span class="p">;</span>                   <span class="c1">// Size of header in paragraphs</span>
+    <span class="n">WORD</span>   <span class="n">e_minalloc</span><span class="p">;</span>                  <span class="c1">// Minimum extra paragraphs needed</span>
+    <span class="n">WORD</span>   <span class="n">e_maxalloc</span><span class="p">;</span>                  <span class="c1">// Maximum extra paragraphs needed</span>
+    <span class="n">WORD</span>   <span class="n">e_ss</span><span class="p">;</span>                        <span class="c1">// Initial (relative) SS value</span>
+    <span class="n">WORD</span>   <span class="n">e_sp</span><span class="p">;</span>                        <span class="c1">// Initial SP value</span>
+    <span class="n">WORD</span>   <span class="n">e_csum</span><span class="p">;</span>                      <span class="c1">// Checksum</span>
+    <span class="n">WORD</span>   <span class="n">e_ip</span><span class="p">;</span>                        <span class="c1">// Initial IP value</span>
+    <span class="n">WORD</span>   <span class="n">e_cs</span><span class="p">;</span>                        <span class="c1">// Initial (relative) CS value</span>
+    <span class="n">WORD</span>   <span class="n">e_lfarlc</span><span class="p">;</span>                    <span class="c1">// File address of relocation table</span>
+    <span class="n">WORD</span>   <span class="n">e_ovno</span><span class="p">;</span>                      <span class="c1">// Overlay number</span>
+    <span class="n">WORD</span>   <span class="n">e_res</span><span class="p">[</span><span class="mi">4</span><span class="p">];</span>                    <span class="c1">// Reserved words</span>
+    <span class="n">WORD</span>   <span class="n">e_oemid</span><span class="p">;</span>                     <span class="c1">// OEM identifier (for e_oeminfo)</span>
+    <span class="n">WORD</span>   <span class="n">e_oeminfo</span><span class="p">;</span>                   <span class="c1">// OEM information; e_oemid specific</span>
+    <span class="n">WORD</span>   <span class="n">e_res2</span><span class="p">[</span><span class="mi">10</span><span class="p">];</span>                  <span class="c1">// Reserved words</span>
+    <span class="n">LONG</span>   <span class="n">e_lfanew</span><span class="p">;</span>                    <span class="c1">// File address of new exe header</span>
+  <span class="p">}</span> <span class="n">IMAGE_DOS_HEADER</span><span class="p">,</span> <span class="o">*</span><span class="n">PIMAGE_DOS_HEADER</span><span class="p">;</span>
+
+</code></pre></div></div>
+<p>对PE loader来说, 有些字段没那么重要。</p>
+
+<ul>
+  <li>e_magic: It has a fixed value of 0x5A4D or MZ in ASCII, and it serves as a signature that marks the file as an MS-DOS executable</li>
+</ul>
+
+<p>e_lfanew: it holds an offset to the start of the NT headers. 很重要, PE-Loader需要根据这个值去找 file header.</p>
+
+<h2 id="dos-stub">DOS Stub</h2>
+
+<p>是一段DOS程序, 打印” the executable is not compatible with DOS”然后退出。</p>
+
+<h2 id="nt-headers">NT Headers</h2>
+
+<p>分为64位和32位:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">_IMAGE_NT_HEADERS64</span> <span class="p">{</span>
+    <span class="n">DWORD</span> <span class="n">Signature</span><span class="p">;</span>
+    <span class="n">IMAGE_FILE_HEADER</span> <span class="n">FileHeader</span><span class="p">;</span>
+    <span class="n">IMAGE_OPTIONAL_HEADER64</span> <span class="n">OptionalHeader</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">IMAGE_NT_HEADERS64</span><span class="p">,</span> <span class="o">*</span><span class="n">PIMAGE_NT_HEADERS64</span><span class="p">;</span>
+
+<span class="k">typedef</span> <span class="k">struct</span> <span class="nc">_IMAGE_NT_HEADERS</span> <span class="p">{</span>
+    <span class="n">DWORD</span> <span class="n">Signature</span><span class="p">;</span>
+    <span class="n">IMAGE_FILE_HEADER</span> <span class="n">FileHeader</span><span class="p">;</span>
+    <span class="n">IMAGE_OPTIONAL_HEADER32</span> <span class="n">OptionalHeader</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">IMAGE_NT_HEADERS32</span><span class="p">,</span> <span class="o">*</span><span class="n">PIMAGE_NT_HEADERS32</span><span class="p">;</span>
+
+</code></pre></div></div>
+
+<p>### Signatrue</p>
+
+<p>4字节, 0x50450000,  PE\0\0 in ASCII.</p>
+
+<h3 id="file-header">File Header</h3>
+
+<p>定义如下:</p>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">_IMAGE_FILE_HEADER</span> <span class="p">{</span>
+    <span class="n">WORD</span>    <span class="n">Machine</span><span class="p">;</span>
+    <span class="n">WORD</span>    <span class="n">NumberOfSections</span><span class="p">;</span>
+    <span class="n">DWORD</span>   <span class="n">TimeDateStamp</span><span class="p">;</span>
+    <span class="n">DWORD</span>   <span class="n">PointerToSymbolTable</span><span class="p">;</span>
+    <span class="n">DWORD</span>   <span class="n">NumberOfSymbols</span><span class="p">;</span>
+    <span class="n">WORD</span>    <span class="n">SizeOfOptionalHeader</span><span class="p">;</span>
+    <span class="n">WORD</span>    <span class="n">Characteristics</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">IMAGE_FILE_HEADER</span><span class="p">,</span> <span class="o">*</span><span class="n">PIMAGE_FILE_HEADER</span><span class="p">;</span>
+
+</code></pre></div></div>
+
+<ul>
+  <li>Machine: 0x8864 for AMD64 and 0x14c for i386.</li>
+  <li>NumberOfSections: 字面意思</li>
+  <li>TimeDateStamp: 创建时间(unix时间戳)</li>
+  <li>PointerToSymbolTable and NumberOfSymbols: 和符号表有关</li>
+  <li>SizeOfOptionalHeader: 扩展头的长度</li>
+  <li>Characteristics: <a href="!https://learn.microsoft.com/en-us/windows/win32/debug/pe-format#characteristics">文件特征</a></li>
+</ul>
+
+<h3 id="optional-header">Optional Header</h3>
+
+<p>非常重要的一个部分，分为32和64两个版本:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">_IMAGE_OPTIONAL_HEADER</span> <span class="p">{</span>
+    <span class="c1">//</span>
+    <span class="c1">// Standard fields.</span>
+    <span class="c1">//</span>
+
+    <span class="n">WORD</span>    <span class="n">Magic</span><span class="p">;</span>
+    <span class="n">BYTE</span>    <span class="n">MajorLinkerVersion</span><span class="p">;</span>
+    <span class="n">BYTE</span>    <span class="n">MinorLinkerVersion</span><span class="p">;</span>
+    <span class="n">DWORD</span>   <span class="n">SizeOfCode</span><span class="p">;</span>
+    <span class="n">DWORD</span>   <span class="n">SizeOfInitializedData</span><span class="p">;</span>
+    <span class="n">DWORD</span>   <span class="n">SizeOfUninitializedData</span><span class="p">;</span>
+    <span class="n">DWORD</span>   <span class="n">AddressOfEntryPoint</span><span class="p">;</span>
+    <span class="n">DWORD</span>   <span class="n">BaseOfCode</span><span class="p">;</span>
+    <span class="n">DWORD</span>   <span class="n">BaseOfData</span><span class="p">;</span>
+
+    <span class="c1">//</span>
+    <span class="c1">// NT additional fields.</span>
+    <span class="c1">//</span>
+
+    <span class="n">DWORD</span>   <span class="n">ImageBase</span><span class="p">;</span>
+    <span class="n">DWORD</span>   <span class="n">SectionAlignment</span><span class="p">;</span>
+    <span class="n">DWORD</span>   <span class="n">FileAlignment</span><span class="p">;</span>
+    <span class="n">WORD</span>    <span class="n">MajorOperatingSystemVersion</span><span class="p">;</span>
+    <span class="n">WORD</span>    <span class="n">MinorOperatingSystemVersion</span><span class="p">;</span>
+    <span class="n">WORD</span>    <span class="n">MajorImageVersion</span><span class="p">;</span>
+    <span class="n">WORD</span>    <span class="n">MinorImageVersion</span><span class="p">;</span>
+    <span class="n">WORD</span>    <span class="n">MajorSubsystemVersion</span><span class="p">;</span>
+    <span class="n">WORD</span>    <span class="n">MinorSubsystemVersion</span><span class="p">;</span>
+    <span class="n">DWORD</span>   <span class="n">Win32VersionValue</span><span class="p">;</span>
+    <span class="n">DWORD</span>   <span class="n">SizeOfImage</span><span class="p">;</span>
+    <span class="n">DWORD</span>   <span class="n">SizeOfHeaders</span><span class="p">;</span>
+    <span class="n">DWORD</span>   <span class="n">CheckSum</span><span class="p">;</span>
+    <span class="n">WORD</span>    <span class="n">Subsystem</span><span class="p">;</span>
+    <span class="n">WORD</span>    <span class="n">DllCharacteristics</span><span class="p">;</span>
+    <span class="n">DWORD</span>   <span class="n">SizeOfStackReserve</span><span class="p">;</span>
+    <span class="n">DWORD</span>   <span class="n">SizeOfStackCommit</span><span class="p">;</span>
+    <span class="n">DWORD</span>   <span class="n">SizeOfHeapReserve</span><span class="p">;</span>
+    <span class="n">DWORD</span>   <span class="n">SizeOfHeapCommit</span><span class="p">;</span>
+    <span class="n">DWORD</span>   <span class="n">LoaderFlags</span><span class="p">;</span>
+    <span class="n">DWORD</span>   <span class="n">NumberOfRvaAndSizes</span><span class="p">;</span>
+    <span class="n">IMAGE_DATA_DIRECTORY</span> <span class="n">DataDirectory</span><span class="p">[</span><span class="n">IMAGE_NUMBEROF_DIRECTORY_ENTRIES</span><span class="p">];</span>
+<span class="p">}</span> <span class="n">IMAGE_OPTIONAL_HEADER32</span><span class="p">,</span> <span class="o">*</span><span class="n">PIMAGE_OPTIONAL_HEADER32</span><span class="p">;</span>
+
+<span class="k">typedef</span> <span class="k">struct</span> <span class="nc">_IMAGE_OPTIONAL_HEADER64</span> <span class="p">{</span>
+    <span class="n">WORD</span>        <span class="n">Magic</span><span class="p">;</span>
+    <span class="n">BYTE</span>        <span class="n">MajorLinkerVersion</span><span class="p">;</span>
+    <span class="n">BYTE</span>        <span class="n">MinorLinkerVersion</span><span class="p">;</span>
+    <span class="n">DWORD</span>       <span class="n">SizeOfCode</span><span class="p">;</span>
+    <span class="n">DWORD</span>       <span class="n">SizeOfInitializedData</span><span class="p">;</span>
+    <span class="n">DWORD</span>       <span class="n">SizeOfUninitializedData</span><span class="p">;</span>
+    <span class="n">DWORD</span>       <span class="n">AddressOfEntryPoint</span><span class="p">;</span>
+    <span class="n">DWORD</span>       <span class="n">BaseOfCode</span><span class="p">;</span>
+    <span class="n">ULONGLONG</span>   <span class="n">ImageBase</span><span class="p">;</span>
+    <span class="n">DWORD</span>       <span class="n">SectionAlignment</span><span class="p">;</span>
+    <span class="n">DWORD</span>       <span class="n">FileAlignment</span><span class="p">;</span>
+    <span class="n">WORD</span>        <span class="n">MajorOperatingSystemVersion</span><span class="p">;</span>
+    <span class="n">WORD</span>        <span class="n">MinorOperatingSystemVersion</span><span class="p">;</span>
+    <span class="n">WORD</span>        <span class="n">MajorImageVersion</span><span class="p">;</span>
+    <span class="n">WORD</span>        <span class="n">MinorImageVersion</span><span class="p">;</span>
+    <span class="n">WORD</span>        <span class="n">MajorSubsystemVersion</span><span class="p">;</span>
+    <span class="n">WORD</span>        <span class="n">MinorSubsystemVersion</span><span class="p">;</span>
+    <span class="n">DWORD</span>       <span class="n">Win32VersionValue</span><span class="p">;</span>
+    <span class="n">DWORD</span>       <span class="n">SizeOfImage</span><span class="p">;</span>
+    <span class="n">DWORD</span>       <span class="n">SizeOfHeaders</span><span class="p">;</span>
+    <span class="n">DWORD</span>       <span class="n">CheckSum</span><span class="p">;</span>
+    <span class="n">WORD</span>        <span class="n">Subsystem</span><span class="p">;</span>
+    <span class="n">WORD</span>        <span class="n">DllCharacteristics</span><span class="p">;</span>
+    <span class="n">ULONGLONG</span>   <span class="n">SizeOfStackReserve</span><span class="p">;</span>
+    <span class="n">ULONGLONG</span>   <span class="n">SizeOfStackCommit</span><span class="p">;</span>
+    <span class="n">ULONGLONG</span>   <span class="n">SizeOfHeapReserve</span><span class="p">;</span>
+    <span class="n">ULONGLONG</span>   <span class="n">SizeOfHeapCommit</span><span class="p">;</span>
+    <span class="n">DWORD</span>       <span class="n">LoaderFlags</span><span class="p">;</span>
+    <span class="n">DWORD</span>       <span class="n">NumberOfRvaAndSizes</span><span class="p">;</span>
+    <span class="n">IMAGE_DATA_DIRECTORY</span> <span class="n">DataDirectory</span><span class="p">[</span><span class="n">IMAGE_NUMBEROF_DIRECTORY_ENTRIES</span><span class="p">];</span>
+<span class="p">}</span> <span class="n">IMAGE_OPTIONAL_HEADER64</span><span class="p">,</span> <span class="o">*</span><span class="n">PIMAGE_OPTIONAL_HEADER64</span><span class="p">;</span>
+
+</code></pre></div></div>
+
+<ul>
+  <li>Magic: 0x10B (PE32), 0x20B(PE32+),0x107(ROM Image)</li>
+  <li>MajorLinkerVersion, MinorLinkerVersion: linker 版本</li>
+  <li>SizeOfCode: .text段的长度</li>
+  <li>SizeOfInitializedData: .data段的长度</li>
+  <li>SizeOfUninitializedData: .bss段的长度</li>
+  <li>AddressOfEntryPoint: 入口点，对dll来说是个可选项</li>
+  <li>BaseOfCode: 第一个code section的地址</li>
+  <li>BaseOfData(PE32 Only): 第一个data section的地址</li>
+  <li>ImageBase: 不太懂</li>
+  <li>SectionAlignment: 略</li>
+  <li>FileAlignment: 略</li>
+  <li>.*version: 略</li>
+  <li>Win32VersionValue: set to 0</li>
+  <li>SizeOfImage: 略</li>
+  <li>SizeOfHeaders: 略</li>
+  <li>Subsystem: 控制台、应用程序之类<a href="!https://docs.microsoft.com/en-us/windows/win32/debug/pe-format">详细请点击</a></li>
+</ul>
+
+  </div>
+  
+</div>
+<footer class="footer">
+  <span>Copyright © 2023 memetao</span>
+  <a href="/static/xml/rss.xml">RSS订阅</a>
+  <span>Theme By</span>
+  <a href="https://github.com/TMaize/tmaize-blog">TMaize</a>
+</footer>
+<div id="to-top">
+  <span></span>
+  <span></span>
+</div>
+<script type="text/javascript" src="/static/js/blog.js?t=20240731210702"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20240731210702"></script>
+<!-- 腾讯MTA移动分析 -->
+<script>
+  var _mtac = {performanceMonitor: 1, senseQuery: 1}
+  ;(function() {
+    if (window.location.hostname == '127.0.0.1') {
+      return
+    }
+    var mta = document.createElement('script')
+    mta.src = '//pingjs.qq.com/h5/stats.js?v2.0.4'
+    mta.setAttribute('name', 'MTAH5')
+    mta.setAttribute('sid', '500581966')
+    mta.setAttribute('cid', '500581972')
+    var s = document.getElementsByTagName('script')[0]
+    s.parentNode.insertBefore(mta, s)
+  })()
+</script>
+
+<!-- 百度自动推送 -->
+<script>
+  ;(function () {
+    if (window.location.hostname == '127.0.0.1') {
+      return
+    }
+    var bp = document.createElement('script')
+    var curProtocol = window.location.protocol.split(':')[0]
+    if (curProtocol === 'https') {
+      bp.src = 'https://zz.bdstatic.com/linksubmit/push.js'
+    } else {
+      bp.src = 'http://push.zhanzhang.baidu.com/push.js'
+    }
+    var s = document.getElementsByTagName('script')[0]
+    s.parentNode.insertBefore(bp, s)
+  })()
+</script>
+
+<!-- MathJax数学公式支持 -->
+<style>
+  .has-jax {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-color: transparent !important;
+    line-height: normal !important;
+    word-break: normal !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .has-jax * {
+    outline: 0;
+  }
+</style>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    showProcessingMessages: false,
+    messageStyle: "none",
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'a']
+    },
+    "HTML-CSS": {
+      showMathMenu: false
+    }
+  });
+  // 父级元素添加类名，便于css控制
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax();
+    var i = 0;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script
+  type="text/javascript"
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+></script>
+
+
+</body>
+</html>

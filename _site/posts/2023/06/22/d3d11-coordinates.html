@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>D3D11 坐标变换-memetao</title>
+  <title>D3D11中的坐标-memetao</title>
   <meta charset="utf-8" />
   <meta http-equiv="content-language" content="zh-CN" />
   <meta name="theme-color" content="#ffffff" />
@@ -12,17 +12,17 @@
   <meta name="applicable-device" content="pc,mobile">
   <meta name="google-site-verification" content="ckhUaoa05QCmWoE1FafzTBcqYI4yBOy-UJKopXDS18M" />
   <meta name="author" content="memetao" />
-  <meta name="description" content="D3D11 坐标变换"/>
+  <meta name="description" content="D3D11中的坐标"/>
   <meta name="keywords" content="memetao,graphics"/>
-  <link rel="stylesheet" href="/static/css/common.css?t=20231224112352">
-  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20231224112352">
-  <link rel="stylesheet" href="/static/css/post.css?t=20231224112352">
-  <link rel="stylesheet" href="/static/css/code-dark.css?t=20231224112352">
-  <link rel="stylesheet" href="/static/css/code-light.css?t=20231224112352">
+  <link rel="stylesheet" href="/static/css/common.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/post.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20240731210702">
   <script>
     window.blog = {
       baseurl:"",
-      buildAt:"20231224112352",
+      buildAt:"20240731210702",
       darkTheme: false,
       setDarkTheme: function (dark) {
         this.darkTheme = Boolean(dark);
@@ -54,40 +54,17 @@
     </nav>
 </header>
 <div class="page page-post">
-  <h1 class="title" id="D3D11 坐标变换">D3D11 坐标变换</h1>
+  <h1 class="title" id="D3D11中的坐标">D3D11中的坐标</h1>
   
   <div class="subtitle">memetao 于 2023-06-22 发布</div>
   
   <div class="post">
     <hr />
 
-<h2 id="world-transformation">World Transformation</h2>
+<h2 id="顶点着色器中的坐标">顶点着色器中的坐标</h2>
 
-<p>旋转
-<img src="rotation.jpg" alt="raster" />
-<img src="rotation.jpg" alt="rotaion" /></p>
+<h2 id="像素着色器中的坐标">像素着色器中的坐标</h2>
 
-<p>缩放</p>
-
-<p><img src="scaling.jpg" alt="scaling" /></p>
-
-<h2 id="view-transformation">View Transformation</h2>
-
-<p>世界坐标下的摄像机位置:</p>
-
-<p><img src="viewTransformation1.jpg" alt="view1" /></p>
-
-<p>根据摄像机位置转换坐标:</p>
-
-<p><img src="viewTransformation2.jpg" alt="view1" /></p>
-
-<h2 id="projection-transformation">Projection Transformation</h2>
-
-<p>从摄像机视野转变为屏幕视野:</p>
-
-<p><img src="screenTransformation.jpg" alt="view1" /></p>
-
-<p>以上的转换都是针对顶点坐标而言!</p>
 
   </div>
   
@@ -102,8 +79,8 @@
   <span></span>
   <span></span>
 </div>
-<script type="text/javascript" src="/static/js/blog.js?t=20231224112352"></script>
-<script type="text/javascript" src="/static/js/search.js?t=20231224112352"></script>
+<script type="text/javascript" src="/static/js/blog.js?t=20240731210702"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20240731210702"></script>
 <!-- 腾讯MTA移动分析 -->
 <script>
   var _mtac = {performanceMonitor: 1, senseQuery: 1}

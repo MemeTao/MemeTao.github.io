@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>D3D11画三角形-memetao</title>
+  <title>用D3D11画一个三角形-memetao</title>
   <meta charset="utf-8" />
   <meta http-equiv="content-language" content="zh-CN" />
   <meta name="theme-color" content="#ffffff" />
@@ -12,17 +12,17 @@
   <meta name="applicable-device" content="pc,mobile">
   <meta name="google-site-verification" content="ckhUaoa05QCmWoE1FafzTBcqYI4yBOy-UJKopXDS18M" />
   <meta name="author" content="memetao" />
-  <meta name="description" content="D3D11画三角形"/>
+  <meta name="description" content="用D3D11画一个三角形"/>
   <meta name="keywords" content="memetao,graphics"/>
-  <link rel="stylesheet" href="/static/css/common.css?t=20231224112352">
-  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20231224112352">
-  <link rel="stylesheet" href="/static/css/post.css?t=20231224112352">
-  <link rel="stylesheet" href="/static/css/code-dark.css?t=20231224112352">
-  <link rel="stylesheet" href="/static/css/code-light.css?t=20231224112352">
+  <link rel="stylesheet" href="/static/css/common.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/post.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20240731210702">
   <script>
     window.blog = {
       baseurl:"",
-      buildAt:"20231224112352",
+      buildAt:"20240731210702",
       darkTheme: false,
       setDarkTheme: function (dark) {
         this.darkTheme = Boolean(dark);
@@ -54,14 +54,14 @@
     </nav>
 </header>
 <div class="page page-post">
-  <h1 class="title" id="D3D11画三角形">D3D11画三角形</h1>
+  <h1 class="title" id="用D3D11画一个三角形">用D3D11画一个三角形</h1>
   
   <div class="subtitle">memetao 于 2023-06-17 发布</div>
   
   <div class="post">
     <hr />
 
-<h3 id="vertex">Vertex</h3>
+<h2 id="vertex">Vertex</h2>
 
 <p>三角形的端点。</p>
 
@@ -69,19 +69,19 @@
 
 <p>在D3D11中三角形是顺时针处理的。</p>
 
-<h3 id="primitives">Primitives</h3>
+<h2 id="primitives">Primitives</h2>
 
 <p>基元，3D环境中的一个元素, 可以是三角形、线、点或者任何其他图形。</p>
 
-<h3 id="d3d-device">D3D DEVICE</h3>
+<h2 id="d3d-device">D3D DEVICE</h2>
 
 <p>代表一个VideoAdapter(device要从指定的adapter上创建)。</p>
 
-<h3 id="d3d11devicecontext">D3D11DeviceContext</h3>
+<h2 id="d3d11devicecontext">D3D11DeviceContext</h2>
 
 <p>代表GPU的渲染管线.</p>
 
-<h3 id="资源和资源视图">资源和资源视图</h3>
+<h2 id="资源和资源视图">资源和资源视图</h2>
 
 <p>资源是场景的构建基块：几何图形、纹理、着色器数据。</p>
 
@@ -100,14 +100,10 @@
 </code></pre>
 <p>目的是将”数据”换到backbuffer上, 但是backbuffer是一个资源, 所以需要创建backbuffer的视图。通过”D3D11_RENDER_TARGET_VIEW_DESC”来描述, 这里传了nullptr(accesses all of the subresources in <a href="https://zh.wikipedia.org/wiki/Mipmap">Mipmap</a> level 0)<a href="https://www.zhihu.com/question/398101779">Mipmap的通俗解释</a>。</p>
 
-<h3 id="画一个三角形">画一个三角形</h3>
+<h2 id="画一个三角形">画一个三角形</h2>
 <ul>
   <li>定义VERTEX结构</li>
 </ul>
-
-<ol>
-  <li>CPU部分</li>
-</ol>
 
 <pre><code class="language-C++">struct VERTEX {
     DirectX::XMFLOAT3 pos;
@@ -125,10 +121,6 @@ d3d11_dev_-&gt;CreateBuffer(&amp;bd, NULL, &amp;pVBuffer); // create the buffer
 </code></pre>
 <p>通过上述代码, 我们创建了一个 buffer(就是一个数据块), 那么GPU如果解析这个数据块呢?</p>
 
-<ol>
-  <li>GPU部分</li>
-</ol>
-
 <pre><code class="language-C++">void init() {
     // 告诉GPU, 输入数据应该如何解析
     const D3D11_INPUT_ELEMENT_DESC input_desc[2] = {
@@ -141,7 +133,6 @@ d3d11_dev_-&gt;CreateBuffer(&amp;bd, NULL, &amp;pVBuffer); // create the buffer
                                         blob-&gt;GetBufferPointer(), blob-&gt;GetBufferSize(), &amp;layout);
     d3d11_ctx_-&gt;IASetInputLayout(layout);
 }
-
 </code></pre>
 
 <pre><code class="language-C++">void render() {
@@ -151,9 +142,8 @@ d3d11_dev_-&gt;CreateBuffer(&amp;bd, NULL, &amp;pVBuffer); // create the buffer
     // 为什么每一帧都要绑定: see remark
     // https://learn.microsoft.com/en-us/windows/win32/api/d3d11/nf-d3d11-id3d11devicecontext-omsetrendertargets
     d3d11_ctx_-&gt;OMSetRenderTargets(1, render_view_.GetAddressOf(), nullptr);
-    // 这里不能直接&amp;render_view_, 会导致render_view_=nullptr
 
-    // 使用哪些"Vertex"
+    // 设置顶点
     UINT stride = sizeof(VERTEX);
     UINT offset = 0;
     d3d11_ctx_-&gt;IASetVertexBuffers(0, 1, &amp;vertex_buffer_, &amp;stride, &amp;offset);
@@ -171,76 +161,6 @@ d3d11_dev_-&gt;CreateBuffer(&amp;bd, NULL, &amp;pVBuffer); // create the buffer
 
 <p><img src="triangle.png" alt="triangle" /></p>
 
-<h3 id="画一个3d的三角形-沿着y轴旋转">画一个3D的三角形 (沿着Y轴旋转)</h3>
-
-<ul>
-  <li>步骤1, 定义一个ConstantBuffer, 用来存储旋转矩阵:</li>
-</ul>
-
-<pre><code class="language-C++">
-struct ConstantBuffer {
-    DirectX::XMFLOAT4X4 matrix;
-};
-
-D3D11_BUFFER_DESC bd = {0};
-bd.ByteWidth = sizeof(ConstantBuffer);
-bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-bd.Usage = D3D11_USAGE_DEFAULT;
-hr = d3d11_dev_-&gt;CreateBuffer(&amp;bd, nullptr, &amp;const_buf_);
-if (FAILED(hr)) {
-    return false;
-}
-d3d11_ctx_-&gt;VSSetConstantBuffers(0, 1, const_buf_.GetAddressOf());
-
-// shader
-
-cbuffer ConstantBuffer {
-    float4x4 final_matrix;
-}
-VOut VShader(float4 position : POSITION, float4 color : COLOR) {
-    VOut output;
-
-    output.position = mul(final_matrix, position); //一个三阶矩阵 X 一维矩阵 = 一维矩阵 (就是最后的坐标)
-    output.color = color;
-
-    return output;
-}
-</code></pre>
-
-<ul>
-  <li>步骤2, 产生这个转换矩阵(坐标转换)</li>
-</ul>
-
-<pre><code class="language-C++">// 世界坐标转换矩阵(这里只是绕Y轴旋转)
-DirectX::XMMATRIX matrix_world = DirectX::XMMatrixRotationY(delta_angle);
-
-// 计算View Transformation
-DirectX::XMVECTOR vec_carmera = DirectX::XMVectorSet(0.f, 0.f, -5.f, 0);
-DirectX::XMVECTOR vec_lookat = DirectX::XMVectorSet(0, 0, 0, 0);
-DirectX::XMVECTOR vec_camara_up = DirectX::XMVectorSet(0, 1, 0, 0);
-DirectX::XMMATRIX matrix_view =
-    DirectX::XMMatrixLookAtLH(vec_carmera, vec_lookat, vec_camara_up);
-
-// 计算Projection Transformation
-DirectX::XMMATRIX matrix_projection =
-    DirectX::XMMatrixPerspectiveFovLH(DirectX::XMConvertToRadians(45), // the field of view
-                                        (FLOAT)width_ / (FLOAT)height_,  // aspect ratio
-                                        1,                               // the near view-plane
-                                        100);
-// 将矩阵数据传送给GPU
-DirectX::XMMATRIX final_matri = matrix_world * matrix_view * matrix_projection;
-d3d11_ctx_-&gt;UpdateSubresource(const_buf_.Get(), 0, 0, &amp;final_matri, 0, 0);
-
-// 三个顶点, 从0开始
-d3d11_ctx_-&gt;Draw(3, 0);
-</code></pre>
-
-<h3 id="注意事项">注意事项</h3>
-
-<ul>
-  <li>全屏模式下无法关闭, 因此在退出D3D11的时候需要先切换到窗口模式</li>
-</ul>
-
   </div>
   
 </div>
@@ -254,8 +174,8 @@ d3d11_ctx_-&gt;Draw(3, 0);
   <span></span>
   <span></span>
 </div>
-<script type="text/javascript" src="/static/js/blog.js?t=20231224112352"></script>
-<script type="text/javascript" src="/static/js/search.js?t=20231224112352"></script>
+<script type="text/javascript" src="/static/js/blog.js?t=20240731210702"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20240731210702"></script>
 <!-- 腾讯MTA移动分析 -->
 <script>
   var _mtac = {performanceMonitor: 1, senseQuery: 1}

@@ -2,187 +2,223 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
   <url>
     <loc>/</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/pages/categories.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/pages/about.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>/posts/2024/07/24/WindowsThreadStack.html</loc>
+    <lastmod>2024-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>/posts/2024/03/28/winui-gallery.html</loc>
+    <lastmod>2024-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>/posts/2024/03/10/xaml.html</loc>
+    <lastmod>2024-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>/posts/2024/02/14/dotnet.html</loc>
+    <lastmod>2024-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>/posts/2024/02/05/HDR.html</loc>
+    <lastmod>2024-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>/posts/2024/01/20/life-review.html</loc>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/posts/2023/12/24/d3d11-render-video.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/posts/2023/12/09/visable-window-edge.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/posts/2023/08/26/Aero.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>/posts/2023/08/26/d3d11-alpha.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <loc>/posts/2023/08/26/dwm-alpha.html</loc>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/posts/2023/08/26/texture-clip.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/posts/2023/08/26/texture-scaling.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/posts/2023/08/26/d3d11-rgb2nv12.html</loc>
-    <lastmod>2023-12-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>/posts/2023/08/26/d3d11-buffer.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/posts/2023/08/26/d3d11-hlsl.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>/posts/2023/06/22/windbg-command.html</loc>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/posts/2023/06/22/d3d11-coordinates.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/posts/2023/06/17/CPLUSPLUS.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/posts/2023/06/17/d3d11-triangle.html</loc>
-    <lastmod>2023-12-24</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>/posts/2023/06/17/d3d11-pipeline.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/posts/2023/06/07/thoughts.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/posts/2023/05/21/QtLayout.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>/posts/2023/01/14/PE.html</loc>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/posts/2021/10/06/bpf-filter.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/posts/2021/09/04/directx.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/posts/2021/08/23/windows-interview.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/posts/2021/06/08/frame-picker.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/posts/2021/05/14/webrtc-jitter-buffer.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/posts/2021/04/07/leaVSmov.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/posts/2020/12/12/x84-assembly.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/posts/2019/08/12/webrtc-porber.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/posts/2019/07/16/sharedptrTheory.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/posts/2019/06/28/GccTrendlineFilter.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/posts/2019/03/11/cppcastall.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/posts/2018/11/08/string-coding.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>/posts/2018/07/12/theSizeOfMemeberFunctionPointer.html</loc>
-    <lastmod>2023-12-24</lastmod>
+    <lastmod>2024-07-31</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>

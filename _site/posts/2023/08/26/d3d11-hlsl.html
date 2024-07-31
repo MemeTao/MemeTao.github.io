@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>D3D11 HLSL摘记-memetao</title>
+  <title>D3D11 HLSL注意项-memetao</title>
   <meta charset="utf-8" />
   <meta http-equiv="content-language" content="zh-CN" />
   <meta name="theme-color" content="#ffffff" />
@@ -12,17 +12,17 @@
   <meta name="applicable-device" content="pc,mobile">
   <meta name="google-site-verification" content="ckhUaoa05QCmWoE1FafzTBcqYI4yBOy-UJKopXDS18M" />
   <meta name="author" content="memetao" />
-  <meta name="description" content="D3D11 HLSL摘记"/>
+  <meta name="description" content="D3D11 HLSL注意项"/>
   <meta name="keywords" content="memetao,graphics"/>
-  <link rel="stylesheet" href="/static/css/common.css?t=20231224112352">
-  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20231224112352">
-  <link rel="stylesheet" href="/static/css/post.css?t=20231224112352">
-  <link rel="stylesheet" href="/static/css/code-dark.css?t=20231224112352">
-  <link rel="stylesheet" href="/static/css/code-light.css?t=20231224112352">
+  <link rel="stylesheet" href="/static/css/common.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/post.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20240731210702">
   <script>
     window.blog = {
       baseurl:"",
-      buildAt:"20231224112352",
+      buildAt:"20240731210702",
       darkTheme: false,
       setDarkTheme: function (dark) {
         this.darkTheme = Boolean(dark);
@@ -54,7 +54,7 @@
     </nav>
 </header>
 <div class="page page-post">
-  <h1 class="title" id="D3D11 HLSL摘记">D3D11 HLSL摘记</h1>
+  <h1 class="title" id="D3D11 HLSL注意项">D3D11 HLSL注意项</h1>
   
   <div class="subtitle">memetao 于 2023-08-26 发布</div>
   
@@ -123,7 +123,7 @@ IASetVertexBuffers(vertex_buf_);
 <span class="p">};</span>
 
 
-<span class="n">VOut</span> <span class="nf">VShader</span><span class="p">(</span><span class="kt">float4</span> <span class="n">position</span> <span class="o">:</span> <span class="nb">POSITION</span><span class="p">,</span> <span class="kt">float4</span> <span class="n">color</span> <span class="o">:</span> <span class="nb">COLOR</span><span class="p">)</span> 
+<span class="n">VOut</span> <span class="nf">VShader</span><span class="p">(</span><span class="kt">float4</span> <span class="n">position</span> <span class="o">:</span> <span class="nb">POSITION</span><span class="p">,</span> <span class="kt">float4</span> <span class="n">color</span> <span class="o">:</span> <span class="nb">COLOR</span><span class="p">)</span>
 <span class="p">{</span>
     <span class="n">VOut</span> <span class="n">output</span><span class="p">;</span>
     <span class="n">output</span><span class="p">.</span><span class="n">position</span> <span class="o">=</span> <span class="n">position</span><span class="p">;</span>
@@ -132,8 +132,8 @@ IASetVertexBuffers(vertex_buf_);
 <span class="p">}</span>
 
 <span class="c1">// 使用的是normailized坐标, 返回值是给输出合并阶段的用的, 输出到render Target上</span>
-<span class="kt">float4</span> <span class="nf">PShader</span><span class="p">(</span><span class="kt">float4</span> <span class="n">position</span> <span class="o">:</span> <span class="nb">SV_POSITION</span><span class="p">,</span> 
-    <span class="kt">float4</span> <span class="n">color</span><span class="o">:</span> <span class="nb">COLOR</span><span class="p">)</span><span class="o">:</span> <span class="n">SV_TARGET</span> 
+<span class="kt">float4</span> <span class="nf">PShader</span><span class="p">(</span><span class="kt">float4</span> <span class="n">position</span> <span class="o">:</span> <span class="nb">SV_POSITION</span><span class="p">,</span>
+    <span class="kt">float4</span> <span class="n">color</span><span class="o">:</span> <span class="nb">COLOR</span><span class="p">)</span><span class="o">:</span> <span class="n">SV_TARGET</span>
 <span class="p">{</span>
     <span class="k">return</span> <span class="n">color</span><span class="p">;</span>
 <span class="p">}</span>
@@ -171,8 +171,8 @@ IASetVertexBuffers(vertex_buf_);
   <span></span>
   <span></span>
 </div>
-<script type="text/javascript" src="/static/js/blog.js?t=20231224112352"></script>
-<script type="text/javascript" src="/static/js/search.js?t=20231224112352"></script>
+<script type="text/javascript" src="/static/js/blog.js?t=20240731210702"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20240731210702"></script>
 <!-- 腾讯MTA移动分析 -->
 <script>
   var _mtac = {performanceMonitor: 1, senseQuery: 1}

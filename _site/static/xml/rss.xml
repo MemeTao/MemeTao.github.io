@@ -5,19 +5,61 @@
     <link></link>
     <description>memetao的成长轨迹</description>
     <language>zh-CN</language>
-    <pubDate>Sun, 24 Dec 2023 11:23:52 +0800</pubDate>
-    <lastBuildDate>Sun, 24 Dec 2023 11:23:52 +0800</lastBuildDate>
+    <pubDate>Wed, 31 Jul 2024 21:07:02 +0800</pubDate>
+    <lastBuildDate>Wed, 31 Jul 2024 21:07:02 +0800</lastBuildDate>
     <generator>Jekyll v4.3.2</generator>
     <atom:link href="/static/xml/rss.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>D3D11 渲染视频</title>
+      <title>Windows 线程</title>
+      <link>/posts/2024/07/24/WindowsThreadStack.html</link>
+      <description>windows线程线程包含三个东西:ThreadKernalObjectStackTEB内核对象：ThreadContext寄存器状态:instructionpointer(指令地址)andstackpointerregisters(...</description>
+      <pubDate>Wed, 24 Jul 2024 13:13:17 +0800</pubDate>
+      <gui>/posts/2024/07/24/WindowsThreadStack.html</gui>
+    </item>
+    <item>
+      <title>WinUIGallery 刨析----HomePage</title>
+      <link>/posts/2024/03/28/winui-gallery.html</link>
+      <description>HomePage主页长这个样子:首先看xaml代码(HomePage.xaml):&amp;lt;local:ItemsPageBasex:Class=&quot;AppUIBasics.HomePage&quot;xmlns=&quot;http://schemas.m...</description>
+      <pubDate>Thu, 28 Mar 2024 13:13:17 +0800</pubDate>
+      <gui>/posts/2024/03/28/winui-gallery.html</gui>
+    </item>
+    <item>
+      <title>xaml 语法摘记</title>
+      <link>/posts/2024/03/10/xaml.html</link>
+      <description>引用C#中的类publicclassStudent{publicintid{get,set};}&amp;lt;Windowx:Class=&quot;xxx&quot;...xmlns:local=&quot;clr-namesapce:AppName&quot;&amp;gt;&amp;lt;...</description>
+      <pubDate>Sun, 10 Mar 2024 13:13:17 +0800</pubDate>
+      <gui>/posts/2024/03/10/xaml.html</gui>
+    </item>
+    <item>
+      <title>C# 入门</title>
+      <link>/posts/2024/02/14/dotnet.html</link>
+      <description>控件布局《C#入门经典第八版》P300第一个窗口程序[Serializable]注解c#里的Attribute,完全没看懂是怎么起作用的.能几句话说清楚吗?-LoyieKing的回答-知乎https://www.zhihu.com/q...</description>
+      <pubDate>Wed, 14 Feb 2024 13:13:17 +0800</pubDate>
+      <gui>/posts/2024/02/14/dotnet.html</gui>
+    </item>
+    <item>
+      <title>Hdr</title>
+      <link>/posts/2024/02/05/HDR.html</link>
+      <description>色彩空间https://zhuanlan.zhihu.com/p/24214731###CIEXYZ和CIERGB的区别可以看到，曲线上出现了负数，这是怎么回事？回想一下前面描述的实验过程，左边是被测试的光色，右边是可调节的三色光的混...</description>
+      <pubDate>Mon, 05 Feb 2024 10:13:17 +0800</pubDate>
+      <gui>/posts/2024/02/05/HDR.html</gui>
+    </item>
+    <item>
+      <title>生活复盘</title>
+      <link>/posts/2024/01/20/life-review.html</link>
+      <description>开车加油站后退时一定要注意左右距离，多看后视镜右变道时没有特别注意和右后车得距离,是否可以变道。红灯车位停车时没有理会告警就盲目后退,应该下车检查距离。宁愿错过路口也不要危险变道##</description>
+      <pubDate>Sat, 20 Jan 2024 10:13:17 +0800</pubDate>
+      <gui>/posts/2024/01/20/life-review.html</gui>
+    </item>
+    <item>
+      <title>D3D11 视频渲染中的变换（平移、缩放、裁剪、镜像、旋转）</title>
       <link>/posts/2023/12/24/d3d11-render-video.html</link>
-      <description>需求描述视频渲染通常会有如下功能:1视频渲染2支持旋转[90,180,270…任意角度]3镜像[垂直,水平]4Alpha通道[虚拟人]5HDR(通常为10BIT)输入数据一个渲染器的输入源目前看上去会有两种:本地预览，来自摄像头、屏幕...</description>
+      <description>需求视频渲染通常会有如下功能:1视频渲染2支持旋转[90,180,270…任意角度]3镜像[垂直,水平]4Alpha通道[虚拟人]5HDR(通常为10BIT)输入数据一个渲染器的输入源目前看上去会有两种:本地预览，来自摄像头、屏幕捕获...</description>
       <pubDate>Sun, 24 Dec 2023 10:13:17 +0800</pubDate>
       <gui>/posts/2023/12/24/d3d11-render-video.html</gui>
     </item>
     <item>
-      <title>windows透明边缘</title>
+      <title>windows窗口的透明边缘</title>
       <link>/posts/2023/12/09/visable-window-edge.html</link>
       <description>现象win8之后操作系统会给窗口设置左、右、下三个方向上的”透明边缘”:当我们调用getclientRect函数时,系统返回的窗口区域包含”透明边缘’,并且Bitblt函数也会把这部分区域包含进去。解决办法if(rtc::rtc_wi...</description>
       <pubDate>Sat, 09 Dec 2023 10:13:17 +0800</pubDate>
@@ -31,11 +73,11 @@
       <gui>/posts/2023/08/26/Aero.html</gui>
     </item>
     <item>
-      <title>D3D11 透明渲染</title>
-      <link>/posts/2023/08/26/d3d11-alpha.html</link>
+      <title>DWM窗口透明</title>
+      <link>/posts/2023/08/26/dwm-alpha.html</link>
       <description>ColorBlendingColorBlending发生在PixelShader的下一个阶段:OutputMergerStage.默认情况下,混合功能时被关闭的。方程Color=SrcColor*SrcBlend+DestColor*...</description>
       <pubDate>Sat, 26 Aug 2023 10:13:17 +0800</pubDate>
-      <gui>/posts/2023/08/26/d3d11-alpha.html</gui>
+      <gui>/posts/2023/08/26/dwm-alpha.html</gui>
     </item>
     <item>
       <title>D3D11 裁剪texture</title>
@@ -59,23 +101,23 @@
       <gui>/posts/2023/08/26/d3d11-rgb2nv12.html</gui>
     </item>
     <item>
-      <title>D3D11 Buffer</title>
-      <link>/posts/2023/08/26/d3d11-buffer.html</link>
-      <description>VertexBuffer//C++structVERTEX{DirectX::XMFLOAT3pos;DirectX::XMFLOAT3Color;};//shaderReturnTypeVShader(float4position:...</description>
-      <pubDate>Sat, 26 Aug 2023 10:13:17 +0800</pubDate>
-      <gui>/posts/2023/08/26/d3d11-buffer.html</gui>
-    </item>
-    <item>
-      <title>D3D11 HLSL摘记</title>
+      <title>D3D11 HLSL注意项</title>
       <link>/posts/2023/08/26/d3d11-hlsl.html</link>
       <description>VertexShadlerD3D11_INPUT_ELEMENT_DESCinput_desc[]={//我们知道DXGI_FORMAT_R32G32B32_FLOAT是12字节的{&quot;POSITION&quot;,0,DXGI_FORMAT_R...</description>
       <pubDate>Sat, 26 Aug 2023 10:13:17 +0800</pubDate>
       <gui>/posts/2023/08/26/d3d11-hlsl.html</gui>
     </item>
     <item>
-      <title>D3D11 坐标变换</title>
+      <title>Windbg 常用命令</title>
+      <link>/posts/2023/06/22/windbg-command.html</link>
+      <description>排查野指针前提:开启Gflag全页堆//堆栈VZVCamDshow!DllMain+0xd8d:00007ffe`7270313d8982d8000000movdwordptr[rdx+0D8h],eaxds:00000267`e03...</description>
+      <pubDate>Thu, 22 Jun 2023 10:13:17 +0800</pubDate>
+      <gui>/posts/2023/06/22/windbg-command.html</gui>
+    </item>
+    <item>
+      <title>D3D11中的坐标</title>
       <link>/posts/2023/06/22/d3d11-coordinates.html</link>
-      <description>WorldTransformation旋转缩放ViewTransformation世界坐标下的摄像机位置:根据摄像机位置转换坐标:ProjectionTransformation从摄像机视野转变为屏幕视野:以上的转换都是针对顶点坐标而言!</description>
+      <description>顶点着色器中的坐标像素着色器中的坐标</description>
       <pubDate>Thu, 22 Jun 2023 10:13:17 +0800</pubDate>
       <gui>/posts/2023/06/22/d3d11-coordinates.html</gui>
     </item>
@@ -87,18 +129,11 @@
       <gui>/posts/2023/06/17/CPLUSPLUS.html</gui>
     </item>
     <item>
-      <title>D3D11画三角形</title>
+      <title>用D3D11画一个三角形</title>
       <link>/posts/2023/06/17/d3d11-triangle.html</link>
       <description>Vertex三角形的端点。D3D11中的顶点可以看成是三角形的端点坐标(x,y,z)以及这些点的属性。在D3D11中三角形是顺时针处理的。Primitives基元，3D环境中的一个元素,可以是三角形、线、点或者任何其他图形。D3DDE...</description>
       <pubDate>Sat, 17 Jun 2023 11:13:17 +0800</pubDate>
       <gui>/posts/2023/06/17/d3d11-triangle.html</gui>
-    </item>
-    <item>
-      <title>D3D11 渲染管线</title>
-      <link>/posts/2023/06/17/d3d11-pipeline.html</link>
-      <description>TheInputAssemblerStage管线的第一个阶段,用来收集数据,为后续做准备。FunctionDescriptionIASetVertexBuffersTellstheinput-assemblerwhichvertexb...</description>
-      <pubDate>Sat, 17 Jun 2023 10:13:17 +0800</pubDate>
-      <gui>/posts/2023/06/17/d3d11-pipeline.html</gui>
     </item>
     <item>
       <title>士兵突击</title>
@@ -113,6 +148,13 @@
       <description>QT的Widget尺寸策略QSizePolicy::Fixed只能使用sizeHint的大小,任何操作都不会改变控件大小QSizePolicy::MinimumsizeHint为最小大小,控件可以被拉伸QSizePolicy::Max...</description>
       <pubDate>Sun, 21 May 2023 09:10:17 +0800</pubDate>
       <gui>/posts/2023/05/21/QtLayout.html</gui>
+    </item>
+    <item>
+      <title>windows PE 格式</title>
+      <link>/posts/2023/01/14/PE.html</link>
+      <description>PEPE(PortableExecute)是可执行文件的一个总称,DLL,EXE等，专指32位可执行文件，64位的叫做PE+\PE32+,是一种扩展格式。文件结构如下所示:实在是复杂,从上到下又分为DOS头，NT头，节表以及具体的节，...</description>
+      <pubDate>Sat, 14 Jan 2023 13:13:17 +0800</pubDate>
+      <gui>/posts/2023/01/14/PE.html</gui>
     </item>
     <item>
       <title>bpf filter code 解释</title>

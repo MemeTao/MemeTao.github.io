@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>D3D11 Buffer-memetao</title>
+  <title>C# 入门-memetao</title>
   <meta charset="utf-8" />
   <meta http-equiv="content-language" content="zh-CN" />
   <meta name="theme-color" content="#ffffff" />
@@ -12,17 +12,17 @@
   <meta name="applicable-device" content="pc,mobile">
   <meta name="google-site-verification" content="ckhUaoa05QCmWoE1FafzTBcqYI4yBOy-UJKopXDS18M" />
   <meta name="author" content="memetao" />
-  <meta name="description" content="D3D11 Buffer"/>
-  <meta name="keywords" content="memetao,graphics"/>
-  <link rel="stylesheet" href="/static/css/common.css?t=20231224112352">
-  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20231224112352">
-  <link rel="stylesheet" href="/static/css/post.css?t=20231224112352">
-  <link rel="stylesheet" href="/static/css/code-dark.css?t=20231224112352">
-  <link rel="stylesheet" href="/static/css/code-light.css?t=20231224112352">
+  <meta name="description" content="C# 入门"/>
+  <meta name="keywords" content="memetao,C#"/>
+  <link rel="stylesheet" href="/static/css/common.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/post.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20240731210702">
   <script>
     window.blog = {
       baseurl:"",
-      buildAt:"20231224112352",
+      buildAt:"20240731210702",
       darkTheme: false,
       setDarkTheme: function (dark) {
         this.darkTheme = Boolean(dark);
@@ -54,80 +54,49 @@
     </nav>
 </header>
 <div class="page page-post">
-  <h1 class="title" id="D3D11 Buffer">D3D11 Buffer</h1>
+  <h1 class="title" id="C# 入门">C# 入门</h1>
   
-  <div class="subtitle">memetao 于 2023-08-26 发布</div>
+  <div class="subtitle">memetao 于 2024-02-14 发布</div>
   
   <div class="post">
     <hr />
 
-<h2 id="vertex-buffer">Vertex Buffer</h2>
+<h2 id="控件布局">控件布局</h2>
 
-<pre><code class="language-C++">
-// C++
-struct VERTEX {
-    DirectX::XMFLOAT3 pos;
-    DirectX::XMFLOAT3 Color;
-}; 
+<p>《C# 入门经典 第八版》 P300</p>
 
-// shader
-ReturnType VShader(float4 position : POSITION, float4 color : COLOR)
-{
-    //
-}
-</code></pre>
-<p>当我们定义一个Vertex结构时, Position和Color会被自动解释成float4</p>
-
-<blockquote>
-  <blockquote>
-    <p>提供给像素着色器的纹理坐标必须具有四个分量， (u、v、w、q) 。 如果缺少 u、v 或 w 组件，硬件或驱动程序必须向该组件提供默认值 0。 如果缺少 q 组件，硬件或驱动程序必须向该组件提供默认值 1。 因此，如果缺少所有组件，则默认值 (0，0，0，1) 。 例如，如果将 2D 纹理坐标发送到使用 3D 纹理坐标的像素着色器，则硬件或驱动程序会分别向第 3 和第 4 个分量提供默认值 0 和 1。</p>
-  </blockquote>
-</blockquote>
-
-<h2 id="constant-buffer">Constant Buffer</h2>
-
-<p>和VertexBuffer不同的是, ConstantBuffer有字节对齐的规则: 以16字节对齐。</p>
-
-<p>并且需要遵循这么几个约定:</p>
+<h2 id="第一个窗口程序">第一个窗口程序</h2>
 
 <ul>
-  <li>
-    <ol>
-      <li>C++中的结构体数据是以字节流的形式传输给HLSL的；</li>
-    </ol>
+  <li>[Serializable]注解
+    <blockquote>
+      <p>c#里的Attribute,完全没看懂是怎么起作用的.能几句话说清楚吗? - LoyieKing的回答 - 知乎
+https://www.zhihu.com/question/308374020/answer/621704342
+https://www.cnblogs.com/for-easy-fast/p/12410686.html</p>
+    </blockquote>
+  </li>
+  <li>? 表达式
+    <blockquote>
+      <p>https://www.cnblogs.com/shanfeng1000/p/14975705.html</p>
+    </blockquote>
   </li>
   <li>
-    <ol>
-      <li>HLSL常量缓冲区中的向量不允许拆分；</li>
-    </ol>
+    <p>as关键字</p>
   </li>
-  <li>
-    <ol>
-      <li>HLSL常量缓冲区中多个相邻的变量若有空缺则优先打包进同一个4D向量中；</li>
-    </ol>
-  </li>
-  <li>
-    <ol>
-      <li>HLSL常量缓冲区中，结构体常量前面的所有常量都会被打包成4D向量，内部也进行打包操作，但结构体的最后一个成员可能会和后续的常量打包成4D向量；</li>
-    </ol>
-  </li>
-  <li>
-    <ol>
-      <li>数组中的每一个元素都会独自打包，但对于最后一个元素来说如果后续的变量不是数组、结构体且还有空缺，则可以进行打包操作。</li>
-    </ol>
+  <li>using 关键字, 回收资源
+    <blockquote>
+      <p>https://www.cnblogs.com/xiaobiexi/p/6179127.html</p>
+    </blockquote>
   </li>
 </ul>
 
-<p>see http://www.directxtutorial.com/Lesson.aspx?lessonid=112-5-5 for detail.</p>
+<h2 id="x-命名空间常用关键字">X 命名空间常用关键字</h2>
 
-<p>通常使用下面的代码创建一个buffer:</p>
-<pre><code class="language-C++">ComPtr&lt;ID3D11Buffer&gt; constantbuffer;    
-D3D11_BUFFER_DESC bd = {0};
-bd.Usage = D3D11_USAGE_DEFAULT;
-bd.ByteWidth = 16;  // float4对齐
-bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-dev-&gt;CreateBuffer(&amp;bd, nullptr, &amp;constantbuffer);
-</code></pre>
+<p>https://zhuanlan.zhihu.com/p/637297052</p>
+
+<h2 id="xaml-详解">XAML 详解</h2>
+
+<p>《深入浅出WPF第一章》</p>
 
   </div>
   
@@ -142,8 +111,8 @@ dev-&gt;CreateBuffer(&amp;bd, nullptr, &amp;constantbuffer);
   <span></span>
   <span></span>
 </div>
-<script type="text/javascript" src="/static/js/blog.js?t=20231224112352"></script>
-<script type="text/javascript" src="/static/js/search.js?t=20231224112352"></script>
+<script type="text/javascript" src="/static/js/blog.js?t=20240731210702"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20240731210702"></script>
 <!-- 腾讯MTA移动分析 -->
 <script>
   var _mtac = {performanceMonitor: 1, senseQuery: 1}

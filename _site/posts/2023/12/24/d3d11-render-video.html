@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>D3D11 渲染视频-memetao</title>
+  <title>D3D11 视频渲染中的变换（平移、缩放、裁剪、镜像、旋转）-memetao</title>
   <meta charset="utf-8" />
   <meta http-equiv="content-language" content="zh-CN" />
   <meta name="theme-color" content="#ffffff" />
@@ -12,17 +12,17 @@
   <meta name="applicable-device" content="pc,mobile">
   <meta name="google-site-verification" content="ckhUaoa05QCmWoE1FafzTBcqYI4yBOy-UJKopXDS18M" />
   <meta name="author" content="memetao" />
-  <meta name="description" content="D3D11 渲染视频"/>
+  <meta name="description" content="D3D11 视频渲染中的变换（平移、缩放、裁剪、镜像、旋转）"/>
   <meta name="keywords" content="memetao,graphics"/>
-  <link rel="stylesheet" href="/static/css/common.css?t=20231224112352">
-  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20231224112352">
-  <link rel="stylesheet" href="/static/css/post.css?t=20231224112352">
-  <link rel="stylesheet" href="/static/css/code-dark.css?t=20231224112352">
-  <link rel="stylesheet" href="/static/css/code-light.css?t=20231224112352">
+  <link rel="stylesheet" href="/static/css/common.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/post.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20240731210702">
   <script>
     window.blog = {
       baseurl:"",
-      buildAt:"20231224112352",
+      buildAt:"20240731210702",
       darkTheme: false,
       setDarkTheme: function (dark) {
         this.darkTheme = Boolean(dark);
@@ -54,14 +54,14 @@
     </nav>
 </header>
 <div class="page page-post">
-  <h1 class="title" id="D3D11 渲染视频">D3D11 渲染视频</h1>
+  <h1 class="title" id="D3D11 视频渲染中的变换（平移、缩放、裁剪、镜像、旋转）">D3D11 视频渲染中的变换（平移、缩放、裁剪、镜像、旋转）</h1>
   
   <div class="subtitle">memetao 于 2023-12-24 发布</div>
   
   <div class="post">
     <hr />
 
-<h2 id="需求描述">需求描述</h2>
+<h2 id="需求">需求</h2>
 
 <p>视频渲染通常会有如下功能:</p>
 
@@ -147,11 +147,11 @@
 
 <p>在平面坐标上，任意点P(x1,y1)，绕一个坐标点Q(x2,y2)逆时针旋转θ角度后,新的坐标设为(x, y)的计算公式：</p>
 
-<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">x</span><span class="o">=</span> <span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x2</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="err">θ</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">y1</span> <span class="o">-</span> <span class="n">y2</span><span class="p">)</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="err">θ</span><span class="p">)</span> <span class="o">+</span> <span class="n">x2</span> <span class="p">;</span>
-<span class="n">y</span><span class="o">=</span> <span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x2</span><span class="p">)</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="err">θ</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">y1</span> <span class="o">-</span> <span class="n">y2</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="err">θ</span><span class="p">)</span> <span class="o">+</span> <span class="n">y2</span> <span class="p">;</span>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">x</span><span class="o">=</span> <span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x2</span><span class="p">)</span> <span class="o">*</span> <span class="n">cos</span><span class="p">(</span><span class="err">θ</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">y1</span> <span class="o">-</span> <span class="n">y2</span><span class="p">)</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="err">θ</span><span class="p">)</span> <span class="o">+</span> <span class="n">x2</span> <span class="p">;</span>
+<span class="n">y</span><span class="o">=</span> <span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x2</span><span class="p">)</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="err">θ</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">y1</span> <span class="o">-</span> <span class="n">y2</span><span class="p">)</span> <span class="o">*</span> <span class="n">cos</span><span class="p">(</span><span class="err">θ</span><span class="p">)</span> <span class="o">+</span> <span class="n">y2</span> <span class="p">;</span>
 </code></pre></div></div>
 
-<p>这个公式可以抽象成矩阵运算。</p>
+<p>这个公式可以整理成矩阵运算。</p>
 
 <h3 id="缩放">缩放</h3>
 
@@ -161,8 +161,8 @@
 
 <p>在平面坐标上，任意点P(x1,y1)，以坐标点Q(x2,y2)缩放a倍之后,新的坐标设为(x, y)的计算公式：</p>
 
-<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">x</span><span class="o">=</span> <span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x2</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="err">θ</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">y1</span> <span class="o">-</span> <span class="n">y2</span><span class="p">)</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="err">θ</span><span class="p">)</span> <span class="o">+</span> <span class="n">x2</span> <span class="p">;</span>
-<span class="n">y</span><span class="o">=</span> <span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x2</span><span class="p">)</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="err">θ</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">y1</span> <span class="o">-</span> <span class="n">y2</span><span class="p">)</span><span class="o">*</span><span class="n">cos</span><span class="p">(</span><span class="err">θ</span><span class="p">)</span> <span class="o">+</span> <span class="n">y2</span> <span class="p">;</span>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">x</span><span class="o">=</span> <span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x2</span><span class="p">)</span> <span class="o">*</span> <span class="n">cos</span><span class="p">(</span><span class="err">θ</span><span class="p">)</span> <span class="o">-</span> <span class="p">(</span><span class="n">y1</span> <span class="o">-</span> <span class="n">y2</span><span class="p">)</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="err">θ</span><span class="p">)</span> <span class="o">+</span> <span class="n">x2</span> <span class="p">;</span>
+<span class="n">y</span><span class="o">=</span> <span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x2</span><span class="p">)</span> <span class="o">*</span> <span class="n">sin</span><span class="p">(</span><span class="err">θ</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">y1</span> <span class="o">-</span> <span class="n">y2</span><span class="p">)</span> <span class="o">*</span> <span class="n">cos</span><span class="p">(</span><span class="err">θ</span><span class="p">)</span> <span class="o">+</span> <span class="n">y2</span> <span class="p">;</span>
 </code></pre></div></div>
 
 <p>注意: 这个公式当中并没有要求P和Q的初始位置（任意位置都可以）</p>
@@ -212,6 +212,7 @@ y= y + b;
 <span class="k">static</span> <span class="kt">void</span> <span class="nf">renderVertices</span><span class="p">(</span><span class="n">SIZE</span> <span class="n">src_dimension</span><span class="p">,</span> <span class="n">RECT</span> <span class="n">source_region</span><span class="p">,</span> <span class="kt">int</span> <span class="n">rotation</span><span class="p">,</span>
                            <span class="n">Mirror</span> <span class="n">mirror_mode</span><span class="p">,</span> <span class="n">SIZE</span> <span class="n">dst_dimension</span><span class="p">,</span> <span class="n">POINT</span> <span class="n">center</span><span class="p">,</span>
                            <span class="n">VERTEX</span><span class="o">*</span> <span class="n">vertices</span><span class="p">)</span> <span class="p">{</span>
+     <span class="c1">//这里jekll不知道为什么会解析错误, 实际上需要多个花括号</span>
     <span class="k">static</span> <span class="k">const</span> <span class="n">DirectX</span><span class="o">::</span><span class="n">XMVECTORF32</span> <span class="n">points</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
         <span class="p">{</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">},</span>
         <span class="p">{</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">},</span>
@@ -270,6 +271,10 @@ y= y + b;
 
 <p>最后一个for循环将平移、缩放、旋转、镜像结合在了一起, 我尽量写的清晰。</p>
 
+<h2 id="hdr">HDR</h2>
+
+<p>太复杂了，单独开篇。</p>
+
   </div>
   
 </div>
@@ -283,8 +288,8 @@ y= y + b;
   <span></span>
   <span></span>
 </div>
-<script type="text/javascript" src="/static/js/blog.js?t=20231224112352"></script>
-<script type="text/javascript" src="/static/js/search.js?t=20231224112352"></script>
+<script type="text/javascript" src="/static/js/blog.js?t=20240731210702"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20240731210702"></script>
 <!-- 腾讯MTA移动分析 -->
 <script>
   var _mtac = {performanceMonitor: 1, senseQuery: 1}

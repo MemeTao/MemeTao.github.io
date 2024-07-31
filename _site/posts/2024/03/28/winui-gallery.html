@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WinUIGallery 刨析----HomePage-memetao</title>
+  <meta charset="utf-8" />
+  <meta http-equiv="content-language" content="zh-CN" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="supported-color-schemes" content="light dark">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="applicable-device" content="pc,mobile">
+  <meta name="google-site-verification" content="ckhUaoa05QCmWoE1FafzTBcqYI4yBOy-UJKopXDS18M" />
+  <meta name="author" content="memetao" />
+  <meta name="description" content="WinUIGallery 刨析----HomePage"/>
+  <meta name="keywords" content="memetao,WinUI3"/>
+  <link rel="stylesheet" href="/static/css/common.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/post.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20240731210702">
+  <script>
+    window.blog = {
+      baseurl:"",
+      buildAt:"20240731210702",
+      darkTheme: false,
+      setDarkTheme: function (dark) {
+        this.darkTheme = Boolean(dark);
+        document.documentElement.className = this.darkTheme ? 'dark': '';
+        document.querySelector('meta[name=theme-color]').setAttribute('content', this.darkTheme ? '#2D2E32': '#FFFFFF');
+      }
+    }
+    if (sessionStorage.darkTheme !== undefined) {
+      blog.setDarkTheme(sessionStorage.darkTheme === 'true'); // 记忆值，单个窗口内有效
+    } else {
+      blog.setDarkTheme(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches); // 跟随系统
+    }
+    if (window.matchMedia) {
+      var media = window.matchMedia('(prefers-color-scheme: dark)');
+      media.addListener(function (ev) {
+        blog.setDarkTheme(ev.currentTarget.matches);
+        sessionStorage.removeItem('darkTheme');
+      });
+    }
+  </script>
+</head>
+<body ondragstart="return false;">
+<header class="header">
+  <img class="logo" src="/static/img/logo.jpg" alt="logo"/>
+  <nav class="menu">
+    <a href="/" class="hover-underline">首页</a>
+    <a href="/pages/categories.html" class="hover-underline">归类</a>
+    <a href="/pages/about.html" class="hover-underline">关于</a>
+    </nav>
+</header>
+<div class="page page-post">
+  <h1 class="title" id="WinUIGallery 刨析----HomePage">WinUIGallery 刨析----HomePage</h1>
+  
+  <div class="subtitle">memetao 于 2024-03-28 发布</div>
+  
+  <div class="post">
+    <hr />
+
+<h2 id="homepage">HomePage</h2>
+
+<p>主页长这个样子:</p>
+
+<p><img src="home_page.png" alt="alt text" /></p>
+
+<p>首先看xaml代码(HomePage.xaml):</p>
+
+<pre><code class="language-xaml">&lt;local:ItemsPageBase
+    x:Class="AppUIBasics.HomePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:AppUIBasics.Controls"
+    xmlns:controls1="using:WinUIGallery.DesktopWap.Controls"
+    xmlns:local="using:AppUIBasics"
+    HighContrastAdjustment="None"
+    NavigationCacheMode="Enabled"&gt;
+...
+&lt;/local:ItemsPageBase&gt;
+</code></pre>
+<p>ItemsPageBase是一个继承自Page和INotifyPropertyChanged的抽象类:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="k">public</span> <span class="n">abstract</span> <span class="k">class</span> <span class="nc">ItemsPageBase</span> <span class="o">:</span> <span class="n">Page</span><span class="p">,</span> <span class="n">INotifyPropertyChanged</span> <span class="p">{</span>
+    <span class="k">public</span> <span class="n">event</span> <span class="n">PropertyChangedEventHandler</span> <span class="n">PropertyChanged</span><span class="p">;</span>
+        <span class="k">private</span> <span class="n">string</span> <span class="n">_itemId</span><span class="p">;</span>
+        <span class="k">private</span> <span class="n">IEnumerable</span><span class="o">&lt;</span><span class="n">ControlInfoDataItem</span><span class="o">&gt;</span> <span class="n">_items</span><span class="p">;</span>
+
+        <span class="k">public</span> <span class="n">IEnumerable</span><span class="o">&lt;</span><span class="n">ControlInfoDataItem</span><span class="o">&gt;</span> <span class="n">Items</span> <span class="p">{</span>
+            <span class="n">get</span> <span class="p">{</span> <span class="k">return</span> <span class="n">_items</span><span class="p">;</span> <span class="p">}</span>
+            <span class="n">set</span> <span class="p">{</span> <span class="n">SetProperty</span><span class="p">(</span><span class="n">ref</span> <span class="n">_items</span><span class="p">,</span> <span class="n">value</span><span class="p">);</span> <span class="p">}</span>
+        <span class="p">}</span>
+ <span class="p">}</span>
+</code></pre></div></div>
+
+<h3 id="propertychangedeventhandler">PropertyChangedEventHandler</h3>
+
+<p>继承了这个玩意儿之后这个Page相当于就可以作为一个Binding Source了，可以参考《深入浅出WPf》Page 84。</p>
+
+<p>这里面需要通知给外面的是 Items(它的set函数中有Notify)。</p>
+
+<div class="language-c# highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">protected</span> <span class="kt">bool</span> <span class="n">SetProperty</span><span class="p">&lt;</span><span class="n">T</span><span class="p">&gt;(</span><span class="k">ref</span> <span class="n">T</span> <span class="n">storage</span><span class="p">,</span> <span class="n">T</span> <span class="k">value</span><span class="p">,</span> <span class="p">[</span><span class="n">CallerMemberName</span><span class="p">]</span> <span class="kt">string</span> <span class="n">propertyName</span> <span class="p">=</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nf">Equals</span><span class="p">(</span><span class="n">storage</span><span class="p">,</span> <span class="k">value</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="k">false</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">storage</span> <span class="p">=</span> <span class="k">value</span><span class="p">;</span>
+    <span class="nf">NotifyPropertyChanged</span><span class="p">(</span><span class="n">propertyName</span><span class="p">);</span>
+    <span class="k">return</span> <span class="k">true</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="k">protected</span> <span class="k">void</span> <span class="nf">NotifyPropertyChanged</span><span class="p">([</span><span class="n">CallerMemberName</span><span class="p">]</span> <span class="kt">string</span> <span class="n">propertyName</span> <span class="p">=</span> <span class="k">null</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">PropertyChanged</span><span class="p">?.</span><span class="nf">Invoke</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="k">new</span> <span class="nf">PropertyChangedEventArgs</span><span class="p">(</span><span class="n">propertyName</span><span class="p">));</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>这里的[CallerMemberName]是个注解, 编译器会自动填上”Items”。</p>
+
+<p>继续往下看(HomePage.xaml)</p>
+
+<pre><code class="language-xaml">    &lt;Page.Resources&gt;
+        &lt;CollectionViewSource x:Name="itemsCVS" IsSourceGrouped="true" /&gt;
+    &lt;/Page.Resources&gt;
+</code></pre>
+
+<p>这里定义了一个资源, 名字叫做”itemCVS”, 暂时不管。</p>
+
+<pre><code class="language-xaml">&lt;Grid&gt;
+    &lt;VisualStateManager.VisualStateGroups&gt;
+        &lt;VisualStateGroup x:Name="LayoutVisualStates"&gt;
+            &lt;VisualState x:Name="WideLayout"&gt;
+                &lt;VisualState.StateTriggers&gt;
+                    &lt;AdaptiveTrigger MinWindowWidth="{StaticResource Breakpoint640Plus}" /&gt;
+                &lt;/VisualState.StateTriggers&gt;
+            &lt;/VisualState&gt;
+            &lt;VisualState x:Name="NarrowLayout"&gt;
+                &lt;VisualState.StateTriggers&gt;
+                    &lt;AdaptiveTrigger MinWindowWidth="0" /&gt;
+                &lt;/VisualState.StateTriggers&gt;
+                &lt;VisualState.Setters&gt;
+                    &lt;Setter Target="learnMoreGrid.Margin" Value="16,36,0,36" /&gt;
+                    &lt;Setter Target="itemGridView.Padding" Value="4,0,4,36" /&gt;
+                    &lt;Setter Target="itemGridView.ItemContainerStyle" Value="{StaticResource IndentedGridViewItemStyleSmall}" /&gt;
+                &lt;/VisualState.Setters&gt;
+            &lt;/VisualState&gt;
+        &lt;/VisualStateGroup&gt;
+    &lt;/VisualStateManager.VisualStateGroups&gt;
+&lt;/Grid&gt;
+</code></pre>
+<p>出现新东西了，VisualStateGroup是啥?</p>
+
+<h3 id="visualstatemanagervisualstategroups">VisualStateManager.VisualStateGroups</h3>
+
+<p>好像只是一个状态记录？</p>
+
+<h3 id="setter-是啥">setter 是啥</h3>
+
+<p>setter通常和style一起用, 一般是”属性名=属性值”的形式，就是一个”设置器”:</p>
+
+<pre><code class="language-xaml">&lt;Setter Property="FontSize" Value="24"/&gt;
+</code></pre>
+<p>举个例子:</p>
+<pre><code class="language-xaml">&lt;Style TargetType="TextBlock" x:Key="style1"&gt;
+    &lt;Style.Setters&gt;
+        &lt;Setter Property="FontSize" Value="24"/&gt;
+    &lt;/Style.Setters&gt;
+&lt;/Style&gt;
+</code></pre>
+
+<pre><code class="language-xaml">&lt;TextBlock Text="hello, style" Style="{StaticResource style1}"&gt;
+</code></pre>
+
+<p>接着往下看,</p>
+<pre><code class="language-xaml">&lt;GridView&gt;
+&lt;GridView.Header&gt;
+        &lt;Grid x:Name="HeaderGrid" Margin="-24,0,-24,0"&gt;
+            &lt;Grid.RowDefinitions&gt;
+                &lt;RowDefinition Height="204" /&gt;
+                &lt;RowDefinition Height="*" /&gt;
+            &lt;/Grid.RowDefinitions&gt;
+            &lt;controls:HomePageHeaderImage
+                Grid.RowSpan="2"
+                Height="396"
+                VerticalAlignment="Top" /&gt;
+
+            &lt;TextBlock AutomationProperties.AutomationId="__ClickableAreaTextBlock" /&gt;
+            &lt;StackPanel
+                Margin="36,0,0,0"
+                VerticalAlignment="Center"
+                Orientation="Vertical"&gt;
+                &lt;TextBlock
+                    x:Name="smallHeaderSubtitleText"
+                    FontSize="18"
+                    Text="{x:Bind WinAppSdkDetails}" /&gt;
+                &lt;TextBlock
+                    x:Name="smallHeaderText"
+                    Style="{StaticResource TitleLargeTextBlockStyle}"
+                    Text="{StaticResource AppTitleName}" /&gt;
+            &lt;/StackPanel&gt;
+
+            &lt;controls:TileGallery
+                x:Name="headerTileGallery"
+                Grid.Row="1"
+                Margin="0,0,0,0" /&gt;
+        &lt;/Grid&gt;
+    &lt;GridView.Header&gt;
+&lt;/GridView&gt;
+</code></pre>
+
+<p>在Header里面定一个了一个Grid,就是这块区域:</p>
+
+<p><img src="gridview.header.png" alt="alt text" /></p>
+<pre><code class="language-xaml">&lt;Grid x:Name="HeaderGrid" Margin="-24,0,-24,0"&gt;
+                    &lt;Grid.RowDefinitions&gt;
+                        &lt;RowDefinition Height="204" /&gt;
+                        &lt;RowDefinition Height="*" /&gt;
+                    &lt;/Grid.RowDefinitions&gt;
+                    &lt;controls:HomePageHeaderImage
+                        Grid.RowSpan="2"
+                        Height="396"
+                        VerticalAlignment="Top" /&gt;
+
+                    &lt;TextBlock AutomationProperties.AutomationId="__ClickableAreaTextBlock" /&gt;
+                    &lt;StackPanel
+                        Margin="36,0,0,0"
+                        VerticalAlignment="Center"
+                        Orientation="Vertical"&gt;
+                        &lt;TextBlock
+                            x:Name="smallHeaderSubtitleText"
+                            FontSize="18"
+                            Text="{x:Bind WinAppSdkDetails}" /&gt;
+                        &lt;TextBlock
+                            x:Name="smallHeaderText"
+                            Style="{StaticResource TitleLargeTextBlockStyle}"
+                            Text="{StaticResource AppTitleName}" /&gt;
+                    &lt;/StackPanel&gt;
+
+                    &lt;controls:TileGallery
+                        x:Name="headerTileGallery"
+                        Grid.Row="1"
+                        Margin="0,0,0,0" /&gt;
+                &lt;/Grid&gt;
+</code></pre>
+<p>定义了两行，HomePageHeaderImage横跨两行(Grid.RowSpan=”2”), StackPanel在第一行（默认？）并且包含2个字块。</p>
+
+<p>第二行就是自定义个的一个TileGallery，看上去有点复杂。</p>
+
+<p>先看这个背景图片的实现:</p>
+<pre><code class="language-xaml">&lt;controls:HomePageHeaderImage
+                        Grid.RowSpan="2"
+                        Height="396"
+                        VerticalAlignment="Top" /&gt;
+</code></pre>
+<p>它在control目录下:</p>
+<pre><code class="language-xaml">&lt;UserControl
+    x:Class="AppUIBasics.Controls.HomePageHeaderImage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:toolkit="using:CommunityToolkit.WinUI"
+    Loaded="OnLoaded"
+    Loading="OnLoading"
+    Unloaded="OnUnloaded"
+    mc:Ignorable="d"&gt;
+    &lt;UserControl.Resources&gt;
+        &lt;ResourceDictionary&gt;
+            &lt;ResourceDictionary.ThemeDictionaries&gt;
+                &lt;ResourceDictionary x:Key="Light"&gt;
+                    &lt;LinearGradientBrush x:Name="BackgroundGradient" StartPoint="0.5,0" EndPoint="0.5,1"&gt;
+                        &lt;GradientStop Offset="0.0" Color="#CED8E4" /&gt;
+                        &lt;GradientStop Offset="1.0" Color="#D5DBE3" /&gt;
+                    &lt;/LinearGradientBrush&gt;
+                &lt;/ResourceDictionary&gt;
+                &lt;ResourceDictionary x:Key="Dark"&gt;
+                    &lt;SolidColorBrush x:Key="BackgroundGradient" Color="Black" /&gt;
+                &lt;/ResourceDictionary&gt;
+                &lt;ResourceDictionary x:Key="HighContrast"&gt;
+                    &lt;SolidColorBrush x:Key="BackgroundGradient" Color="Black" /&gt;
+                &lt;/ResourceDictionary&gt;
+            &lt;/ResourceDictionary.ThemeDictionaries&gt;
+        &lt;/ResourceDictionary&gt;
+    &lt;/UserControl.Resources&gt;
+    &lt;Grid&gt;
+        &lt;Grid
+            x:Name="ImageGrid"
+            Background="{ThemeResource BackgroundGradient}"
+            Opacity="0"&gt;
+            &lt;Image
+                x:Name="HeroImage"
+                toolkit:VisualExtensions.NormalizedCenterPoint="0.5"
+                ImageOpened="OnImageOpened"
+                Source="/Assets/GalleryHeaderImage.png"
+                Stretch="UniformToFill" /&gt;
+
+            &lt;Image
+                x:Name="HeroOverlayImage"
+                toolkit:VisualExtensions.NormalizedCenterPoint="0.5"
+                Opacity="0.5"
+                Source="/Assets/GalleryHeaderImage.png"
+                Stretch="UniformToFill" /&gt;
+
+        &lt;/Grid&gt;
+        &lt;Rectangle x:Name="ImageGridSurfaceRec" Fill="Transparent" /&gt;
+    &lt;/Grid&gt;
+&lt;/UserControl&gt;
+</code></pre>
+
+<p>还没搞懂，暂时先略过。</p>
+
+<p>接着看TileGallery，也在controls目录下，代码更加复杂了，一点点分析吧。</p>
+
+<p>TitleGallery里面包了一个ScrollViewer, item是HeaderTile。主要学习一下这个绑定外部资源的方式:</p>
+
+<pre><code class="language-xaml"> &lt;local:HeaderTile
+    Title="Getting started"
+    Description="An overview of app development options, tools, and samples."
+    Link="https://learn.microsoft.com/windows/apps/get-started/"&gt;
+    &lt;local:HeaderTile.Source&gt;
+        &lt;Image Source="/Assets/HomeHeaderTiles/Header-WinUIGallery.png" /&gt;
+    &lt;/local:HeaderTile.Source&gt;
+&lt;/local:HeaderTile&gt;
+</code></pre>
+<p>这里我们看到 HeaderTile赋值了 Title、Description、Link等属性，那么它们是如何绑定到HeaderTile内部的。</p>
+
+<p>HeaderTitle内部的一个StackPanel如下：</p>
+
+<pre><code class="language-xaml">&lt;StackPanel
+    Grid.Row="1"
+    Orientation="Vertical"
+    Spacing="4"&gt;
+    &lt;TextBlock
+        x:Name="TitleText"
+        FontSize="18"
+        Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+        Style="{StaticResource BodyTextBlockStyle}"
+        Text="{x:Bind Title, Mode=OneWay}" /&gt;
+    &lt;TextBlock
+        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+        Style="{StaticResource CaptionTextBlockStyle}"
+        Text="{x:Bind Description, Mode=OneWay}" /&gt;
+&lt;/StackPanel&gt;
+</code></pre>
+
+<p>原来，Bind还可以这么用。</p>
+
+<p>HeaderTitle是一个包在Grid中的Button:</p>
+<pre><code class="language-xaml"> &lt;Grid&gt;
+    &lt;HyperlinkButton&gt;
+    ...
+    &lt;/HyperlinkButton&gt;
+ &lt;/Grid&gt;
+</code></pre>
+
+<p>这个Button内部又包含一个Grid, Grid中有FontIcon、ContentPresenter以及一个有2行TextBlock的StackPanel。</p>
+
+<p>这里ContentPresenter值得学习:</p>
+
+<pre><code class="language-xaml">&lt;ContentPresenter
+    HorizontalAlignment="Left"
+    VerticalAlignment="Top"
+    Content="{x:Bind Source, Mode=OneWay}" /&gt;
+</code></pre>
+
+<p>在外面是如何为这个 Source赋值的呢?</p>
+
+<pre><code class="language-xaml">// 一个简单的
+&lt;local:HeaderTile.Source&gt;
+    &lt;Image Source="/Assets/HomeHeaderTiles/Header-WindowsDesign.png" /&gt;
+&lt;/local:HeaderTile.Source&gt;
+
+// 一个复杂的
+&lt;local:HeaderTile.Source&gt;
+    &lt;PathIcon Data="{StaticResource GitHubIconPath}" Foreground="{ThemeResource TextFillColorPrimaryBrush}"&gt;
+        &lt;PathIcon.RenderTransform&gt;
+            &lt;CompositeTransform
+                ScaleX="2.05"
+                ScaleY="2.05"
+                TranslateX="-20" /&gt;
+        &lt;/PathIcon.RenderTransform&gt;
+    &lt;/PathIcon&gt;
+&lt;/local:HeaderTile.Source&gt;
+</code></pre>
+
+<p>到这里，HomePage中的Grid.Header的布局就大概清楚了。</p>
+
+  </div>
+  
+</div>
+<footer class="footer">
+  <span>Copyright © 2023 memetao</span>
+  <a href="/static/xml/rss.xml">RSS订阅</a>
+  <span>Theme By</span>
+  <a href="https://github.com/TMaize/tmaize-blog">TMaize</a>
+</footer>
+<div id="to-top">
+  <span></span>
+  <span></span>
+</div>
+<script type="text/javascript" src="/static/js/blog.js?t=20240731210702"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20240731210702"></script>
+<!-- 腾讯MTA移动分析 -->
+<script>
+  var _mtac = {performanceMonitor: 1, senseQuery: 1}
+  ;(function() {
+    if (window.location.hostname == '127.0.0.1') {
+      return
+    }
+    var mta = document.createElement('script')
+    mta.src = '//pingjs.qq.com/h5/stats.js?v2.0.4'
+    mta.setAttribute('name', 'MTAH5')
+    mta.setAttribute('sid', '500581966')
+    mta.setAttribute('cid', '500581972')
+    var s = document.getElementsByTagName('script')[0]
+    s.parentNode.insertBefore(mta, s)
+  })()
+</script>
+
+<!-- 百度自动推送 -->
+<script>
+  ;(function () {
+    if (window.location.hostname == '127.0.0.1') {
+      return
+    }
+    var bp = document.createElement('script')
+    var curProtocol = window.location.protocol.split(':')[0]
+    if (curProtocol === 'https') {
+      bp.src = 'https://zz.bdstatic.com/linksubmit/push.js'
+    } else {
+      bp.src = 'http://push.zhanzhang.baidu.com/push.js'
+    }
+    var s = document.getElementsByTagName('script')[0]
+    s.parentNode.insertBefore(bp, s)
+  })()
+</script>
+
+<!-- MathJax数学公式支持 -->
+<style>
+  .has-jax {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-color: transparent !important;
+    line-height: normal !important;
+    word-break: normal !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .has-jax * {
+    outline: 0;
+  }
+</style>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    showProcessingMessages: false,
+    messageStyle: "none",
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'a']
+    },
+    "HTML-CSS": {
+      showMathMenu: false
+    }
+  });
+  // 父级元素添加类名，便于css控制
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax();
+    var i = 0;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script
+  type="text/javascript"
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+></script>
+
+
+</body>
+</html>
