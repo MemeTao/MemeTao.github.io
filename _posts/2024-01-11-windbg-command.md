@@ -33,6 +33,49 @@ description:
 
 ## 断点
 
+![alt text](image.png)
+deferred的意思是"还没加载", 这时候需要用bu命令。
+
+断点支持三种语法, 虚拟地址、函数偏移、源码:
+```shell
+0:000> bp 0040108c
+0:000> bp main+5c
+0:000> bp `source.c:31`
+```
+对C++成员函数来说:
+```shell
+0:000> bp MyClass::MyMethod
+0:000> bp MyClass__MyMethod
+0:000> bp @@( MyClass::MyMethod )
+```
+
+源码路径的语法：
+```shell
+`[[Module!]Filename][:LineNumber]`
+```
+如果文件名相同, 需要加上上一级目录的名称予以区别, 否则就用第一个匹配的。
+
+总的来说, windbg的断点难用的很。
+
+条件断点的语法更是惨绝人寰，不建议使用。
+
+## Reading and Writing Memory
+
+内存可以通过地址或者变量名直接引用。
+
+读命令: d*(d是display的意思)
+
+![alt text](image-2.png)
+
+![alt text](image-3.png)
+
+```shell
+# mmhighestuseraddress是一个变量, 查看这个变量的地址
+kd> dp nt!mmhighestuseraddress L1
+81f71864  7ffeffff
+```
+这表明用户态的地址空间上限是0x7FFEFFFF(32位系统)
+
 ## 内存泄露
 
 查看内存使用情况:
