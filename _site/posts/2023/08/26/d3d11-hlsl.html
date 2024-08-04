@@ -14,15 +14,15 @@
   <meta name="author" content="memetao" />
   <meta name="description" content="D3D11 HLSL注意项"/>
   <meta name="keywords" content="memetao,graphics"/>
-  <link rel="stylesheet" href="/static/css/common.css?t=20240731210702">
-  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20240731210702">
-  <link rel="stylesheet" href="/static/css/post.css?t=20240731210702">
-  <link rel="stylesheet" href="/static/css/code-dark.css?t=20240731210702">
-  <link rel="stylesheet" href="/static/css/code-light.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/common.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/post.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20240804112431">
   <script>
     window.blog = {
       baseurl:"",
-      buildAt:"20240731210702",
+      buildAt:"20240804112431",
       darkTheme: false,
       setDarkTheme: function (dark) {
         this.darkTheme = Boolean(dark);
@@ -60,6 +60,65 @@
   
   <div class="post">
     <hr />
+
+<h2 id="纹理">纹理</h2>
+
+<h3 id="dxgi-format对应hlsl中的类型">DXGI FORMAT对应HLSL中的类型</h3>
+<p>| DXGI                           | HLSL         |
+| —————————— | ———— |
+| DXGI_FORMAT_R32_FLOAT          | float        |
+| DXGI_FORMAT_R32G32_FLOAT       | float2       |
+| DXGI_FORMAT_R32G32B32A32_FLOAT | float4       |
+| DXGI_FORMAT_R32_UINT           | uint         |
+| DXGI_FORMAT_R32G32_UINT        | uint2        |
+| DXGI_FORMAT_R32G32B32A32_UINT  | uint4        |
+| DXGI_FORMAT_R32_SINT           | int          |
+| DXGI_FORMAT_R32G32_SINT        | int2         |
+| DXGI_FORMAT_R32G32B32A32_SINT  | int4         |
+| DXGI_FORMAT_R16G16B16A16_FLOAT | float4       |
+| DXGI_FORMAT_R8G8B8A8_UNORM     | unorm float4 |
+| DXGI_FORMAT_R8G8B8A8_SNORM     | snorm float4 |</p>
+
+<p>其中unorm float表示的是一个32位无符号的，规格化的浮点数，可以表示范围0到1
+而与之对应的snorm float表示的是32位有符号的，规格化的浮点数，可以表示范围-1到1</p>
+
+<h3 id="usage">USAGE</h3>
+<p>| D3D11_USAGE           | CPU读 | CPU写 | GPU读 | GPU写 |
+| ——————— | —– | —– | —– | —– |
+| D3D11_USAGE_DEFAULT   |       |       | √     | √     |
+| D3D11_USAGE_IMMUTABLE | √     |       |       |       |
+| D3D11_USAGE_DYNAMIC   |       | √     | √     |       |
+| D3D11_USAGE_STAGING   | √     | √     | √     | √     |</p>
+
+<h3 id="bindflag">BindFlag</h3>
+<p>| D3D11_BIND_FLAG             | 描述                                                        |
+| ————————— | ———————————————————– |
+| D3D11_BIND_SHADER_RESOURCE  | 纹理可以作为着色器资源绑定到渲染管线                        |
+| D3D11_BIND_STREAM_OUTPUT    | 纹理可以作为流输出阶段的输出点                              |
+| D3D11_BIND_RENDER_TARGET    | 纹理可以作为渲染目标的输出点，并且指定它可以用于生成mipmaps |
+| D3D11_BIND_DEPTH_STENCIL    | 纹理可以作为深度/模板缓冲区                                 |
+| D3D11_BIND_UNORDERED_ACCESS | 纹理可以绑定到无序访问视图作为输出                          |</p>
+
+<h3 id="cpu-acess">CPU ACESS</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>D3D11_CPU_ACCESS_FLAG</th>
+      <th>描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>D3D11_CPU_ACCESS_WRITE</td>
+      <td>允许通过映射方式从CPU写入，它不能作为管线的输出，且只能用于D3D11_USAGE_DYNAMIC和D3D11_USAGE_STAGING绑定的资源</td>
+    </tr>
+    <tr>
+      <td>D3D11_CPU_ACCESS_READ</td>
+      <td>允许通过映射方式给CPU读取，它不能作为管线的输入或输出，且只能用于D3D11_USAGE_STAGING绑定的资源</td>
+    </tr>
+  </tbody>
+</table>
 
 <h3 id="vertex-shadler">Vertex Shadler</h3>
 
@@ -158,6 +217,12 @@ IASetVertexBuffers(vertex_buf_);
 
 <p>不知道用什么工具可以对GPU数据进行DEBUG呢？</p>
 
+<h2 id="参考文档">参考文档</h2>
+
+<ul>
+  <li>https://www.cnblogs.com/X-Jun/p/10262524.html</li>
+</ul>
+
   </div>
   
 </div>
@@ -171,8 +236,8 @@ IASetVertexBuffers(vertex_buf_);
   <span></span>
   <span></span>
 </div>
-<script type="text/javascript" src="/static/js/blog.js?t=20240731210702"></script>
-<script type="text/javascript" src="/static/js/search.js?t=20240731210702"></script>
+<script type="text/javascript" src="/static/js/blog.js?t=20240804112431"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20240804112431"></script>
 <!-- 腾讯MTA移动分析 -->
 <script>
   var _mtac = {performanceMonitor: 1, senseQuery: 1}

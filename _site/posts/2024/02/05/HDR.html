@@ -20,6 +20,12 @@
 
 <p>https://zhuanlan.zhihu.com/p/142377883</p>
 
+<p>### ICC 文件</p>
+
+<blockquote>
+  <p>所以我们在描述一个 RGB 颜色的时候，不仅需要描述它的 RGB 三个分量，还要说明是在哪个空间，这就是 ICC 文件的作用。</p>
+</blockquote>
+
 <h2 id="色域马蹄图的产生">色域马蹄图的产生</h2>
 
 <ul>
@@ -27,7 +33,9 @@
   <li>https://zhuanlan.zhihu.com/p/137639368</li>
 </ul>
 
-<h2 id="hdr-元数据">HDR 元数据</h2>
+<h2 id="hdr">HDR</h2>
+
+<h3 id="hdr-元数据">HDR 元数据</h3>
 
 <p>https://zhuanlan.zhihu.com/p/524890604</p>
 
@@ -35,15 +43,13 @@
   <p>HDR设置和传输元数据metadata的目的，是想告诉视频使用者额外一些该视频的特性和信息，比如说画面的峰值亮度是多少。当某个显示器不支持这么高的峰值亮度时(比如HDR内容在SDR显示器上显示)，就需要考虑该如何合理恰当的做tone mapping色调映射，从而使不同内容的画面可以正常显示，而不至于出现过曝或其他画面问题。</p>
 </blockquote>
 
-<h2 id="重要术语">重要术语</h2>
+<h3 id="oetf-和-eotf">OETF 和 EOTF</h3>
 
-<ul>
-  <li>ICC 文件
-    <blockquote>
-      <p>所以我们在描述一个 RGB 颜色的时候，不仅需要描述它的 RGB 三个分量，还要说明是在哪个空间，这就是 ICC 文件的作用。</p>
-    </blockquote>
-  </li>
-</ul>
+<blockquote>
+  <blockquote>
+    <p>摄像头感应自然场景中光的变化用电信号存储下来，显示器把电信号转换成屏幕光信号展示出来，这个传递光的过程就叫传递函数。传递函数包含三个变换，相机采集线性光信号压缩成暗部细节更多的非线性电信号叫做光电转换(OETF)，屏幕显示时解压缩的过程叫做电光转换(EOTF)，修正相机环境和屏幕环境的亮度差异叫做光光转换(OOTF)。OETF、EOTF、OOTF中O是光optical的缩写、E是电electro的缩写、TF是传递函数transfer funciton的缩写。</p>
+  </blockquote>
+</blockquote>
 
 <h2 id="待解问题">待解问题</h2>
 

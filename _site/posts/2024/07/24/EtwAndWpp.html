@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Windbg 常用命令-memetao</title>
+  <title>ETW 和 WPP-memetao</title>
   <meta charset="utf-8" />
   <meta http-equiv="content-language" content="zh-CN" />
   <meta name="theme-color" content="#ffffff" />
@@ -12,17 +12,17 @@
   <meta name="applicable-device" content="pc,mobile">
   <meta name="google-site-verification" content="ckhUaoa05QCmWoE1FafzTBcqYI4yBOy-UJKopXDS18M" />
   <meta name="author" content="memetao" />
-  <meta name="description" content="Windbg 常用命令"/>
+  <meta name="description" content="ETW 和 WPP"/>
   <meta name="keywords" content="memetao,windows"/>
-  <link rel="stylesheet" href="/static/css/common.css?t=20240731210702">
-  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20240731210702">
-  <link rel="stylesheet" href="/static/css/post.css?t=20240731210702">
-  <link rel="stylesheet" href="/static/css/code-dark.css?t=20240731210702">
-  <link rel="stylesheet" href="/static/css/code-light.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/common.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/post.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20240804112431">
   <script>
     window.blog = {
       baseurl:"",
-      buildAt:"20240731210702",
+      buildAt:"20240804112431",
       darkTheme: false,
       setDarkTheme: function (dark) {
         this.darkTheme = Boolean(dark);
@@ -54,43 +54,14 @@
     </nav>
 </header>
 <div class="page page-post">
-  <h1 class="title" id="Windbg 常用命令">Windbg 常用命令</h1>
+  <h1 class="title" id="ETW 和 WPP">ETW 和 WPP</h1>
   
-  <div class="subtitle">memetao 于 2023-06-22 发布</div>
+  <div class="subtitle">memetao 于 2024-07-24 发布</div>
   
   <div class="post">
     <hr />
 
-<h2 id="排查野指针">排查野指针</h2>
-
-<p>前提: 开启Gflag全页堆</p>
-
-<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 堆栈</span>
-<span class="n">VZVCamDshow</span><span class="o">!</span><span class="n">DllMain</span><span class="o">+</span><span class="mh">0xd8d</span><span class="o">:</span>
-<span class="mo">00007</span><span class="n">ffe</span><span class="err">`</span><span class="mx">7270313d</span> <span class="mi">8982</span><span class="n">d8000000</span>    <span class="n">mov</span>     <span class="n">dword</span> <span class="n">ptr</span> <span class="p">[</span><span class="n">rdx</span><span class="o">+</span><span class="mi">0</span><span class="n">D8h</span><span class="p">],</span><span class="n">eax</span> <span class="n">ds</span><span class="o">:</span><span class="mo">00000267</span><span class="err">`</span><span class="n">e03d0fd8</span><span class="o">=????????</span>
-</code></pre></div></div>
-<p>访问 00000267`e03d0fd8时crash, 先看一下这个地址的情况。</p>
-
-<blockquote>
-  <blockquote>
-    <p>!address 00000267`e03d0fd8</p>
-  </blockquote>
-</blockquote>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Usage:                  PageHeap
-Base Address:           00000267<span class="sb">`</span>e03cf000
-End Address:            00000267<span class="sb">`</span>e03d2000
-Region Size:            00000000<span class="sb">`</span>00003000 <span class="o">(</span>  12.000 kB<span class="o">)</span>
-State:                  00002000          MEM_RESERVE
-Protect:                &lt;info not present at the target&gt;
-Type:                   00020000          MEM_PRIVATE
-Allocation Base:        00000267<span class="sb">`</span>e0160000
-Allocation Protect:     00000001          PAGE_NOACCESS
-More info:              <span class="o">!</span>heap <span class="nt">-p</span> 0x267fbcd1000
-More info:              <span class="o">!</span>heap <span class="nt">-p</span> <span class="nt">-a</span> 0x267e03d0fd8
-
-
-</code></pre></div></div>
+<h2 id="todo">TODO</h2>
 
   </div>
   
@@ -105,8 +76,8 @@ More info:              <span class="o">!</span>heap <span class="nt">-p</span> 
   <span></span>
   <span></span>
 </div>
-<script type="text/javascript" src="/static/js/blog.js?t=20240731210702"></script>
-<script type="text/javascript" src="/static/js/search.js?t=20240731210702"></script>
+<script type="text/javascript" src="/static/js/blog.js?t=20240804112431"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20240804112431"></script>
 <!-- 腾讯MTA移动分析 -->
 <script>
   var _mtac = {performanceMonitor: 1, senseQuery: 1}

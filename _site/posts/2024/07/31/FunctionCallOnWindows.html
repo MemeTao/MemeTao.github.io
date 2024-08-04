@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>函数调用与寄存器-memetao</title>
+  <meta charset="utf-8" />
+  <meta http-equiv="content-language" content="zh-CN" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="supported-color-schemes" content="light dark">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="applicable-device" content="pc,mobile">
+  <meta name="google-site-verification" content="ckhUaoa05QCmWoE1FafzTBcqYI4yBOy-UJKopXDS18M" />
+  <meta name="author" content="memetao" />
+  <meta name="description" content="函数调用与寄存器"/>
+  <meta name="keywords" content="memetao,windows"/>
+  <link rel="stylesheet" href="/static/css/common.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/post.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20240804112431">
+  <script>
+    window.blog = {
+      baseurl:"",
+      buildAt:"20240804112431",
+      darkTheme: false,
+      setDarkTheme: function (dark) {
+        this.darkTheme = Boolean(dark);
+        document.documentElement.className = this.darkTheme ? 'dark': '';
+        document.querySelector('meta[name=theme-color]').setAttribute('content', this.darkTheme ? '#2D2E32': '#FFFFFF');
+      }
+    }
+    if (sessionStorage.darkTheme !== undefined) {
+      blog.setDarkTheme(sessionStorage.darkTheme === 'true'); // 记忆值，单个窗口内有效
+    } else {
+      blog.setDarkTheme(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches); // 跟随系统
+    }
+    if (window.matchMedia) {
+      var media = window.matchMedia('(prefers-color-scheme: dark)');
+      media.addListener(function (ev) {
+        blog.setDarkTheme(ev.currentTarget.matches);
+        sessionStorage.removeItem('darkTheme');
+      });
+    }
+  </script>
+</head>
+<body ondragstart="return false;">
+<header class="header">
+  <img class="logo" src="/static/img/logo.jpg" alt="logo"/>
+  <nav class="menu">
+    <a href="/" class="hover-underline">首页</a>
+    <a href="/pages/categories.html" class="hover-underline">归类</a>
+    <a href="/pages/about.html" class="hover-underline">关于</a>
+    </nav>
+</header>
+<div class="page page-post">
+  <h1 class="title" id="函数调用与寄存器">函数调用与寄存器</h1>
+  
+  <div class="subtitle">memetao 于 2024-07-31 发布</div>
+  
+  <div class="post">
+    <hr />
+
+<h2 id="寄存器">寄存器</h2>
+
+<p>32位操作系统的寄存器:
+<img src="image-1.png" alt="alt text" /></p>
+
+<p>大部分EXE都是64位了, 这里只记录64的情况:</p>
+
+<p><img src="image-2.png" alt="alt text" /></p>
+
+<p><strong>MSVC使用RSP作为栈顶指针(注意栈的增长方向)。</strong></p>
+
+<h2 id="函数调用约定">函数调用约定</h2>
+
+<p><img src="image-3.png" alt="alt text" /></p>
+
+<p>C/C++代码默认使用__cdecl约定。x86的程序中, 参数的转递是靠栈, x64中参数的传递是靠寄存器, 只有当参数个数大于6时才回使用栈。</p>
+
+<p><img src="image-4.png" alt="alt text" /></p>
+
+<h2 id="函数调用过程">函数调用过程</h2>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">class</span> <span class="nc">FunctionCall</span> <span class="p">{</span>
+<span class="nl">public:</span>
+    <span class="kt">void</span> <span class="n">foo</span><span class="p">(</span><span class="kt">int</span> <span class="n">a1</span><span class="p">,</span> <span class="kt">int</span> <span class="n">a2</span><span class="p">,</span> <span class="kt">float</span> <span class="n">f1</span><span class="p">,</span> <span class="kt">float</span> <span class="n">f2</span><span class="p">,</span> <span class="kt">int</span> <span class="n">a3</span><span class="p">,</span> <span class="kt">int</span> <span class="n">a4</span><span class="p">,</span> <span class="kt">int</span> <span class="n">a5</span><span class="p">)</span> <span class="p">{</span>
+        <span class="n">std</span><span class="o">::</span><span class="n">printf</span><span class="p">(</span><span class="s">"a1:%d, %d, %0.2f, %0.2f, %d, %d, %d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">a1</span><span class="p">,</span> <span class="n">a2</span><span class="p">,</span> <span class="n">f1</span><span class="p">,</span> <span class="n">f2</span><span class="p">,</span> <span class="n">a3</span><span class="p">,</span> <span class="n">a4</span><span class="p">,</span> <span class="n">a5</span><span class="p">);</span>
+    <span class="p">}</span>
+
+<span class="k">private</span><span class="o">:</span>
+    <span class="kt">int</span> <span class="n">a_</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="n">FunctionCall</span> <span class="n">call</span><span class="p">;</span>
+    <span class="n">call</span><span class="p">.</span><span class="n">foo</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mf">3.0</span><span class="p">,</span> <span class="mf">4.0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">);</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<p>汇编代码解释：</p>
+
+<div class="language-nasm highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">00007</span><span class="nf">FF7DEB96E14</span>  <span class="nv">lea</span>         <span class="nb">rcx</span><span class="p">,[</span><span class="nv">call</span><span class="p">]</span> 
+<span class="err">00007</span><span class="nf">FF7DEB96E19</span>  <span class="nv">call</span>        <span class="nv">FunctionCall</span><span class="p">::</span><span class="nv">FunctionCall</span> <span class="p">(</span><span class="mh">07FF7DEB91299h</span><span class="p">)</span>  
+<span class="err">00007</span><span class="nf">FF7DEB96E1E</span>  <span class="nv">mov</span>         <span class="kt">dword</span> <span class="nv">ptr</span> <span class="p">[</span><span class="nb">rsp</span><span class="o">+</span><span class="mh">38h</span><span class="p">],</span><span class="mi">7</span>  <span class="err">#</span> <span class="err">参数入栈</span><span class="p">,</span> <span class="err">注意入栈顺序</span>
+<span class="err">00007</span><span class="nf">FF7DEB96E26</span>  <span class="nv">mov</span>         <span class="kt">dword</span> <span class="nv">ptr</span> <span class="p">[</span><span class="nb">rsp</span><span class="o">+</span><span class="mh">30h</span><span class="p">],</span><span class="mi">6</span>  
+<span class="err">00007</span><span class="nf">FF7DEB96E2E</span>  <span class="nv">mov</span>         <span class="kt">dword</span> <span class="nv">ptr</span> <span class="p">[</span><span class="nb">rsp</span><span class="o">+</span><span class="mh">28h</span><span class="p">],</span><span class="mi">5</span>  
+<span class="err">00007</span><span class="nf">FF7DEB96E36</span>  <span class="nv">movss</span>       <span class="nv">xmm0</span><span class="p">,</span><span class="kt">dword</span> <span class="nv">ptr</span> <span class="p">[</span><span class="nv">__real@40800000</span> <span class="p">(</span><span class="mh">07FF7DEB9B144h</span><span class="p">)]</span>  <span class="err">#</span> <span class="err">浮点数放到</span><span class="nv">xmm0</span><span class="o">-</span><span class="nv">xmm3</span><span class="err">寄存器</span>
+<span class="err">00007</span><span class="nf">FF7DEB96E3E</span>  <span class="nv">movss</span>       <span class="kt">dword</span> <span class="nv">ptr</span> <span class="p">[</span><span class="nb">rsp</span><span class="o">+</span><span class="mh">20h</span><span class="p">],</span><span class="nv">xmm0</span>  
+<span class="err">00007</span><span class="nf">FF7DEB96E44</span>  <span class="nv">movss</span>       <span class="nv">xmm3</span><span class="p">,</span><span class="kt">dword</span> <span class="nv">ptr</span> <span class="p">[</span><span class="nv">__real@40400000</span> <span class="p">(</span><span class="mh">07FF7DEB9B140h</span><span class="p">)]</span>  
+<span class="err">00007</span><span class="nf">FF7DEB96E4C</span>  <span class="nv">mov</span>         <span class="nb">r8d</span><span class="p">,</span><span class="mi">2</span>  <span class="err">#因为只有</span><span class="mi">2</span><span class="err">个整形</span><span class="p">,</span> <span class="err">所以只用了</span><span class="nb">edx</span><span class="err">和</span><span class="nv">r8</span><span class="err">寄存器</span>
+<span class="err">00007</span><span class="nf">FF7DEB96E52</span>  <span class="nv">mov</span>         <span class="nb">edx</span><span class="p">,</span><span class="mi">1</span>  
+<span class="err">00007</span><span class="nf">FF7DEB96E57</span>  <span class="nv">lea</span>         <span class="nb">rcx</span><span class="p">,[</span><span class="nv">call</span><span class="p">]</span>   <span class="err">#取</span><span class="nv">call</span><span class="err">变量的地址</span><span class="p">,</span><span class="err">也就是</span><span class="nv">this</span><span class="err">指针的值到</span><span class="nb">rcx</span><span class="err">寄存器</span>
+<span class="err">00007</span><span class="nf">FF7DEB96E5C</span>  <span class="nv">call</span>        <span class="nv">FunctionCall</span><span class="p">::</span><span class="nv">foo</span> <span class="p">(</span><span class="mh">07FF7DEB91294h</span><span class="p">)</span> <span class="err">#</span> <span class="nv">call</span>
+</code></pre></div></div>
+
+  </div>
+  
+</div>
+<footer class="footer">
+  <span>Copyright © 2023 memetao</span>
+  <a href="/static/xml/rss.xml">RSS订阅</a>
+  <span>Theme By</span>
+  <a href="https://github.com/TMaize/tmaize-blog">TMaize</a>
+</footer>
+<div id="to-top">
+  <span></span>
+  <span></span>
+</div>
+<script type="text/javascript" src="/static/js/blog.js?t=20240804112431"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20240804112431"></script>
+<!-- 腾讯MTA移动分析 -->
+<script>
+  var _mtac = {performanceMonitor: 1, senseQuery: 1}
+  ;(function() {
+    if (window.location.hostname == '127.0.0.1') {
+      return
+    }
+    var mta = document.createElement('script')
+    mta.src = '//pingjs.qq.com/h5/stats.js?v2.0.4'
+    mta.setAttribute('name', 'MTAH5')
+    mta.setAttribute('sid', '500581966')
+    mta.setAttribute('cid', '500581972')
+    var s = document.getElementsByTagName('script')[0]
+    s.parentNode.insertBefore(mta, s)
+  })()
+</script>
+
+<!-- 百度自动推送 -->
+<script>
+  ;(function () {
+    if (window.location.hostname == '127.0.0.1') {
+      return
+    }
+    var bp = document.createElement('script')
+    var curProtocol = window.location.protocol.split(':')[0]
+    if (curProtocol === 'https') {
+      bp.src = 'https://zz.bdstatic.com/linksubmit/push.js'
+    } else {
+      bp.src = 'http://push.zhanzhang.baidu.com/push.js'
+    }
+    var s = document.getElementsByTagName('script')[0]
+    s.parentNode.insertBefore(bp, s)
+  })()
+</script>
+
+<!-- MathJax数学公式支持 -->
+<style>
+  .has-jax {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-color: transparent !important;
+    line-height: normal !important;
+    word-break: normal !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .has-jax * {
+    outline: 0;
+  }
+</style>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    showProcessingMessages: false,
+    messageStyle: "none",
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'a']
+    },
+    "HTML-CSS": {
+      showMathMenu: false
+    }
+  });
+  // 父级元素添加类名，便于css控制
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax();
+    var i = 0;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script
+  type="text/javascript"
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+></script>
+
+
+</body>
+</html>

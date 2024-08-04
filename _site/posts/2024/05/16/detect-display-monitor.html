@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>显示器插拔通知-memetao</title>
+  <meta charset="utf-8" />
+  <meta http-equiv="content-language" content="zh-CN" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="supported-color-schemes" content="light dark">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="applicable-device" content="pc,mobile">
+  <meta name="google-site-verification" content="ckhUaoa05QCmWoE1FafzTBcqYI4yBOy-UJKopXDS18M" />
+  <meta name="author" content="memetao" />
+  <meta name="description" content="显示器插拔通知"/>
+  <meta name="keywords" content="memetao,windows"/>
+  <link rel="stylesheet" href="/static/css/common.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/post.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20240804112431">
+  <script>
+    window.blog = {
+      baseurl:"",
+      buildAt:"20240804112431",
+      darkTheme: false,
+      setDarkTheme: function (dark) {
+        this.darkTheme = Boolean(dark);
+        document.documentElement.className = this.darkTheme ? 'dark': '';
+        document.querySelector('meta[name=theme-color]').setAttribute('content', this.darkTheme ? '#2D2E32': '#FFFFFF');
+      }
+    }
+    if (sessionStorage.darkTheme !== undefined) {
+      blog.setDarkTheme(sessionStorage.darkTheme === 'true'); // 记忆值，单个窗口内有效
+    } else {
+      blog.setDarkTheme(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches); // 跟随系统
+    }
+    if (window.matchMedia) {
+      var media = window.matchMedia('(prefers-color-scheme: dark)');
+      media.addListener(function (ev) {
+        blog.setDarkTheme(ev.currentTarget.matches);
+        sessionStorage.removeItem('darkTheme');
+      });
+    }
+  </script>
+</head>
+<body ondragstart="return false;">
+<header class="header">
+  <img class="logo" src="/static/img/logo.jpg" alt="logo"/>
+  <nav class="menu">
+    <a href="/" class="hover-underline">首页</a>
+    <a href="/pages/categories.html" class="hover-underline">归类</a>
+    <a href="/pages/about.html" class="hover-underline">关于</a>
+    </nav>
+</header>
+<div class="page page-post">
+  <h1 class="title" id="显示器插拔通知">显示器插拔通知</h1>
+  
+  <div class="subtitle">memetao 于 2024-05-16 发布</div>
+  
+  <div class="post">
+    <hr />
+
+<h2 id="向windows注册显示器设备事件">向windows注册显示器设备事件</h2>
+
+<p>GUID 是固定的, 可以从微软文档查到</p>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">static</span> <span class="n">GUID</span> <span class="n">monitor_guid</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span><span class="p">)</span><span class="mh">0xE6F07B5F</span><span class="p">,</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">short</span><span class="p">)</span><span class="mh">0xEE97</span><span class="p">,</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">short</span><span class="p">)</span><span class="mh">0x4a90</span><span class="p">,</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="p">)</span><span class="mh">0xB0</span><span class="p">,</span>
+    <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="p">)</span><span class="mh">0x76</span><span class="p">,</span>       <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="p">)</span><span class="mh">0x33</span><span class="p">,</span>    <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="p">)</span><span class="mh">0xF5</span><span class="p">,</span>    <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="p">)</span><span class="mh">0x7B</span><span class="p">,</span>
+    <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="p">)</span><span class="mh">0xF4</span><span class="p">,</span>       <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="p">)</span><span class="mh">0xEA</span><span class="p">,</span>    <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="p">)</span><span class="mh">0xA7</span><span class="p">};</span>
+
+<span class="c1">// For informational messages and window titles.</span>
+<span class="n">PWSTR</span> <span class="n">g_pszAppName</span><span class="p">;</span>
+
+<span class="n">BOOL</span> <span class="nf">DoRegisterDeviceInterfaceToHwnd</span><span class="p">(</span><span class="n">IN</span> <span class="n">GUID</span> <span class="n">InterfaceClassGuid</span><span class="p">,</span> <span class="n">IN</span> <span class="n">HWND</span> <span class="n">hWnd</span><span class="p">,</span>
+                                     <span class="n">OUT</span> <span class="n">HDEVNOTIFY</span><span class="o">*</span> <span class="n">hDeviceNotify</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">DEV_BROADCAST_DEVICEINTERFACE</span> <span class="n">NotificationFilter</span><span class="p">;</span>
+
+    <span class="n">ZeroMemory</span><span class="p">(</span><span class="o">&amp;</span><span class="n">NotificationFilter</span><span class="p">,</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">NotificationFilter</span><span class="p">));</span>
+    <span class="n">NotificationFilter</span><span class="p">.</span><span class="n">dbcc_size</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">DEV_BROADCAST_DEVICEINTERFACE</span><span class="p">);</span>
+    <span class="n">NotificationFilter</span><span class="p">.</span><span class="n">dbcc_devicetype</span> <span class="o">=</span> <span class="n">DBT_DEVTYP_DEVICEINTERFACE</span><span class="p">;</span>
+    <span class="n">NotificationFilter</span><span class="p">.</span><span class="n">dbcc_classguid</span> <span class="o">=</span> <span class="n">InterfaceClassGuid</span><span class="p">;</span>
+
+    <span class="o">*</span><span class="n">hDeviceNotify</span> <span class="o">=</span>
+        <span class="n">RegisterDeviceNotification</span><span class="p">(</span><span class="n">hWnd</span><span class="p">,</span>                       <span class="c1">// events recipient</span>
+                                   <span class="o">&amp;</span><span class="n">NotificationFilter</span><span class="p">,</span>        <span class="c1">// type of device</span>
+                                   <span class="n">DEVICE_NOTIFY_WINDOW_HANDLE</span> <span class="c1">// type of recipient handle</span>
+        <span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">NULL</span> <span class="o">==</span> <span class="o">*</span><span class="n">hDeviceNotify</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">return</span> <span class="n">TRUE</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<h2 id="处理pdev_broadcast_hdr消息">处理PDEV_BROADCAST_HDR消息</h2>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">bool</span> <span class="nf">onDeviceChanged</span><span class="p">(</span><span class="n">WPARAM</span> <span class="n">wParam</span><span class="p">,</span> <span class="n">LPARAM</span> <span class="n">lParam</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">PDEV_BROADCAST_HDR</span> <span class="n">lpdb</span> <span class="o">=</span> <span class="p">(</span><span class="n">PDEV_BROADCAST_HDR</span><span class="p">)</span><span class="n">lParam</span><span class="p">;</span>
+    <span class="k">switch</span> <span class="p">(</span><span class="n">wParam</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="n">DBT_DEVICEARRIVAL</span><span class="p">:</span>
+    <span class="p">{</span>
+        <span class="k">auto</span> <span class="n">devicetype</span> <span class="o">=</span> <span class="n">lpdb</span><span class="o">-&gt;</span><span class="n">dbch_devicetype</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">devicetype</span> <span class="o">==</span> <span class="n">DBT_DEVTYP_DEVICEINTERFACE</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">auto</span><span class="o">*</span> <span class="n">lptr</span> <span class="o">=</span> <span class="p">(</span><span class="n">PDEV_BROADCAST_DEVICEINTERFACE</span><span class="p">)</span><span class="n">lParam</span><span class="p">;</span>
+            <span class="n">lptr</span><span class="o">-&gt;</span><span class="n">dbcc_name</span><span class="p">;</span>
+            <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">case</span> <span class="n">DBT_DEVICEREMOVECOMPLETE</span><span class="p">:</span>
+    <span class="p">{</span>
+        <span class="k">auto</span> <span class="n">devicetype</span> <span class="o">=</span> <span class="n">lpdb</span><span class="o">-&gt;</span><span class="n">dbch_devicetype</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">devicetype</span> <span class="o">==</span> <span class="n">DBT_DEVTYP_DEVICEINTERFACE</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">auto</span><span class="o">*</span> <span class="n">lptr</span> <span class="o">=</span> <span class="p">(</span><span class="n">PDEV_BROADCAST_DEVICEINTERFACE</span><span class="p">)</span><span class="n">lParam</span><span class="p">;</span>
+            <span class="n">lptr</span><span class="o">-&gt;</span><span class="n">dbcc_name</span><span class="p">;</span>
+            <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span> <span class="k">break</span><span class="p">;</span>
+    <span class="k">default</span><span class="o">:</span>
+        <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// this is the main message handler for the program</span>
+<span class="n">LRESULT</span> <span class="n">CALLBACK</span> <span class="nf">WindowProc2</span><span class="p">(</span><span class="n">HWND</span> <span class="n">hWnd</span><span class="p">,</span> <span class="n">UINT</span> <span class="n">message</span><span class="p">,</span> <span class="n">WPARAM</span> <span class="n">wParam</span><span class="p">,</span> <span class="n">LPARAM</span> <span class="n">lParam</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">static</span> <span class="n">HDEVNOTIFY</span> <span class="n">hDeviceNotify</span><span class="p">;</span>
+    <span class="k">static</span> <span class="n">HWND</span> <span class="n">hEditWnd</span><span class="p">;</span>
+    <span class="k">static</span> <span class="n">ULONGLONG</span> <span class="n">msgCount</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="c1">// sort through and find what code to run for the message given</span>
+    <span class="k">switch</span> <span class="p">(</span><span class="n">message</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">case</span> <span class="n">WM_CREATE</span><span class="p">:</span>
+        <span class="n">DoRegisterDeviceInterfaceToHwnd</span><span class="p">(</span><span class="n">monitor_guid</span><span class="p">,</span> <span class="n">hWnd</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">hDeviceNotify</span><span class="p">);</span>
+        <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="n">WM_DEVICECHANGE</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">onDeviceChanged</span><span class="p">(</span><span class="n">wParam</span><span class="p">,</span> <span class="n">lParam</span><span class="p">))</span> <span class="p">{</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="p">}</span>
+        <span class="k">break</span><span class="p">;</span>
+    <span class="k">case</span> <span class="n">WM_DESTROY</span><span class="p">:</span>
+        <span class="c1">// close the application entirely</span>
+        <span class="n">PostQuitMessage</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+        <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nf">DefWindowProc</span><span class="p">(</span><span class="n">hWnd</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">wParam</span><span class="p">,</span> <span class="n">lParam</span><span class="p">);</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+
+<p>这里获取的dbcc_name可以和这个device_name对比:</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;;</span> <span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">1024</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">GetMonitorInfo</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">buf</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="n">BOOL</span> <span class="nf">GetMonitorInfo</span><span class="p">(</span><span class="kt">int</span> <span class="n">nDeviceIndex</span><span class="p">,</span> <span class="n">LPSTR</span> <span class="n">lpszMonitorInfo</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">DISPLAY_DEVICE</span> <span class="n">DispDev</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+    <span class="n">DispDev</span><span class="p">.</span><span class="n">cb</span> <span class="o">=</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">DISPLAY_DEVICE</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">EnumDisplayDevices</span><span class="p">(</span><span class="nb">nullptr</span><span class="p">,</span> <span class="n">nDeviceIndex</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">DispDev</span><span class="p">,</span> <span class="n">EDD_GET_DEVICE_INTERFACE_NAME</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="kt">char</span> <span class="n">szDeviceName</span><span class="p">[</span><span class="mi">32</span><span class="p">];</span>
+    <span class="n">lstrcpy</span><span class="p">(</span><span class="n">szDeviceName</span><span class="p">,</span> <span class="n">DispDev</span><span class="p">.</span><span class="n">DeviceName</span><span class="p">);</span>
+    <span class="c1">// after second call DispDev.DeviceString contains monitor's name</span>
+    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">EnumDisplayDevices</span><span class="p">(</span><span class="n">szDeviceName</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">DispDev</span><span class="p">,</span> <span class="n">EDD_GET_DEVICE_INTERFACE_NAME</span><span class="p">))</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">lstrcpy</span><span class="p">(</span><span class="n">lpszMonitorInfo</span><span class="p">,</span> <span class="n">DispDev</span><span class="p">.</span><span class="n">DeviceString</span><span class="p">);</span>
+    <span class="k">return</span> <span class="nb">true</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>匹配上了就说明是同一个显示器。</p>
+
+  </div>
+  
+</div>
+<footer class="footer">
+  <span>Copyright © 2023 memetao</span>
+  <a href="/static/xml/rss.xml">RSS订阅</a>
+  <span>Theme By</span>
+  <a href="https://github.com/TMaize/tmaize-blog">TMaize</a>
+</footer>
+<div id="to-top">
+  <span></span>
+  <span></span>
+</div>
+<script type="text/javascript" src="/static/js/blog.js?t=20240804112431"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20240804112431"></script>
+<!-- 腾讯MTA移动分析 -->
+<script>
+  var _mtac = {performanceMonitor: 1, senseQuery: 1}
+  ;(function() {
+    if (window.location.hostname == '127.0.0.1') {
+      return
+    }
+    var mta = document.createElement('script')
+    mta.src = '//pingjs.qq.com/h5/stats.js?v2.0.4'
+    mta.setAttribute('name', 'MTAH5')
+    mta.setAttribute('sid', '500581966')
+    mta.setAttribute('cid', '500581972')
+    var s = document.getElementsByTagName('script')[0]
+    s.parentNode.insertBefore(mta, s)
+  })()
+</script>
+
+<!-- 百度自动推送 -->
+<script>
+  ;(function () {
+    if (window.location.hostname == '127.0.0.1') {
+      return
+    }
+    var bp = document.createElement('script')
+    var curProtocol = window.location.protocol.split(':')[0]
+    if (curProtocol === 'https') {
+      bp.src = 'https://zz.bdstatic.com/linksubmit/push.js'
+    } else {
+      bp.src = 'http://push.zhanzhang.baidu.com/push.js'
+    }
+    var s = document.getElementsByTagName('script')[0]
+    s.parentNode.insertBefore(bp, s)
+  })()
+</script>
+
+<!-- MathJax数学公式支持 -->
+<style>
+  .has-jax {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-color: transparent !important;
+    line-height: normal !important;
+    word-break: normal !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .has-jax * {
+    outline: 0;
+  }
+</style>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    showProcessingMessages: false,
+    messageStyle: "none",
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'a']
+    },
+    "HTML-CSS": {
+      showMathMenu: false
+    }
+  });
+  // 父级元素添加类名，便于css控制
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax();
+    var i = 0;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script
+  type="text/javascript"
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+></script>
+
+
+</body>
+</html>

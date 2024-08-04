@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Windbg 常用命令-memetao</title>
+  <meta charset="utf-8" />
+  <meta http-equiv="content-language" content="zh-CN" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="supported-color-schemes" content="light dark">
+  <meta name="renderer" content="webkit">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="applicable-device" content="pc,mobile">
+  <meta name="google-site-verification" content="ckhUaoa05QCmWoE1FafzTBcqYI4yBOy-UJKopXDS18M" />
+  <meta name="author" content="memetao" />
+  <meta name="description" content="Windbg 常用命令"/>
+  <meta name="keywords" content="memetao,windows"/>
+  <link rel="stylesheet" href="/static/css/common.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/post.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20240804112431">
+  <script>
+    window.blog = {
+      baseurl:"",
+      buildAt:"20240804112431",
+      darkTheme: false,
+      setDarkTheme: function (dark) {
+        this.darkTheme = Boolean(dark);
+        document.documentElement.className = this.darkTheme ? 'dark': '';
+        document.querySelector('meta[name=theme-color]').setAttribute('content', this.darkTheme ? '#2D2E32': '#FFFFFF');
+      }
+    }
+    if (sessionStorage.darkTheme !== undefined) {
+      blog.setDarkTheme(sessionStorage.darkTheme === 'true'); // 记忆值，单个窗口内有效
+    } else {
+      blog.setDarkTheme(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches); // 跟随系统
+    }
+    if (window.matchMedia) {
+      var media = window.matchMedia('(prefers-color-scheme: dark)');
+      media.addListener(function (ev) {
+        blog.setDarkTheme(ev.currentTarget.matches);
+        sessionStorage.removeItem('darkTheme');
+      });
+    }
+  </script>
+</head>
+<body ondragstart="return false;">
+<header class="header">
+  <img class="logo" src="/static/img/logo.jpg" alt="logo"/>
+  <nav class="menu">
+    <a href="/" class="hover-underline">首页</a>
+    <a href="/pages/categories.html" class="hover-underline">归类</a>
+    <a href="/pages/about.html" class="hover-underline">关于</a>
+    </nav>
+</header>
+<div class="page page-post">
+  <h1 class="title" id="Windbg 常用命令">Windbg 常用命令</h1>
+  
+  <div class="subtitle">memetao 于 2024-01-11 发布</div>
+  
+  <div class="post">
+    <hr />
+
+<h2 id="查看变量">查看变量</h2>
+
+<ul>
+  <li>dv, Display Variable的缩写, 查看局部变量.</li>
+  <li>dv /i, 查看局部变量, 并显示符号的类型和参数类型.</li>
+  <li>dv /V, 查看局部变量, 并显示变量的存储位置.</li>
+  <li>dv /V VariableName, 指定需要查看的变量的名字</li>
+  <li>dt, Display Type的缩写. 当变量的类型为复合类型, 比如说结构体或者类, 那么dv命令只会显示变量的地址. dt命令可以将一块内存按照某个数据类型来解析, 其中的数据类型需要作为参数被传递给dt命令. (dt this)</li>
+</ul>
+
+<h2 id="查看线程">查看线程</h2>
+
+<ul>
+  <li>~,  简洁的显示当前进程的所有线程</li>
+  <li>~., 表示当前进程</li>
+  <li>~#, 表示异常或者产生调试时间的线程</li>
+  <li>~*, 表示所有线程</li>
+  <li>~1, 表示一号线程</li>
+  <li>~2 s, 选择2号线程作为当前线程</li>
+  <li>~3 f, 冻结3号线程</li>
+  <li>~3 u, 解冻3号线程</li>
+  <li>~2 n, 挂起2号线程</li>
+  <li>~2 m, 恢复2号线程</li>
+  <li>~*e ~clrstack, 遍历每个线程, 一次输出它们的托管调用栈</li>
+  <li>!threads, 查看所有的托管线程</li>
+</ul>
+
+<h2 id="断点">断点</h2>
+
+<p><img src="image.png" alt="alt text" />
+deferred的意思是”还没加载”, 这时候需要用bu命令。</p>
+
+<p>断点支持三种语法, 虚拟地址、函数偏移、源码:</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0:000&gt; bp 0040108c
+0:000&gt; bp main+5c
+0:000&gt; bp <span class="sb">`</span>source.c:31<span class="sb">`</span>
+</code></pre></div></div>
+<p>对C++成员函数来说:</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>0:000&gt; bp MyClass::MyMethod
+0:000&gt; bp MyClass__MyMethod
+0:000&gt; bp @@<span class="o">(</span> MyClass::MyMethod <span class="o">)</span>
+</code></pre></div></div>
+
+<p>源码路径的语法：</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="sb">`</span><span class="o">[[</span>Module!]Filename][:LineNumber]<span class="sb">`</span>
+</code></pre></div></div>
+<p>如果文件名相同, 需要加上上一级目录的名称予以区别, 否则就用第一个匹配的。</p>
+
+<p>总的来说, windbg的断点难用的很。</p>
+
+<p>条件断点的语法更是惨绝人寰，不建议使用。</p>
+
+<h2 id="reading-and-writing-memory">Reading and Writing Memory</h2>
+
+<p>内存可以通过地址或者变量名直接引用。</p>
+
+<p>读命令: d*(d是display的意思)</p>
+
+<p><img src="image-2.png" alt="alt text" /></p>
+
+<p><img src="image-3.png" alt="alt text" /></p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># mmhighestuseraddress是一个变量, 查看这个变量的地址</span>
+kd&gt; dp nt!mmhighestuseraddress L1
+81f71864  7ffeffff
+</code></pre></div></div>
+<p>这表明用户态的地址空间上限是0x7FFEFFFF(32位系统)</p>
+
+<h2 id="内存泄露">内存泄露</h2>
+
+<p>查看内存使用情况:</p>
+<ul>
+  <li>!address -summary</li>
+</ul>
+
+<p>查看堆详情:</p>
+
+<ul>
+  <li>!heap -s 查看堆详情</li>
+</ul>
+
+<p>图片</p>
+
+<ul>
+  <li>!heap -stat -h 堆地址  打印这个堆的使用情况</li>
+  <li>!heap -flt s [堆size]  打印size大小的堆的数量、地址</li>
+  <li>!heap -p -a 堆地址  打印这个堆是哪个函数申请的</li>
+</ul>
+
+<h2 id="排查野指针">排查野指针</h2>
+
+<p>前提: 开启Gflag全页堆</p>
+
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 堆栈</span>
+<span class="n">VZVCamDshow</span><span class="o">!</span><span class="n">DllMain</span><span class="o">+</span><span class="mh">0xd8d</span><span class="o">:</span>
+<span class="mo">00007</span><span class="n">ffe</span><span class="err">`</span><span class="mx">7270313d</span> <span class="mi">8982</span><span class="n">d8000000</span>    <span class="n">mov</span>     <span class="n">dword</span> <span class="n">ptr</span> <span class="p">[</span><span class="n">rdx</span><span class="o">+</span><span class="mi">0</span><span class="n">D8h</span><span class="p">],</span><span class="n">eax</span> <span class="n">ds</span><span class="o">:</span><span class="mo">00000267</span><span class="err">`</span><span class="n">e03d0fd8</span><span class="o">=????????</span>
+</code></pre></div></div>
+<p>访问 00000267`e03d0fd8时crash, 先看一下这个地址的情况。</p>
+
+<blockquote>
+  <blockquote>
+    <p>!address 00000267`e03d0fd8</p>
+  </blockquote>
+</blockquote>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Usage:                  PageHeap
+Base Address:           00000267<span class="sb">`</span>e03cf000
+End Address:            00000267<span class="sb">`</span>e03d2000
+Region Size:            00000000<span class="sb">`</span>00003000 <span class="o">(</span>  12.000 kB<span class="o">)</span>
+State:                  00002000          MEM_RESERVE
+Protect:                &lt;info not present at the target&gt;
+Type:                   00020000          MEM_PRIVATE
+Allocation Base:        00000267<span class="sb">`</span>e0160000
+Allocation Protect:     00000001          PAGE_NOACCESS
+More info:              <span class="o">!</span>heap <span class="nt">-p</span> 0x267fbcd1000
+More info:              <span class="o">!</span>heap <span class="nt">-p</span> <span class="nt">-a</span> 0x267e03d0fd8
+</code></pre></div></div>
+
+<h2 id="句柄泄露">句柄泄露</h2>
+
+<p>分析命令
+1、!htrace -enble。
+2、执行重现过程，让进程句柄泄漏
+3、通过!htrace -diff 找出有问题的栈。</p>
+
+<h2 id="参考文档">参考文档</h2>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/using-umdh-to-find-a-user-mode-memory-leak
+https://learn.microsoft.com/en-us/windows-hardware/drivers/debuggercmds/-heap
+https://www.codeproject.com/Articles/6489/Debug-Tutorial-Part-3-The-Heap
+https://bsodtutorials.wordpress.com/2014/01/06/debugging-heaps-and-heap-internals-part-2/
+https://icepng.github.io/2017/02/25/HeapAlloc/
+https://blog.csdn.net/hgy413/article/details/7620599
+
+
+https://illmatics.com/Understanding_the_LFH_Slides.pdf
+https://www.i.u-tokyo.ac.jp/edu/training/ss/lecture/new-documents/Lectures/16-UserModeHeap/UserModeHeapManager.pdf
+https://www.rapid7.com/blog/post/2019/06/12/heap-overflow-exploitation-on-windows-10-explained/
+https://illmatics.com/Understanding_the_LFH.pdf
+https://www.blackhat.com/docs/us-16/materials/us-16-Yason-Windows-10-Segment-Heap-Internals.pdf
+https://cs.wellesley.edu/~cs240/f16/slides/allocator.pdf
+https://stackoverflow.com/questions/50711102/how-is-the-header-of-a-block-formatted-in-heap
+</code></pre></div></div>
+
+
+  </div>
+  
+</div>
+<footer class="footer">
+  <span>Copyright © 2023 memetao</span>
+  <a href="/static/xml/rss.xml">RSS订阅</a>
+  <span>Theme By</span>
+  <a href="https://github.com/TMaize/tmaize-blog">TMaize</a>
+</footer>
+<div id="to-top">
+  <span></span>
+  <span></span>
+</div>
+<script type="text/javascript" src="/static/js/blog.js?t=20240804112431"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20240804112431"></script>
+<!-- 腾讯MTA移动分析 -->
+<script>
+  var _mtac = {performanceMonitor: 1, senseQuery: 1}
+  ;(function() {
+    if (window.location.hostname == '127.0.0.1') {
+      return
+    }
+    var mta = document.createElement('script')
+    mta.src = '//pingjs.qq.com/h5/stats.js?v2.0.4'
+    mta.setAttribute('name', 'MTAH5')
+    mta.setAttribute('sid', '500581966')
+    mta.setAttribute('cid', '500581972')
+    var s = document.getElementsByTagName('script')[0]
+    s.parentNode.insertBefore(mta, s)
+  })()
+</script>
+
+<!-- 百度自动推送 -->
+<script>
+  ;(function () {
+    if (window.location.hostname == '127.0.0.1') {
+      return
+    }
+    var bp = document.createElement('script')
+    var curProtocol = window.location.protocol.split(':')[0]
+    if (curProtocol === 'https') {
+      bp.src = 'https://zz.bdstatic.com/linksubmit/push.js'
+    } else {
+      bp.src = 'http://push.zhanzhang.baidu.com/push.js'
+    }
+    var s = document.getElementsByTagName('script')[0]
+    s.parentNode.insertBefore(bp, s)
+  })()
+</script>
+
+<!-- MathJax数学公式支持 -->
+<style>
+  .has-jax {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-color: transparent !important;
+    line-height: normal !important;
+    word-break: normal !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .has-jax * {
+    outline: 0;
+  }
+</style>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    showProcessingMessages: false,
+    messageStyle: "none",
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'a']
+    },
+    "HTML-CSS": {
+      showMathMenu: false
+    }
+  });
+  // 父级元素添加类名，便于css控制
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax();
+    var i = 0;
+    for(i=0; i < all.length; i += 1) {
+      all[i].SourceElement().parentNode.className += ' has-jax';
+    }
+  });
+</script>
+<script
+  type="text/javascript"
+  src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+></script>
+
+
+</body>
+</html>

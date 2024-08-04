@@ -14,15 +14,15 @@
   <meta name="author" content="memetao" />
   <meta name="description" content="用D3D11画一个三角形"/>
   <meta name="keywords" content="memetao,graphics"/>
-  <link rel="stylesheet" href="/static/css/common.css?t=20240731210702">
-  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20240731210702">
-  <link rel="stylesheet" href="/static/css/post.css?t=20240731210702">
-  <link rel="stylesheet" href="/static/css/code-dark.css?t=20240731210702">
-  <link rel="stylesheet" href="/static/css/code-light.css?t=20240731210702">
+  <link rel="stylesheet" href="/static/css/common.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/post.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20240804112431">
   <script>
     window.blog = {
       baseurl:"",
-      buildAt:"20240731210702",
+      buildAt:"20240804112431",
       darkTheme: false,
       setDarkTheme: function (dark) {
         this.darkTheme = Boolean(dark);
@@ -161,6 +161,12 @@ d3d11_dev_-&gt;CreateBuffer(&amp;bd, NULL, &amp;pVBuffer); // create the buffer
 
 <p><img src="triangle.png" alt="triangle" /></p>
 
+<h2 id="注意事项">注意事项</h2>
+
+<ul>
+  <li>DXGI_SWAP_EFFECT_FLIP_DISCARD 会把hwnd锁住(d3d11画过的窗口不能再传给d3d9使用)</li>
+</ul>
+
   </div>
   
 </div>
@@ -174,8 +180,8 @@ d3d11_dev_-&gt;CreateBuffer(&amp;bd, NULL, &amp;pVBuffer); // create the buffer
   <span></span>
   <span></span>
 </div>
-<script type="text/javascript" src="/static/js/blog.js?t=20240731210702"></script>
-<script type="text/javascript" src="/static/js/search.js?t=20240731210702"></script>
+<script type="text/javascript" src="/static/js/blog.js?t=20240804112431"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20240804112431"></script>
 <!-- 腾讯MTA移动分析 -->
 <script>
   var _mtac = {performanceMonitor: 1, senseQuery: 1}

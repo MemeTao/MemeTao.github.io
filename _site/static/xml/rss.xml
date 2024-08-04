@@ -5,16 +5,51 @@
     <link></link>
     <description>memetao的成长轨迹</description>
     <language>zh-CN</language>
-    <pubDate>Wed, 31 Jul 2024 21:07:02 +0800</pubDate>
-    <lastBuildDate>Wed, 31 Jul 2024 21:07:02 +0800</lastBuildDate>
+    <pubDate>Sun, 04 Aug 2024 11:24:31 +0800</pubDate>
+    <lastBuildDate>Sun, 04 Aug 2024 11:24:31 +0800</lastBuildDate>
     <generator>Jekyll v4.3.2</generator>
     <atom:link href="/static/xml/rss.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Windows 线程</title>
+      <title>函数调用与寄存器</title>
+      <link>/posts/2024/07/31/FunctionCallOnWindows.html</link>
+      <description>寄存器32位操作系统的寄存器:大部分EXE都是64位了,这里只记录64的情况:MSVC使用RSP作为栈顶指针(注意栈的增长方向)。函数调用约定C/C++代码默认使用__cdecl约定。x86的程序中,参数的转递是靠栈,x64中参数的传...</description>
+      <pubDate>Wed, 31 Jul 2024 21:13:17 +0800</pubDate>
+      <gui>/posts/2024/07/31/FunctionCallOnWindows.html</gui>
+    </item>
+    <item>
+      <title>windows 线程</title>
       <link>/posts/2024/07/24/WindowsThreadStack.html</link>
       <description>windows线程线程包含三个东西:ThreadKernalObjectStackTEB内核对象：ThreadContext寄存器状态:instructionpointer(指令地址)andstackpointerregisters(...</description>
       <pubDate>Wed, 24 Jul 2024 13:13:17 +0800</pubDate>
       <gui>/posts/2024/07/24/WindowsThreadStack.html</gui>
+    </item>
+    <item>
+      <title>ETW 和 WPP</title>
+      <link>/posts/2024/07/24/EtwAndWpp.html</link>
+      <description>TODO</description>
+      <pubDate>Wed, 24 Jul 2024 13:13:17 +0800</pubDate>
+      <gui>/posts/2024/07/24/EtwAndWpp.html</gui>
+    </item>
+    <item>
+      <title>当GDI采集遇上多显示器、多DPI缩放</title>
+      <link>/posts/2024/06/18/GDI-DPI.html</link>
+      <description>待完成</description>
+      <pubDate>Tue, 18 Jun 2024 12:13:17 +0800</pubDate>
+      <gui>/posts/2024/06/18/GDI-DPI.html</gui>
+    </item>
+    <item>
+      <title>显示器插拔通知</title>
+      <link>/posts/2024/05/16/detect-display-monitor.html</link>
+      <description>向windows注册显示器设备事件GUID是固定的,可以从微软文档查到staticGUIDmonitor_guid={(unsignedlong)0xE6F07B5F,(unsignedshort)0xEE97,(unsignedsh...</description>
+      <pubDate>Thu, 16 May 2024 10:13:17 +0800</pubDate>
+      <gui>/posts/2024/05/16/detect-display-monitor.html</gui>
+    </item>
+    <item>
+      <title>C#调用C/C++</title>
+      <link>/posts/2024/04/24/dotnetAndCPlusPlus.html</link>
+      <description>StructLayout属性Sequential,顺序布局Explicit,精确布局主要是了解精确布局://需要用FieldOffset()设置每个成员的位置这样就可以实现类似c的公用体的功能[StructLayout(LayoutK...</description>
+      <pubDate>Wed, 24 Apr 2024 19:13:17 +0800</pubDate>
+      <gui>/posts/2024/04/24/dotnetAndCPlusPlus.html</gui>
     </item>
     <item>
       <title>WinUIGallery 刨析----HomePage</title>
@@ -24,11 +59,39 @@
       <gui>/posts/2024/03/28/winui-gallery.html</gui>
     </item>
     <item>
+      <title>WinUI3之容器布局</title>
+      <link>/posts/2024/03/18/winui3-container.html</link>
+      <description>StackPanel&amp;lt;Grid&amp;gt;&amp;lt;StackPanel&amp;gt;&amp;lt;TextBoxPadding=&quot;50&quot;/&amp;gt;&amp;lt;TextBoxWidth=&quot;100&quot;/&amp;gt;&amp;lt;TextBox&amp;gt;margin=...</description>
+      <pubDate>Mon, 18 Mar 2024 13:13:17 +0800</pubDate>
+      <gui>/posts/2024/03/18/winui3-container.html</gui>
+    </item>
+    <item>
+      <title>WinUI3之页面导航</title>
+      <link>/posts/2024/03/13/winui3-frame.html</link>
+      <description>Frame微软的文档说Frame是”展示Page，支持导航到新的Page，并且记录了导航的历史”。先新建一个SettingPage&amp;lt;Pagex:Class=&quot;fdesk.Settings&quot;...&amp;gt;&amp;lt;Grid&amp;gt;&amp;...</description>
+      <pubDate>Wed, 13 Mar 2024 13:13:17 +0800</pubDate>
+      <gui>/posts/2024/03/13/winui3-frame.html</gui>
+    </item>
+    <item>
+      <title>WinUI3之窗口初探</title>
+      <link>/posts/2024/03/11/winui3-navigation.html</link>
+      <description>窗口微软的文档属于Microsoft.UI.Xaml命名空间[Microsoft.UI.Xaml.Markup.ContentProperty(Name=&quot;Content&quot;)][Windows.Foundation.Metadata....</description>
+      <pubDate>Mon, 11 Mar 2024 13:13:17 +0800</pubDate>
+      <gui>/posts/2024/03/11/winui3-navigation.html</gui>
+    </item>
+    <item>
       <title>xaml 语法摘记</title>
       <link>/posts/2024/03/10/xaml.html</link>
       <description>引用C#中的类publicclassStudent{publicintid{get,set};}&amp;lt;Windowx:Class=&quot;xxx&quot;...xmlns:local=&quot;clr-namesapce:AppName&quot;&amp;gt;&amp;lt;...</description>
       <pubDate>Sun, 10 Mar 2024 13:13:17 +0800</pubDate>
       <gui>/posts/2024/03/10/xaml.html</gui>
+    </item>
+    <item>
+      <title>GPU的硬件架构</title>
+      <link>/posts/2024/03/06/gpu-architecture.html</link>
+      <description>GPU硬件架构与运行机制https://www.cnblogs.com/timlly/p/11471507.html</description>
+      <pubDate>Wed, 06 Mar 2024 10:13:17 +0800</pubDate>
+      <gui>/posts/2024/03/06/gpu-architecture.html</gui>
     </item>
     <item>
       <title>C# 入门</title>
@@ -50,6 +113,13 @@
       <description>开车加油站后退时一定要注意左右距离，多看后视镜右变道时没有特别注意和右后车得距离,是否可以变道。红灯车位停车时没有理会告警就盲目后退,应该下车检查距离。宁愿错过路口也不要危险变道##</description>
       <pubDate>Sat, 20 Jan 2024 10:13:17 +0800</pubDate>
       <gui>/posts/2024/01/20/life-review.html</gui>
+    </item>
+    <item>
+      <title>Windbg 常用命令</title>
+      <link>/posts/2024/01/11/windbg-command.html</link>
+      <description>查看变量dv,DisplayVariable的缩写,查看局部变量.dv/i,查看局部变量,并显示符号的类型和参数类型.dv/V,查看局部变量,并显示变量的存储位置.dv/VVariableName,指定需要查看的变量的名字dt,Dis...</description>
+      <pubDate>Thu, 11 Jan 2024 10:13:17 +0800</pubDate>
+      <gui>/posts/2024/01/11/windbg-command.html</gui>
     </item>
     <item>
       <title>D3D11 视频渲染中的变换（平移、缩放、裁剪、镜像、旋转）</title>
@@ -103,16 +173,16 @@
     <item>
       <title>D3D11 HLSL注意项</title>
       <link>/posts/2023/08/26/d3d11-hlsl.html</link>
-      <description>VertexShadlerD3D11_INPUT_ELEMENT_DESCinput_desc[]={//我们知道DXGI_FORMAT_R32G32B32_FLOAT是12字节的{&quot;POSITION&quot;,0,DXGI_FORMAT_R...</description>
+      <description>纹理DXGIFORMAT对应HLSL中的类型|DXGI|HLSL||——————————|————||DXGI_FORMAT_R32_FLOAT|float||DXGI_FORMAT_R32G32_FLOAT|float2||DXGI...</description>
       <pubDate>Sat, 26 Aug 2023 10:13:17 +0800</pubDate>
       <gui>/posts/2023/08/26/d3d11-hlsl.html</gui>
     </item>
     <item>
-      <title>Windbg 常用命令</title>
-      <link>/posts/2023/06/22/windbg-command.html</link>
-      <description>排查野指针前提:开启Gflag全页堆//堆栈VZVCamDshow!DllMain+0xd8d:00007ffe`7270313d8982d8000000movdwordptr[rdx+0D8h],eaxds:00000267`e03...</description>
+      <title>C/C++可变参数的实现原理</title>
+      <link>/posts/2023/06/22/VariableParameterOnCPP.html</link>
+      <description>函数调用约定栈帧</description>
       <pubDate>Thu, 22 Jun 2023 10:13:17 +0800</pubDate>
-      <gui>/posts/2023/06/22/windbg-command.html</gui>
+      <gui>/posts/2023/06/22/VariableParameterOnCPP.html</gui>
     </item>
     <item>
       <title>D3D11中的坐标</title>
@@ -152,7 +222,7 @@
     <item>
       <title>windows PE 格式</title>
       <link>/posts/2023/01/14/PE.html</link>
-      <description>PEPE(PortableExecute)是可执行文件的一个总称,DLL,EXE等，专指32位可执行文件，64位的叫做PE+\PE32+,是一种扩展格式。文件结构如下所示:实在是复杂,从上到下又分为DOS头，NT头，节表以及具体的节，...</description>
+      <description>PE全文翻译摘抄自:https://0xrick.github.io/categories/#win-internalsPE(PortableExecute)是可执行文件的一个总称,DLL,EXE等，专指32位可执行文件，64位的叫做...</description>
       <pubDate>Sat, 14 Jan 2023 13:13:17 +0800</pubDate>
       <gui>/posts/2023/01/14/PE.html</gui>
     </item>

@@ -13,16 +13,16 @@
   <meta name="google-site-verification" content="ckhUaoa05QCmWoE1FafzTBcqYI4yBOy-UJKopXDS18M" />
   <meta name="author" content="memetao" />
   <meta name="description" content="windows PE 格式"/>
-  <meta name="keywords" content="memetao,os"/>
-  <link rel="stylesheet" href="/static/css/common.css?t=20240731210702">
-  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20240731210702">
-  <link rel="stylesheet" href="/static/css/post.css?t=20240731210702">
-  <link rel="stylesheet" href="/static/css/code-dark.css?t=20240731210702">
-  <link rel="stylesheet" href="/static/css/code-light.css?t=20240731210702">
+  <meta name="keywords" content="memetao,windows"/>
+  <link rel="stylesheet" href="/static/css/common.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/theme-dark.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/post.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/code-dark.css?t=20240804112431">
+  <link rel="stylesheet" href="/static/css/code-light.css?t=20240804112431">
   <script>
     window.blog = {
       baseurl:"",
-      buildAt:"20240731210702",
+      buildAt:"20240804112431",
       darkTheme: false,
       setDarkTheme: function (dark) {
         this.darkTheme = Boolean(dark);
@@ -62,6 +62,8 @@
     <hr />
 
 <h2 id="pe">PE</h2>
+
+<p>全文翻译摘抄自: https://0xrick.github.io/categories/#win-internals</p>
 
 <p>PE (Portable Execute) 是可执行文件的一个总称,DLL,EXE等，专指32位可执行文件，64位的叫做PE+\PE32+,是一种扩展格式。</p>
 
@@ -188,101 +190,27 @@ Each header contains information about the section it refers to.</p>
 <p>非常重要的一个部分，分为32和64两个版本:</p>
 
 <div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">typedef</span> <span class="k">struct</span> <span class="nc">_IMAGE_OPTIONAL_HEADER</span> <span class="p">{</span>
-    <span class="c1">//</span>
-    <span class="c1">// Standard fields.</span>
-    <span class="c1">//</span>
-
-    <span class="n">WORD</span>    <span class="n">Magic</span><span class="p">;</span>
-    <span class="n">BYTE</span>    <span class="n">MajorLinkerVersion</span><span class="p">;</span>
-    <span class="n">BYTE</span>    <span class="n">MinorLinkerVersion</span><span class="p">;</span>
-    <span class="n">DWORD</span>   <span class="n">SizeOfCode</span><span class="p">;</span>
-    <span class="n">DWORD</span>   <span class="n">SizeOfInitializedData</span><span class="p">;</span>
-    <span class="n">DWORD</span>   <span class="n">SizeOfUninitializedData</span><span class="p">;</span>
-    <span class="n">DWORD</span>   <span class="n">AddressOfEntryPoint</span><span class="p">;</span>
-    <span class="n">DWORD</span>   <span class="n">BaseOfCode</span><span class="p">;</span>
-    <span class="n">DWORD</span>   <span class="n">BaseOfData</span><span class="p">;</span>
-
-    <span class="c1">//</span>
-    <span class="c1">// NT additional fields.</span>
-    <span class="c1">//</span>
-
-    <span class="n">DWORD</span>   <span class="n">ImageBase</span><span class="p">;</span>
-    <span class="n">DWORD</span>   <span class="n">SectionAlignment</span><span class="p">;</span>
-    <span class="n">DWORD</span>   <span class="n">FileAlignment</span><span class="p">;</span>
-    <span class="n">WORD</span>    <span class="n">MajorOperatingSystemVersion</span><span class="p">;</span>
-    <span class="n">WORD</span>    <span class="n">MinorOperatingSystemVersion</span><span class="p">;</span>
-    <span class="n">WORD</span>    <span class="n">MajorImageVersion</span><span class="p">;</span>
-    <span class="n">WORD</span>    <span class="n">MinorImageVersion</span><span class="p">;</span>
-    <span class="n">WORD</span>    <span class="n">MajorSubsystemVersion</span><span class="p">;</span>
-    <span class="n">WORD</span>    <span class="n">MinorSubsystemVersion</span><span class="p">;</span>
-    <span class="n">DWORD</span>   <span class="n">Win32VersionValue</span><span class="p">;</span>
-    <span class="n">DWORD</span>   <span class="n">SizeOfImage</span><span class="p">;</span>
-    <span class="n">DWORD</span>   <span class="n">SizeOfHeaders</span><span class="p">;</span>
-    <span class="n">DWORD</span>   <span class="n">CheckSum</span><span class="p">;</span>
-    <span class="n">WORD</span>    <span class="n">Subsystem</span><span class="p">;</span>
-    <span class="n">WORD</span>    <span class="n">DllCharacteristics</span><span class="p">;</span>
-    <span class="n">DWORD</span>   <span class="n">SizeOfStackReserve</span><span class="p">;</span>
-    <span class="n">DWORD</span>   <span class="n">SizeOfStackCommit</span><span class="p">;</span>
-    <span class="n">DWORD</span>   <span class="n">SizeOfHeapReserve</span><span class="p">;</span>
-    <span class="n">DWORD</span>   <span class="n">SizeOfHeapCommit</span><span class="p">;</span>
-    <span class="n">DWORD</span>   <span class="n">LoaderFlags</span><span class="p">;</span>
-    <span class="n">DWORD</span>   <span class="n">NumberOfRvaAndSizes</span><span class="p">;</span>
-    <span class="n">IMAGE_DATA_DIRECTORY</span> <span class="n">DataDirectory</span><span class="p">[</span><span class="n">IMAGE_NUMBEROF_DIRECTORY_ENTRIES</span><span class="p">];</span>
+    <span class="c1">//..</span>
 <span class="p">}</span> <span class="n">IMAGE_OPTIONAL_HEADER32</span><span class="p">,</span> <span class="o">*</span><span class="n">PIMAGE_OPTIONAL_HEADER32</span><span class="p">;</span>
 
 <span class="k">typedef</span> <span class="k">struct</span> <span class="nc">_IMAGE_OPTIONAL_HEADER64</span> <span class="p">{</span>
-    <span class="n">WORD</span>        <span class="n">Magic</span><span class="p">;</span>
-    <span class="n">BYTE</span>        <span class="n">MajorLinkerVersion</span><span class="p">;</span>
-    <span class="n">BYTE</span>        <span class="n">MinorLinkerVersion</span><span class="p">;</span>
-    <span class="n">DWORD</span>       <span class="n">SizeOfCode</span><span class="p">;</span>
-    <span class="n">DWORD</span>       <span class="n">SizeOfInitializedData</span><span class="p">;</span>
-    <span class="n">DWORD</span>       <span class="n">SizeOfUninitializedData</span><span class="p">;</span>
-    <span class="n">DWORD</span>       <span class="n">AddressOfEntryPoint</span><span class="p">;</span>
-    <span class="n">DWORD</span>       <span class="n">BaseOfCode</span><span class="p">;</span>
-    <span class="n">ULONGLONG</span>   <span class="n">ImageBase</span><span class="p">;</span>
-    <span class="n">DWORD</span>       <span class="n">SectionAlignment</span><span class="p">;</span>
-    <span class="n">DWORD</span>       <span class="n">FileAlignment</span><span class="p">;</span>
-    <span class="n">WORD</span>        <span class="n">MajorOperatingSystemVersion</span><span class="p">;</span>
-    <span class="n">WORD</span>        <span class="n">MinorOperatingSystemVersion</span><span class="p">;</span>
-    <span class="n">WORD</span>        <span class="n">MajorImageVersion</span><span class="p">;</span>
-    <span class="n">WORD</span>        <span class="n">MinorImageVersion</span><span class="p">;</span>
-    <span class="n">WORD</span>        <span class="n">MajorSubsystemVersion</span><span class="p">;</span>
-    <span class="n">WORD</span>        <span class="n">MinorSubsystemVersion</span><span class="p">;</span>
-    <span class="n">DWORD</span>       <span class="n">Win32VersionValue</span><span class="p">;</span>
-    <span class="n">DWORD</span>       <span class="n">SizeOfImage</span><span class="p">;</span>
-    <span class="n">DWORD</span>       <span class="n">SizeOfHeaders</span><span class="p">;</span>
-    <span class="n">DWORD</span>       <span class="n">CheckSum</span><span class="p">;</span>
-    <span class="n">WORD</span>        <span class="n">Subsystem</span><span class="p">;</span>
-    <span class="n">WORD</span>        <span class="n">DllCharacteristics</span><span class="p">;</span>
-    <span class="n">ULONGLONG</span>   <span class="n">SizeOfStackReserve</span><span class="p">;</span>
-    <span class="n">ULONGLONG</span>   <span class="n">SizeOfStackCommit</span><span class="p">;</span>
-    <span class="n">ULONGLONG</span>   <span class="n">SizeOfHeapReserve</span><span class="p">;</span>
-    <span class="n">ULONGLONG</span>   <span class="n">SizeOfHeapCommit</span><span class="p">;</span>
-    <span class="n">DWORD</span>       <span class="n">LoaderFlags</span><span class="p">;</span>
-    <span class="n">DWORD</span>       <span class="n">NumberOfRvaAndSizes</span><span class="p">;</span>
-    <span class="n">IMAGE_DATA_DIRECTORY</span> <span class="n">DataDirectory</span><span class="p">[</span><span class="n">IMAGE_NUMBEROF_DIRECTORY_ENTRIES</span><span class="p">];</span>
+    <span class="c1">// 略</span>
 <span class="p">}</span> <span class="n">IMAGE_OPTIONAL_HEADER64</span><span class="p">,</span> <span class="o">*</span><span class="n">PIMAGE_OPTIONAL_HEADER64</span><span class="p">;</span>
-
 </code></pre></div></div>
-
 <ul>
   <li>Magic: 0x10B (PE32), 0x20B(PE32+),0x107(ROM Image)</li>
-  <li>MajorLinkerVersion, MinorLinkerVersion: linker 版本</li>
   <li>SizeOfCode: .text段的长度</li>
   <li>SizeOfInitializedData: .data段的长度</li>
   <li>SizeOfUninitializedData: .bss段的长度</li>
   <li>AddressOfEntryPoint: 入口点，对dll来说是个可选项</li>
-  <li>BaseOfCode: 第一个code section的地址</li>
   <li>BaseOfData(PE32 Only): 第一个data section的地址</li>
-  <li>ImageBase: 不太懂</li>
-  <li>SectionAlignment: 略</li>
-  <li>FileAlignment: 略</li>
-  <li>.*version: 略</li>
   <li>Win32VersionValue: set to 0</li>
-  <li>SizeOfImage: 略</li>
-  <li>SizeOfHeaders: 略</li>
   <li>Subsystem: 控制台、应用程序之类<a href="!https://docs.microsoft.com/en-us/windows/win32/debug/pe-format">详细请点击</a></li>
 </ul>
+
+<h2 id="导入表和导出表">导入表和导出表</h2>
+
+<p>导入表结构</p>
 
   </div>
   
@@ -297,8 +225,8 @@ Each header contains information about the section it refers to.</p>
   <span></span>
   <span></span>
 </div>
-<script type="text/javascript" src="/static/js/blog.js?t=20240731210702"></script>
-<script type="text/javascript" src="/static/js/search.js?t=20240731210702"></script>
+<script type="text/javascript" src="/static/js/blog.js?t=20240804112431"></script>
+<script type="text/javascript" src="/static/js/search.js?t=20240804112431"></script>
 <!-- 腾讯MTA移动分析 -->
 <script>
   var _mtac = {performanceMonitor: 1, senseQuery: 1}
