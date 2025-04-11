@@ -130,4 +130,4 @@ BOOL GetMonitorInfo(int nDeviceIndex, LPSTR lpszMonitorInfo) {
 
 ### 后续
 
-还需要再关注WM_SETTINGCHANGE事件，关注DISPLAY_DEVICEA中的DeviceName。
+还需要再关注WM_SETTINGCHANGE事件（UI在设置中点击了显示设置-仅在1中显示等操作），关注DISPLAY_DEVICEA中的DeviceName。
