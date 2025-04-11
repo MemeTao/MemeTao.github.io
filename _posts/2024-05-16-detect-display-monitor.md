@@ -127,3 +127,7 @@ BOOL GetMonitorInfo(int nDeviceIndex, LPSTR lpszMonitorInfo) {
 }
 ```
 匹配上了就说明是同一个显示器。
+
+### 后续
+
+还需要再关注WM_SETTINGCHANGE事件，关注DISPLAY_DEVICEA中的DeviceName。
