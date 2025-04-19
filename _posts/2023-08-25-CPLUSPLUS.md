@@ -56,6 +56,7 @@ B* pb = new C;  // 地址所指向的内容是一样的
 虚函数与虚函数表(重要):
 
 * https://blog.csdn.net/qq_36359022/article/details/81870219
+* https://www.cnblogs.com/QG-whz/p/4909359.html
 
 ### 左值和右值
 
