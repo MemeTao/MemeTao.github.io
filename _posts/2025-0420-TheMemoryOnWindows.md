@@ -1,5 +1,6 @@
+---
 layout: mypost
-title:  "Windows中的内存"
+title:  "Windows中的内存一： 内存的分类"
 date:   2025-04-20 11:13:17 +0800
 categories: windows
 location: HangZhou,China
@@ -9,9 +10,9 @@ description:
 
 ### 概要
 
-此文记录windows中的内存。
+此文记录windows中的内存分类
 
-### 从对比两个进程的内存分布说起
+### VVMap 工具
 
 有个事情是这样子的，程序临近发版突然发现V2版本的内存绝对值比V1版本增加了30MB。
 
@@ -38,4 +39,110 @@ Windbg加载V2进程并设置好PDB路径:
 
 > go #继续跑, 出现断点的时候打印函数栈就一目了然
 
-###
+### 内存分类
+
+从VVMap看到内存分为了三大类：Committed、Private Bytes、Working Set.
+从一个程序来分析（内存页4K）：
+```c++
+int main() {
+    constexpr SIZE_T SIZE = 100 * 1024 * 1024; // 100 MB
+    // Reserve address space, but do not commit yet
+    void* ptr = VirtualAlloc(nullptr, SIZE, MEM_RESERVE, PAGE_READWRITE);
+    std::cout << "Reserved only. Press Enter...\n";
+    std::cin.get();
+
+    if (!VirtualAlloc(ptr, SIZE, MEM_COMMIT, PAGE_READWRITE)) {
+        std::cerr << "Commit failed: " << GetLastError() << "\n";
+    }
+    std::cout << "Committed. Press Enter...\n";
+    std::cin.get();
+
+    char* data = static_cast<char*>(ptr);
+    for (size_t i = 0; i < SIZE; i += 4096)
+        data[i] = 1;
+    std::cout << "Accessed memory. Press Enter to exit...\n";
+    std::cin.get();
+    VirtualFree(ptr, 0, MEM_RELEASE);
+    return 0;
+}
+```
+
+从VVMap中可以明显观察到有个102,000KB的段从Reserve(Protection描述)变成了Read/Write（Commited）, 并且当对这个内存段进行写之后，Working Sets部分也会突然增大。
+
+### MEM_RESERVE
+
+预留地址空间以便将来使用，以下情况下会失败：
+* 系统虚拟地址空间紧张（x86进程2GB限制）
+* 试图保留一个不对齐或非法的地址
+* 忘记释放旧的空间，反复 reserve 尽管没 commit，依然会耗尽虚拟地址空间
+
+### Private
+
+Private内存指的是只属于当前进程的内存区域，这些内存不与其他进程共享。一般来说，Private 内存是由进程自己的代码、堆、栈或者通过 VirtualAlloc 分配的内存所占用的。 
+
+#### 1. 私有且不共享：
+* Private 内存是 进程独占的，不会被其他进程访问。
+* 对它的修改只影响当前进程，不会影响其他进程。
+
+#### 2. 不同于映射文件或共享内存：
+* 如果是 映射文件（通过 CreateFileMapping + MapViewOfFile），内存区域会显示为 Mapped 类型，且这些内存区域是可共享的。
+* Private 内存 只属于当前进程，不会被映射到其他进程的地址空间。
+
+#### 3. 可以通过 MEM_COMMIT 或 MEM_RESERVE申请:
+* 在 VirtualAlloc调用时，若申请的是Private内存区域，它会被标记为Private类型。
+* 只要申请的是没有被其他进程共享的内存，它就是Private。
+
+如何通过API来获取一个进程的内存分配信息:
+```c++
+SIZE_T GetPrivateCommittedMemory() {
+    SIZE_T total = 0;
+    MEMORY_BASIC_INFORMATION mbi = {};
+    BYTE* addr = 0;
+
+    while (VirtualQuery(addr, &mbi, sizeof(mbi)) == sizeof(mbi)) {
+        if ((mbi.State == MEM_COMMIT) && (mbi.Type == MEM_PRIVATE)) {
+            total += mbi.RegionSize;
+        }
+        addr += mbi.RegionSize;
+    }
+
+    return total;
+}
+
+```
+
+### Working Set
+Working Set是进程当前驻留在物理内存（RAM）中的、最近被访问过的虚拟内存页集合。
+
+换句话说：
+* Working Set ≠ 已分配的所有内存；
+* 它只包含**当前加载在物理内存中且活跃使用的内存页**；
+* Windows会动态调整 Working Set大小（增大或收缩），以满足系统的内存压力和进程活跃度。
+
+**任务管理器中见到的内存就属于working set**
+
+### malloc 和 new
+
+注意到 VirtualAlloc分配的内存在VMMap里有明显的**Reserve**和**Commit**显示，但用 malloc 或 new 却看不到类似的现象。这是因为它们之间的本质差别在于：
+| 特性                 | `VirtualAlloc`       | `malloc` / `new`                |
+| ------------------ | -------------------- | ------------------------------- |
+| 调用层级               | 直接调用内核 API           | 调用 CRT（C Runtime）堆管理器           |
+| 目标                 | 分配整个虚拟内存页（通常4KB对齐）   | 管理小块内存、适配频繁分配释放                 |
+| Reserve/Commit 可见性 | 直接体现为 VAD（虚拟地址描述符）结构 | CRT 堆由一整块 VirtualAlloc 支撑，不暴露细节 |
+| 是否可控内存属性           | 是（如 PAGE\_NOACCESS）  | 否，由 CRT 控制                      |
+| 适合                 | 大内存、显式控制             | 小块频繁分配                          |
+
+
+**malloc(size) ≠ VirtualAlloc(size)**
+
+它的实际流程大致如下：
+* malloc → 调用 CRT 的堆分配器（例如 Windows 上的 RtlAllocateHeap）；
+* CRT 在初始化时使用 VirtualAlloc 创建了大块的 reserved+committed 区域；
+*  malloc 在这个区域中管理小块（通过 free list 等结构）；
+* 只有当分配超过一定阈值（如大于 1MB）时，才会直接使用 VirtualAlloc。
+
+也就是说：**小块的 malloc 实际上是从某个已经提交的堆中“划出来”的，你看不到新的 commit/reserve 显示，因为那是堆的事，不是单个malloc的事**。
+
+### 内存优先级（Memory Priority）
+
+Memory Priority 是操作系统对进程或其内存页在内存中的“重要性”评估指标。Windows 会根据这个优先级，决定在内存压力大时，谁的页面先被驱逐出**Working Set**。优先级越低，越容易被回收。
