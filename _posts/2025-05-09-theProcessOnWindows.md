@@ -1,6 +1,6 @@
 ---
 layout: mypost
-title:  "Windows中的线程与进程： 内存的分类"
+title:  "Windows中的线程与进程"
 date:   2025-05-09 11:13:17 +0800
 categories: windows
 location: HangZhou,China
@@ -206,7 +206,66 @@ TLS 的原理是操作系统在创建线程的时候，会查看该模块（EXE/
     Stack Limit: 0019A000
 ```
 
-
-
 ### 结束线程
+
+TerminateThread
+
+## 进程
+
+### 创建进程
+
+| 方法                                 | 描述                                             |
+| ------------------------------------ | ------------------------------------------------ |
+| `CreateProcess`                      | 最底层、功能最全的方式。                         |
+| `ShellExecute / ShellExecuteEx`      | 启动应用程序或打开文档（调用 `CreateProcess`）。 |
+| `WinExec`（不推荐）                  | 老式API，已被淘汰。                              |
+| 命令行调用（例如 system(), popen()） | 底层也调用 `CreateProcess`。                     |
+
+我们重点讲解 CreateProcess 背后的原理。
+
+CreateProcess 是创建子进程的最底层 API，它做了很多复杂的工作：
+
+1️⃣ 解析可执行文件
+* 解析 EXE 的 PE 头，找到入口地址（EntryPoint）和映像基址。
+* 加载器将其映射到新的地址空间。
+
+2️⃣ 创建新进程内核对象
+* 分配并初始化内核对象 EPROCESS。
+* 初始化其 PEB 和 TEB（主线程）。
+* 创建新的页目录，为进程分配虚拟地址空间。
+
+3️⃣ 创建主线程
+* 创建一个新的线程对象 ETHREAD。
+* 绑定到新进程。
+* 设置初始栈，TEB 和栈空间。
+* 初始化线程上下文（CS:EIP指向 EntryPoint）。
+
+4️⃣ 复制父进程句柄表（如果指定了继承）
+* bInheritHandles = TRUE 时复制句柄。
+
+5️⃣ 通知调试器、附加 DLL
+* 如果注册了调试器，会触发 CREATE_PROCESS_DEBUG_EVENT。
+* 加载器调用所有模块的 DLLMain(DLL_PROCESS_ATTACH)。
+
+6️⃣ 启动线程
+* ResumeThread 让子进程主线程开始运行。
+
+子进程不会自动继承父进程的上下文（线程、变量等），父子之间不共享堆栈或静态变量，但可以通过句柄、管道等IPC机制通信。
+
+🎯 问题：CreateProcess 创建的进程什么时候才真正开始执行入口函数？
+
+```shell
+STARTUPINFO si = { sizeof(si) };
+PROCESS_INFORMATION pi = {};
+CreateProcess(..., CREATE_SUSPENDED, ..., &si, &pi);
+```
+* 子进程的地址空间、PEB、TEB、主线程、堆栈都已经创建完毕；
+* 但主线程 并未运行，它处于“挂起”状态；
+* 必须手动调用 ResumeThread(pi.hThread)，主线程才会开始运行，即跳转到 EntryPoint。即使你没有显式指定 CREATE_SUSPENDED，系统也会在内部在某一时刻控制线程“未立即运行”，然后在合适时机自动 resume。
+
+| 点位                   | 状态说明                               |
+| ---------------------- | -------------------------------------- |
+| `CreateProcess` 返回前 | 子进程内核对象已创建，但线程不一定运行 |
+| `ResumeThread` 调用后  | 主线程开始运行，执行 EntryPoint        |
+| 所以入口函数执行点     | 是在 `ResumeThread` 调用之后           |
 

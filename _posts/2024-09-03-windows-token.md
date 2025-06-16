@@ -30,34 +30,34 @@ B进程
 ```c++
 ::OpenProcess(Flag, false, process_a);
 ```
-以普通权限启动A\B: 
-| Flag      | Ret |
-| ----------- | ----------- |
-| PROCESS_QUERY_LIMITED_INFORMATION      | Y       |
-| PROCESS_QUERY_INFORMATION   | Y        |
-| PROCESS_CREATE_THREAD | Y |
-| PROCESS_ALL_ACCESS | Y |
+以普通权限启动A\B:
+| Flag                              | Ret |
+| --------------------------------- | --- |
+| PROCESS_QUERY_LIMITED_INFORMATION | Y   |
+| PROCESS_QUERY_INFORMATION         | Y   |
+| PROCESS_CREATE_THREAD             | Y   |
+| PROCESS_ALL_ACCESS                | Y   |
 
 管理员启动A, 普通权限启动B:
 
-| Flag      | Ret |
-| ----------- | ----------- |
-| PROCESS_QUERY_LIMITED_INFORMATION      | Y       |
-| PROCESS_QUERY_INFORMATION   | N       |
-| PROCESS_CREATE_THREAD | N |
-| PROCESS_ALL_ACCESS | N |
+| Flag                              | Ret |
+| --------------------------------- | --- |
+| PROCESS_QUERY_LIMITED_INFORMATION | Y   |
+| PROCESS_QUERY_INFORMATION         | N   |
+| PROCESS_CREATE_THREAD             | N   |
+| PROCESS_ALL_ACCESS                | N   |
 
 管理员启动A, 普通权限启动B后提权:
 ```c++
 
 ```
 
-| Flag      | Ret |
-| ----------- | ----------- |
-| PROCESS_QUERY_LIMITED_INFORMATION      | Y       |
-| PROCESS_QUERY_INFORMATION   | N       |
-| PROCESS_CREATE_THREAD | N |
-| PROCESS_ALL_ACCESS | N |
+| Flag                              | Ret |
+| --------------------------------- | --- |
+| PROCESS_QUERY_LIMITED_INFORMATION | Y   |
+| PROCESS_QUERY_INFORMATION         | N   |
+| PROCESS_CREATE_THREAD             | N   |
+| PROCESS_ALL_ACCESS                | N   |
 
 ## 访问控制模型
 
@@ -101,6 +101,15 @@ Windows访问控制流程:
 
  ### 访问令牌（Access Token）
 
+ | 内容       | 说明                                 |
+ | ---------- | ------------------------------------ |
+ | 用户身份   | 你是谁（SID）                        |
+ | 所属的组   | 你是哪个部门（组SID）                |
+ | 权限清单   | 你可以干什么（关机/调试等）          |
+ | 完整性级别 | 你是实习生/正式员工/经理（低/中/高） |
+ | 默认DACL   | 给你新建的资源的默认权限设置         |
+
+
  与特定的windows账户关联，账户环境下启动的所有进程都会获得该令牌的副本，进程中的线程默认获得这个令牌，用于描述"安全上下文"。
  令牌中的信息包括与进程或线程关联的用户帐户的标识和特权信息。
 
@@ -128,17 +137,28 @@ Windows访问控制流程:
 * 依据该token创建进程、线程(如果CreaetProcess时自己指定了 Token, LSA会用该Token， 否则就继承父进程Token进行运行)
 
 Access Token分两种：
-* 主令牌（Primary token） 
+* 主令牌（Primary token）
 * 模拟令牌（Impersonation token）， 在默认的情况下，当线程被开启的时候，所在进程的主令牌会自动附加到当前线程上，作为线程的安全上下文。而线程可以运行在另一个非主令牌的访问令牌下执行，而这个令牌被称为模拟令牌。而指定线程的模拟令牌的过程被称为模拟）
 
 主令牌是由windows内核创建并分配给进程的默认访问令牌，每一个进程有一个主令牌，它描述了与当前进程相关的用户帐户的安全上下文。同时，一个线程可以模拟一个客户端帐户，允许此线程与安全对象交互时用客户端的安全上下文。一个正模拟客户端的线程拥有一个主令牌和一个模拟令牌。
 
 ### 安全描述符(Security Descriptors,SD)
 
+如果访问令牌是「你是谁」的身份证明，那安全描述符就是**“门禁系统”**：
+* 它决定谁可以打开门，谁不能。
+* 每个对象（比如文件、进程、注册表项）都可以有一个安全描述符。
 
 安全描述符是与被访问对象关联的，它含有这个对象所有者的SID，以及一个访问控制列表（ACL，Access Control List），访问控制列表又包括了DACL（Discretionary Access Control List）和SACL（System Access Control List）以及一组控制位，用于限定安全描述符含义。
 
 安全描述符可以包括以下安全信息：
+
+| 组成部分                  | 含义                                       |
+| ------------------------- | ------------------------------------------ |
+| Owner SID                 | 谁是这个对象的所有者（拥有者）             |
+| Group SID                 | （很少用）所属组                           |
+| DACL（Discretionary ACL） | **允许/拒绝谁干什么** 的访问控制列表       |
+| SACL（System ACL）        | 用于**审计**，谁访问了你（通常与日志有关） |
+
 
 * 对象的所有者和所属组的安全标识符（SID）
 * DACL：它里面包含零个（可以为0，之后会有详细介绍）或多个访问控制项（ACE，Access Control Entry），每个访问控制项的内容描述了允许或拒绝特定账户对这个对象执行特定操作。
@@ -153,8 +173,65 @@ ACL包含两个东西:
 * SACL
 
 DACL：自主访问控制列表(DACL)是安全描述符中最重要的，它里面包含零个或多个访问控制项（ACE，Access Control Entry），每个访问控制项的内容描述了允许或拒绝特定账户对这个对象执行特定操作。
+| ACE类型 | SID（谁） | 权限     |
+| ------- | --------- | -------- |
+| 允许    | 张三      | 读、写   |
+| 拒绝    | 李四      | 所有操作 |
+
+📌 注意：DACL 是“白名单”机制
+* 如果 DACL 为空（即没有ACE），表示谁也不能访问。
+* 如果 DACL 为 NULL，表示所有人都能访问！（不安全）
+
+### 📋 DACL 的匹配过程
+系统会从 DACL 中依次遍历 ACE：
+* 先看是否有“拒绝”ACE；
+* 然后再看“允许”ACE；
+* 找到匹配就停止判断。
+* 一旦有拒绝，就直接终止访问。
 
 SACL：系统访问控制列表（SACL） 主要是用于系统审计的，它的内容指定了当特定账户对这个对象执行特定操作时，记录到系统日志中。
+
+## UAC
+
+🧠 初衷
+
+为了解决Windows XP 时代"管理员默认运行一切"的安全问题，微软在Vista开始引入UAC（User Account Control）。
+即使你是“管理员”，启动程序时也默认 以标准用户身份运行，需要你手动 同意提升权限。
+
+### 👑 Admin SID 不等于高权限
+
+当你是管理员账户时：
+* 系统会生成一个完整的 Token（含管理员 SID）
+* 但普通启动进程时，会创建一个被过滤过的 Token（称为 filtered token）
+
+🧱 filtered token 特点：
+* 管理员 SID 被移除或标记为“禁用”
+* 拥有的权限（Privileges）大幅减少
+* 所以你虽然是 Admin，但你运行的程序一开始其实不是
+
+当程序需要权限提升时，调用：
+```cpp
+ShellExecute(NULL, "runas", "app.exe", NULL, NULL, SW_SHOW);
+```
+
+* Windows 触发 UAC 提示框（Consent UI）
+* 如果用户点“是”，系统会：
+* 1. 使用完整 Token（Admin SID 启用）
+* 2. 启动一个新进程
+* 3. 原进程不会被提升，无法共享 Token
+
+📌 注意：
+* 提升过程是新建进程，而不是原进程变强。
+* 提升失败不会修改原进程权限。
+
+🔒 UAC 等级分四种：
+| 等级             | 含义                           |
+| ---------------- | ------------------------------ |
+| Always notify    | 改动系统前必须提示             |
+| Default          | 提升程序才提示                 |
+| Only notify apps | 改设置不提示，非交互程序不提示 |
+| Never notify     | **不建议**，UAC基本形同虚设    |
+
 
 ### 参考链接
 

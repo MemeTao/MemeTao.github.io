@@ -23,7 +23,7 @@ description:
 * ~1, 表示一号线程
 * ~2 s, 选择2号线程作为当前线程
 * ~* k, 打印所有线程的调用栈
-
+* .frame 1, 切换到第一个栈帧
 
 ## 断点
 
@@ -121,20 +121,20 @@ More info:              !heap -p -a 0x267e03d0fd8
 3、通过!htrace -diff 找出有问题的栈。
 
 ## 参考文档
-    https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/using-umdh-to-find-a-user-mode-memory-leak
-    https://learn.microsoft.com/en-us/windows-hardware/drivers/debuggercmds/-heap
-    https://www.codeproject.com/Articles/6489/Debug-Tutorial-Part-3-The-Heap
-    https://bsodtutorials.wordpress.com/2014/01/06/debugging-heaps-and-heap-internals-part-2/
-    https://icepng.github.io/2017/02/25/HeapAlloc/
-    https://blog.csdn.net/hgy413/article/details/7620599
+* https://learn.microsoft.com/en-us/windows-hardware/drivers/debugger/using-umdh-to-find-a-user-mode-memory-leak
+* https://learn.microsoft.com/en-us/windows-hardware/drivers/debuggercmds/-heap
+* https://www.codeproject.com/Articles/6489/Debug-Tutorial-Part-3-The-Heap
+* https://bsodtutorials.wordpress.com/2014/01/06/debugging-heaps-and-heap-internals-part-2/
+* https://icepng.github.io/2017/02/25/HeapAlloc/
+* https://blog.csdn.net/hgy413/article/details/7620599
 
 
-    https://illmatics.com/Understanding_the_LFH_Slides.pdf
-    https://www.i.u-tokyo.ac.jp/edu/training/ss/lecture/new-documents/Lectures/16-UserModeHeap/UserModeHeapManager.pdf
-    https://www.rapid7.com/blog/post/2019/06/12/heap-overflow-exploitation-on-windows-10-explained/
-    https://illmatics.com/Understanding_the_LFH.pdf
-    https://www.blackhat.com/docs/us-16/materials/us-16-Yason-Windows-10-Segment-Heap-Internals.pdf
-    https://cs.wellesley.edu/~cs240/f16/slides/allocator.pdf
-    https://stackoverflow.com/questions/50711102/how-is-the-header-of-a-block-formatted-in-heap
+* https://illmatics.com/Understanding_the_LFH_Slides.pdf
+* https://www.i.u-tokyo.ac.jp/edu/training/ss/lecture/new-documents/Lectures/16-UserModeHeap/UserModeHeapManager.pdf
+* https://www.rapid7.com/blog/post/2019/06/12/heap-overflow-exploitation-on-windows-10-explained/
+* https://illmatics.com/Understanding_the_LFH.pdf
+* https://www.blackhat.com/docs/us-16/materials/us-16-Yason-Windows-10-Segment-Heap-Internals.pdf
+* https://cs.wellesley.edu/~cs240/f16/slides/allocator.pdf
+* https://stackoverflow.com/questions/50711102/how-is-the-header-of-a-block-formatted-in-heap
 
 
