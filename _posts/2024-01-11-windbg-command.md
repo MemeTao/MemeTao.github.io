@@ -70,7 +70,7 @@ kd> dp nt!mmhighestuseraddress L1
 ```
 这表明用户态的地址空间上限是0x7FFEFFFF(32位系统)
 
-## 内存泄露
+## 内存相关
 
 查看内存使用情况:
 * !address -summary
@@ -127,8 +127,6 @@ More info:              !heap -p -a 0x267e03d0fd8
 * https://bsodtutorials.wordpress.com/2014/01/06/debugging-heaps-and-heap-internals-part-2/
 * https://icepng.github.io/2017/02/25/HeapAlloc/
 * https://blog.csdn.net/hgy413/article/details/7620599
-
-
 * https://illmatics.com/Understanding_the_LFH_Slides.pdf
 * https://www.i.u-tokyo.ac.jp/edu/training/ss/lecture/new-documents/Lectures/16-UserModeHeap/UserModeHeapManager.pdf
 * https://www.rapid7.com/blog/post/2019/06/12/heap-overflow-exploitation-on-windows-10-explained/
